@@ -115,76 +115,58 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             format: 'a4'
         });
 
+        // Add custom fonts if necessary for better character support, though default is often sufficient.
+        doc.setFont('Helvetica', 'normal');
+
         const margin = 15;
         const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addFormattedText = (text: string, doc: jsPDF) => {
+        const addFormattedText = (text: string) => {
             const lines = text.split('\n');
 
             lines.forEach(line => {
-                if (currentY > pageHeight - margin) {
+                let currentX = margin;
+                 if (currentY > pageHeight - margin) {
                     doc.addPage();
                     currentY = margin;
                 }
 
-                let indent = margin;
-                let textToRender = line;
-                
-                // Basic Markdown parsing
+                // Basic Markdown Parsing
                 if (line.startsWith('# ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(18);
-                    textToRender = line.substring(2);
+                    const textLines = doc.splitTextToSize(line.substring(2), usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 7) + 2;
                 } else if (line.startsWith('## ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(16);
-                    textToRender = line.substring(3);
+                    const textLines = doc.splitTextToSize(line.substring(3), usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 6) + 2;
                 } else if (line.startsWith('### ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(14);
-                    textToRender = line.substring(4);
+                     const textLines = doc.splitTextToSize(line.substring(4), usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 5) + 2;
                 } else if (line.startsWith('* ') || line.startsWith('- ')) {
-                    textToRender = `• ${line.substring(2)}`;
-                    indent += 5; // Indent bullet points
                     doc.setFont('Helvetica', 'normal');
                     doc.setFontSize(11);
+                    const bulletPoint = `• ${line.substring(2)}`;
+                    const textLines = doc.splitTextToSize(bulletPoint, usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 5);
                 } else {
                     doc.setFont('Helvetica', 'normal');
                     doc.setFontSize(11);
+                    const textLines = doc.splitTextToSize(line, usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 5);
                 }
-
-                // Handle bold text within lines
-                const boldRegex = /\*\*(.*?)\*\*/g;
-                let parts = textToRender.split(boldRegex);
-
-                let currentX = indent;
-                parts.forEach((part, index) => {
-                    doc.setFont('Helvetica', index % 2 !== 0 ? 'bold' : 'normal');
-                    const partWidth = doc.getTextWidth(part);
-                    
-                    // Manual text splitting for lines
-                    const textLines = doc.splitTextToSize(part, usableWidth - (currentX - margin));
-
-                    textLines.forEach((splitLine: string, lineIndex: number) => {
-                        if (currentY > pageHeight - margin) {
-                            doc.addPage();
-                            currentY = margin;
-                            currentX = indent; // Reset X on new page
-                        }
-
-                        if(lineIndex > 0) { // New line from split
-                            currentX = indent;
-                            currentY += 6;
-                        }
-                        
-                        doc.text(splitLine, currentX, currentY);
-                        currentX += doc.getTextWidth(splitLine);
-                    });
-                });
-                
-                currentY += line.trim() === '' ? 4 : 8; // Add space after line
+                currentY += 4; // Extra space between paragraphs/lines
             });
         };
 
@@ -193,34 +175,34 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         // Title
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(22);
-        doc.setTextColor("#79B4B7");
+        doc.setTextColor(40, 40, 40); // Dark grey color
         doc.text(`Study Buddy AI - ${title}`, margin, currentY);
         currentY += 15;
 
         // Question
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.setTextColor(30, 30, 30);
-        doc.text("Question:", margin, currentY);
+        doc.setTextColor(60, 60, 60);
+        doc.text("Your Question:", margin, currentY);
         currentY += 8;
 
-        const questionToDisplay = question.trim() || (file ? `Content of ${file.name}` : '');
+        const questionToDisplay = question.trim() || (file ? `Content of ${file.name}` : 'No question text provided.');
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(11);
+        doc.setTextColor(80, 80, 80);
         const questionLines = doc.splitTextToSize(questionToDisplay, usableWidth);
-        questionLines.forEach((line: string) => {
-            doc.text(line, margin, currentY);
-            currentY += 6;
-        });
-        currentY += 10;
+        doc.text(questionLines, margin, currentY);
+        currentY += (questionLines.length * 5) + 10;
 
         // Answer
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.text("Answer:", margin, currentY);
+        doc.setTextColor(60, 60, 60);
+        doc.text("AI Answer:", margin, currentY);
         currentY += 8;
         
-        addFormattedText(answer, doc);
+        doc.setTextColor(0, 0, 0);
+        addFormattedText(answer);
 
         doc.save(`study-buddy-${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
     };

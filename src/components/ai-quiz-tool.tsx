@@ -114,28 +114,35 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         }
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+        doc.setFont('Helvetica', 'normal');
+
         const margin = 15;
         const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addWrappedText = (text: string, x: number, y: number, options: any) => {
-            const lines = doc.splitTextToSize(text, options.maxWidth || usableWidth);
-            if (y + lines.length * 6 > pageHeight - margin) {
+        const addWrappedText = (text: string, x: number, y: number, options?: { maxWidth?: number, fontStyle?: string, fontSize?: number }) => {
+            const { fontStyle = 'normal', fontSize = 11 } = options || {};
+            doc.setFont('Helvetica', fontStyle);
+            doc.setFontSize(fontSize);
+            
+            const lines = doc.splitTextToSize(text, options?.maxWidth || usableWidth);
+
+            if (y + (lines.length * (fontSize / 2)) > pageHeight - margin) {
                 doc.addPage();
                 currentY = margin;
                 y = margin;
             }
             doc.text(lines, x, y);
-            return y + lines.length * 6;
+            return y + (lines.length * (fontSize / 2.5)); // Adjust line height based on font size
         };
 
 
         // Set Title
         doc.setFont("Helvetica", "bold");
         doc.setFontSize(18);
-        doc.setTextColor("#79B4B7");
-        currentY = addWrappedText(quiz.title, margin, currentY, { maxWidth: usableWidth });
+        doc.setTextColor(40, 40, 40);
+        currentY = addWrappedText(quiz.title, margin, currentY, { fontSize: 18, fontStyle: 'bold' });
         currentY += 10;
 
 
@@ -144,16 +151,15 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                 doc.addPage();
                 currentY = margin;
             }
+            doc.setTextColor(0, 0, 0);
 
             // Question
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(12);
-            doc.setTextColor("#222222");
             const questionText = `${index + 1}. ${q.question}`;
-            currentY = addWrappedText(questionText, margin, currentY, { maxWidth: usableWidth });
-            currentY += 4;
+            currentY = addWrappedText(questionText, margin, currentY, { fontSize: 12, fontStyle: 'bold' });
+            currentY += 5;
 
             // Options
+            doc.setTextColor(80, 80, 80);
             q.options.forEach(opt => {
                  if (currentY > pageHeight - margin - 10) {
                     doc.addPage();
@@ -163,21 +169,17 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                 const optionText = `- ${opt}`;
                 
                 doc.setFont("Helvetica", isCorrect ? 'bold' : 'normal');
-                doc.setFontSize(10);
-                doc.setTextColor(isCorrect ? "#2E8B57" : "#666666");
+                if (isCorrect) doc.setTextColor(0, 100, 0); // Green for correct answer
 
                 currentY = addWrappedText(optionText, margin + 5, currentY, { maxWidth: usableWidth - 5 });
+
+                if (isCorrect) doc.setTextColor(80, 80, 80); // Reset color
             });
             
-            // Answer
-             if (currentY > pageHeight - margin - 10) {
-                doc.addPage();
-                currentY = margin;
-            }
+            // Answer Reveal
             doc.setFont("Helvetica", 'bold');
-            doc.setFontSize(10);
-            doc.setTextColor("#2E8B57");
-            currentY = addWrappedText(`Correct Answer: ${q.answer}`, margin, currentY, { maxWidth: usableWidth });
+            doc.setTextColor(0, 100, 0);
+            currentY = addWrappedText(`Correct Answer: ${q.answer}`, margin, currentY, {fontStyle: 'bold'});
             currentY += 10; // Extra space between questions
         });
 
@@ -256,7 +258,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                                         <AccordionContent>
                                            <div className="flex flex-col gap-2 pl-4">
                                                 {q.options.map((option, i) => (
-                                                     <p key={i} className={`p-2 rounded-md ${option === q.answer ? 'bg-green-100 text-green-800' : 'bg-muted'}`}>
+                                                     <p key={i} className={`p-2 rounded-md ${option === q.answer ? 'bg-green-100/20 text-green-500' : 'bg-muted'}`}>
                                                         {option}
                                                      </p>
                                                 ))}

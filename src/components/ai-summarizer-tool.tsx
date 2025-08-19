@@ -113,73 +113,56 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         }
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+        doc.setFont('Helvetica', 'normal');
+
         const margin = 15;
         const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addFormattedText = (text: string, doc: jsPDF) => {
+        const addFormattedText = (text: string) => {
             const lines = text.split('\n');
 
             lines.forEach(line => {
+                let currentX = margin;
                 if (currentY > pageHeight - margin) {
                     doc.addPage();
                     currentY = margin;
                 }
 
-                let indent = margin;
-                let textToRender = line;
-                
-                // Basic Markdown parsing
                 if (line.startsWith('# ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(18);
-                    textToRender = line.substring(2);
+                    const textLines = doc.splitTextToSize(line.substring(2), usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 7) + 2;
                 } else if (line.startsWith('## ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(16);
-                    textToRender = line.substring(3);
+                    const textLines = doc.splitTextToSize(line.substring(3), usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 6) + 2;
                 } else if (line.startsWith('### ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(14);
-                    textToRender = line.substring(4);
+                    const textLines = doc.splitTextToSize(line.substring(4), usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += (textLines.length * 5) + 2;
                 } else if (line.startsWith('* ') || line.startsWith('- ')) {
-                    textToRender = `• ${line.substring(2)}`;
-                    indent += 5; // Indent bullet points
                     doc.setFont('Helvetica', 'normal');
                     doc.setFontSize(11);
+                    const bulletPoint = `• ${line.substring(2)}`;
+                    const textLines = doc.splitTextToSize(bulletPoint, usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += textLines.length * 5;
                 } else {
                     doc.setFont('Helvetica', 'normal');
                     doc.setFontSize(11);
+                    const textLines = doc.splitTextToSize(line, usableWidth);
+                    doc.text(textLines, currentX, currentY);
+                    currentY += textLines.length * 5;
                 }
-
-                // Handle bold text within lines
-                const boldRegex = /\*\*(.*?)\*\*/g;
-                let parts = textToRender.split(boldRegex);
-
-                let currentX = indent;
-                parts.forEach((part, index) => {
-                    doc.setFont('Helvetica', index % 2 !== 0 ? 'bold' : 'normal');
-                    
-                    const textLines = doc.splitTextToSize(part, usableWidth - (currentX - margin));
-
-                    textLines.forEach((splitLine: string, lineIndex: number) => {
-                        if (currentY > pageHeight - margin) {
-                            doc.addPage();
-                            currentY = margin;
-                            currentX = indent;
-                        }
-                         if(lineIndex > 0) {
-                            currentX = indent;
-                            currentY += 6;
-                        }
-                        
-                        doc.text(splitLine, currentX, currentY);
-                        currentX += doc.getTextWidth(splitLine);
-                    });
-                });
-                
-                currentY += line.trim() === '' ? 4 : 8;
+                currentY += 4;
             });
         };
 
@@ -187,13 +170,13 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(22);
-        doc.setTextColor("#79B4B7");
+        doc.setTextColor(40, 40, 40);
         const titleLines = doc.splitTextToSize(summary.title, usableWidth);
         doc.text(titleLines, margin, currentY);
         currentY += titleLines.length * 10 + 5;
         
-        doc.setTextColor(30, 30, 30);
-        addFormattedText(summary.summary, doc);
+        doc.setTextColor(0, 0, 0);
+        addFormattedText(summary.summary);
         
         doc.save(`${summary.title.replace(/\s+/g, '_').toLowerCase()}_summary.pdf`);
     };
