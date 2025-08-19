@@ -119,33 +119,39 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         });
 
         const margin = 15;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const usableWidth = pageWidth - (margin * 2);
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
+        let currentY = 20;
 
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(18);
-        doc.setTextColor(45, 100, 245); // Primary color
-        doc.text(`Study Buddy AI - ${title}`, margin, 20);
-        
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.setTextColor(10, 20, 40); // Darker text
-        doc.text("Question:", margin, 35);
-        
-        doc.setFont('Helvetica', 'normal');
-        // Use the question that was actually sent to the AI
-        const questionToDisplay = question.trim() || (file ? `Summarize the content of the attached file: ${file.name}` : '');
-        const questionLines = doc.splitTextToSize(questionToDisplay, usableWidth);
-        doc.text(questionLines, margin, 42);
-        
-        const lastQuestionY = 42 + (questionLines.length * 5); // Approximate height
+        const addText = (text: string, isBold = false, isTitle = false) => {
+            doc.setFont('Helvetica', isBold || isTitle ? 'bold' : 'normal');
+            doc.setFontSize(isTitle ? 18 : (isBold ? 12 : 11));
+            
+            const lines = doc.splitTextToSize(text, usableWidth);
+            
+            lines.forEach((line: string) => {
+                 if (currentY > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
+                 }
+                 doc.text(line, margin, currentY);
+                 currentY += isTitle ? 8 : 6;
+            });
+             currentY += 4; // Add a bit of space after a block of text
+        }
 
-        doc.setFont('Helvetica', 'bold');
-        doc.text("Answer:", margin, lastQuestionY + 10);
+        doc.setTextColor(45, 100, 245); // Primary color for the main title
+        addText(`Study Buddy AI - ${title}`, true, true);
         
-        doc.setFont('Helvetica', 'normal');
-        const answerLines = doc.splitTextToSize(answer, usableWidth);
-        doc.text(answerLines, margin, lastQuestionY + 17);
+        doc.setTextColor(10, 20, 40); // Darker text for content
+        addText("Question:", true);
+
+        const questionToDisplay = question.trim() || (file ? `Content of ${file.name}` : '');
+        addText(questionToDisplay);
+
+        addText("Answer:", true);
+        
+        addText(answer);
 
         doc.save(`study-buddy-${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
     };
@@ -218,7 +224,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                         </Button>
                     </div>
 
-                    <div className="mt-4 p-4 border border-dashed border-primary/40 rounded-lg min-h-[150px] bg-background/50 relative">
+                    <div className="mt-4 p-4 border border-dashed border-primary/40 rounded-lg min-h-[150px] bg-background/50 relative overflow-y-auto">
                         {loading ? (
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Loader2 className="animate-spin h-5 w-5" />

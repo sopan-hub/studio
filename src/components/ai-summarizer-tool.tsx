@@ -10,6 +10,7 @@ import { generateSummary, SummaryInput, SummaryOutput } from '@/ai/flows/summari
 import { jsPDF } from 'jspdf';
 import "jspdf/dist/polyfills.es.js";
 import { Textarea } from './ui/textarea';
+import { chat } from '@/ai/flows/chat-flow';
 
 interface AiSummarizerToolProps {
     onBack: () => void;
@@ -29,24 +30,28 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         }
     }, [file]);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
         if (selectedFile) {
+             setLoading(true);
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const dataUri = e.target?.result as string;
-                if (selectedFile.type.startsWith('text/')) {
-                    const textContentReader = new FileReader();
-                    textContentReader.onload = (e) => {
-                         setFile({ name: selectedFile.name, dataUri, content: e.target?.result as string });
-                    }
-                    textContentReader.readAsText(selectedFile);
-                } else {
-                     toast({
-                        variant: 'destructive',
-                        title: 'File Type Not Supported',
-                        description: 'For now, please upload a text-based file (e.g., .txt, .md).',
+                try {
+                     const extractedText = await chat({
+                        question: "Extract all the text content from the provided file. Only return the text, with no additional commentary.",
+                        fileDataUri: dataUri,
                     });
+                     setFile({ name: selectedFile.name, dataUri, content: extractedText });
+                } catch(error) {
+                    console.error("File processing error", error);
+                    toast({
+                        variant: 'destructive',
+                        title: 'File Processing Error',
+                        description: 'Could not read the content from the uploaded file. Please try a different file.',
+                    });
+                } finally {
+                    setLoading(false);
                 }
             };
             reader.readAsDataURL(selectedFile);
@@ -109,19 +114,32 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         const margin = 15;
+        const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(18);
+        const addText = (text: string, isBold = false, isTitle = false) => {
+            doc.setFont('Helvetica', isBold || isTitle ? 'bold' : 'normal');
+            doc.setFontSize(isTitle ? 18 : 12);
+            
+            const lines = doc.splitTextToSize(text, usableWidth);
+            
+            lines.forEach((line: string) => {
+                 if (currentY > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
+                 }
+                 doc.text(line, margin, currentY);
+                 currentY += 7;
+            });
+             currentY += 5; // Add a bit of space after a block of text
+        }
+        
         doc.setTextColor(45, 100, 245);
-        doc.text(summary.title, margin, currentY);
-        currentY += 15;
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(12);
-        const summaryLines = doc.splitTextToSize(summary.summary, usableWidth);
-        doc.text(summaryLines, margin, currentY);
+        addText(summary.title, true, true);
+        
+        doc.setTextColor(10, 20, 40);
+        addText(summary.summary);
         
         doc.save(`${summary.title.replace(/\s+/g, '_').toLowerCase()}_summary.pdf`);
     };
@@ -175,7 +193,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                                 ref={fileInputRef}
                                 onChange={handleFileChange}
                                 className="hidden"
-                                accept="text/*"
+                                accept=".txt,.pdf,.md,.docx,.csv"
                                 disabled={loading}
                             />
                             <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">

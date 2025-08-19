@@ -116,21 +116,26 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         const margin = 15;
+        const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
+        // Set Title
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
-        doc.setTextColor(45, 100, 245);
-        doc.text(quiz.title, margin, currentY);
-        currentY += 15;
+        doc.setTextColor(45, 100, 245); // Primary color
+        const titleLines = doc.splitTextToSize(quiz.title, usableWidth);
+        doc.text(titleLines, margin, currentY);
+        currentY += (titleLines.length * 8) + 10;
+
 
         quiz.questions.forEach((q, index) => {
-            if (currentY > 260) { // New page if content overflows
+            if (currentY > pageHeight - margin - 30) { // check for space before adding content
                 doc.addPage();
-                currentY = 20;
+                currentY = margin;
             }
 
+            // Question
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(12);
             doc.setTextColor(10, 20, 40); // Darker text
@@ -138,21 +143,36 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
             doc.text(questionLines, margin, currentY);
             currentY += questionLines.length * 5 + 5;
 
+            // Options
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(10);
             q.options.forEach(opt => {
-                 if (currentY > 270) {
+                 if (currentY > pageHeight - margin) {
                     doc.addPage();
-                    currentY = 20;
+                    currentY = margin;
                 }
-                doc.text(`- ${opt}`, margin + 5, currentY);
-                currentY += 5;
+                const optionText = `- ${opt}`;
+                const optionLines = doc.splitTextToSize(optionText, usableWidth - 5);
+                if(opt === q.answer) {
+                    doc.setTextColor(34, 139, 34); // Green for correct answer
+                } else {
+                    doc.setTextColor(100, 100, 100); // Gray for other options
+                }
+                doc.text(optionLines, margin + 5, currentY);
+                currentY += optionLines.length * 5;
             });
             
+            // Answer
             doc.setFont('Helvetica', 'bold');
             doc.setTextColor(34, 139, 34); // Green for the answer
-            doc.text(`Answer: ${q.answer}`, margin + 5, currentY);
-            currentY += 10;
+            const answerText = `Answer: ${q.answer}`;
+            const answerLines = doc.splitTextToSize(answerText, usableWidth - 5);
+             if (currentY > pageHeight - margin) {
+                doc.addPage();
+                currentY = margin;
+            }
+            doc.text(answerLines, margin + 5, currentY);
+            currentY += answerLines.length * 5 + 10; // Extra space between questions
         });
 
         doc.save(`${quiz.title.replace(/\s+/g, '_').toLowerCase()}_quiz.pdf`);
@@ -205,7 +225,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             className="hidden"
-                            accept=".txt,.pdf,.md,.docx"
+                            accept=".txt,.pdf,.md,.docx,.csv"
                             disabled={loading}
                         />
                         <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
@@ -250,5 +270,3 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         </Card>
     );
 };
-
-    
