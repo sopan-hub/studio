@@ -12,7 +12,6 @@ import { LoginDialog } from '@/components/login-dialog';
 import { InteractiveAiLogo } from '@/components/interactive-ai-logo';
 import { AiChatTool } from '@/components/ai-chat-tool';
 import { AiQuizTool } from '@/components/ai-quiz-tool';
-import { AiToolPlaceholder } from '@/components/ai-tool-placeholder';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
@@ -99,6 +98,7 @@ export default function Home() {
     switch (activeFeature) {
         case 'chat':
             return <AiChatTool 
+                        title="Ask Any Question (AI Chat)"
                         onBack={() => setActiveFeature(null)} 
                         initialQuestion={globalSearchQuery}
                         onSearchPerformed={() => setGlobalSearchQuery("")}
@@ -107,18 +107,16 @@ export default function Home() {
             return <AiSummarizerTool onBack={() => setActiveFeature(null)} />;
         case 'quiz':
             return <AiQuizTool onBack={() => setActiveFeature(null)} />;
-        case 'planner':
-            return <AiToolPlaceholder title="Study Planner & Reminders" onBack={() => setActiveFeature(null)} inputType="text" />;
         case 'explainer':
-            return <AiToolPlaceholder title="Concept Explainer" onBack={() => setActiveFeature(null)} inputType="text" />;
+            return <AiChatTool title="Concept Explainer" onBack={() => setActiveFeature(null)} />;
         case 'flashcards':
-            return <AiToolPlaceholder title="AI Flashcard Maker" onBack={() => setActiveFeature(null)} inputType="text-file" />;
+            return <AiChatTool title="AI Flashcard Maker" onBack={() => setActiveFeature(null)} initialQuestion="Generate flashcards based on the following text: " />;
         case 'math':
-            return <AiToolPlaceholder title="Math Problem Solver" onBack={() => setActiveFeature(null)} inputType="text" />;
+            return <AiChatTool title="Math Problem Solver" onBack={() => setActiveFeature(null)} initialQuestion="Solve the following math problem: " />;
         case 'code':
-            return <AiToolPlaceholder title="Code Explainer" onBack={() => setActiveFeature(null)} inputType="text" />;
+            return <AiChatTool title="Code Explainer" onBack={() => setActiveFeature(null)} initialQuestion="Explain this code: " />;
         case 'translator':
-            return <AiToolPlaceholder title="Document Translator" onBack={() => setActiveFeature(null)} inputType="file" />;
+            return <AiChatTool title="Document Translator" onBack={() => setActiveFeature(null)} initialQuestion="Translate the following document to " />;
         default:
             return null;
     }
@@ -162,7 +160,7 @@ export default function Home() {
               <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
                 <span className="text-primary neon-glow">Your Personal</span>
                 <br/>
-                <span className="text-destructive neon-glow">AI Study Buddy</span>
+                <span className="text-primary neon-glow">AI Study Buddy</span>
               </h1>
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
@@ -263,3 +261,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

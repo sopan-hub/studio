@@ -13,17 +13,21 @@ import "jspdf/dist/polyfills.es.js"; // Required for jsPDF in some environments
 
 interface AiChatToolProps {
     onBack: () => void;
+    title: string;
     initialQuestion?: string;
     onSearchPerformed?: () => void;
 }
 
-export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: AiChatToolProps) => {
+export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerformed }: AiChatToolProps) => {
     const [question, setQuestion] = useState(initialQuestion);
     const [answer, setAnswer] = useState("");
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState<{ name: string, dataUri: string } | null>(null);
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    const combinedQuestion = file ? `${question}\n\nFile Content:\n[Content of ${file.name}]` : question;
+
 
     const handleGenerate = async () => {
         if (!question.trim()) {
@@ -59,13 +63,16 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
     useEffect(() => {
         if (initialQuestion && !loading) { // also check loading status
             setQuestion(initialQuestion);
-            handleGenerate().then(() => {
-                 if (onSearchPerformed) {
-                    onSearchPerformed();
-                }
-            });
+            // Don't auto-generate if it's not the main chat tool
+            if (title === "Ask Any Question (AI Chat)") {
+                 handleGenerate().then(() => {
+                    if (onSearchPerformed) {
+                        onSearchPerformed();
+                    }
+                });
+            }
         }
-    }, [initialQuestion]);
+    }, [initialQuestion, title]);
 
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +121,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
         doc.setTextColor(45, 100, 245); // Primary color
-        doc.text("Study Buddy AI - Your Answer", margin, 20);
+        doc.text(`Study Buddy AI - ${title}`, margin, 20);
         
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(12);
@@ -134,7 +141,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
         const answerLines = doc.splitTextToSize(answer, usableWidth);
         doc.text(answerLines, margin, lastQuestionY + 17);
 
-        doc.save("study-buddy-answer.pdf");
+        doc.save(`study-buddy-${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
     };
 
 
@@ -146,7 +153,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
                         <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
                             <ArrowLeft />
                         </Button>
-                        <CardTitle className="text-2xl font-bold text-primary neon-glow">Ask Any Question (AI Chat)</CardTitle>
+                        <CardTitle className="text-2xl font-bold text-primary neon-glow">{title}</CardTitle>
                     </div>
                      <Button
                         variant="outline"
@@ -188,7 +195,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles /> Generate Answer
+                                    <Sparkles /> Generate
                                 </>
                             )}
                         </Button>
@@ -201,7 +208,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
                         />
                         <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
                             <Upload />
-                            Upload File
+                            {file ? "Change File" : "Upload File"}
                         </Button>
                     </div>
 
@@ -222,3 +229,5 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
         </Card>
     );
 };
+
+    
