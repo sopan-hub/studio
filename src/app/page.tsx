@@ -55,9 +55,6 @@ export default function Home() {
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Study Assistant</Link>
             <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
           </nav>
-          <Button onClick={handleGetStartedClick} className="bg-primary/90 text-primary-foreground font-bold neon-glow-button">
-            Get Started
-          </Button>
         </div>
       </header>
 
