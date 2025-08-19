@@ -198,7 +198,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                 <div className="flex flex-col gap-4">
                     <Textarea
                         placeholder="Paste your study material here, or upload a file below."
-                        className="min-h-[150px] bg-white"
+                        className="min-h-[150px]"
                         value={material}
                         onChange={(e) => setMaterial(e.target.value)}
                         disabled={loading}

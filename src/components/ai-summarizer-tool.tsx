@@ -173,7 +173,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                     <div className="flex flex-col gap-4">
                         <Textarea
                             placeholder="Paste your study material here, or upload a file below."
-                            className="min-h-[300px] flex-grow bg-white"
+                            className="min-h-[300px] flex-grow"
                             value={material}
                             onChange={(e) => setMaterial(e.target.value)}
                             disabled={loading}

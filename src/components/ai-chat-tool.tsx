@@ -188,7 +188,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                 <div className="flex flex-col gap-4">
                     <Textarea
                         placeholder="Ask your AI tutor anything... (Optionally, upload a file for context)"
-                        className="min-h-[150px] bg-white"
+                        className="min-h-[150px]"
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         disabled={loading}
