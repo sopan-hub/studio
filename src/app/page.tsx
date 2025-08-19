@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
   <div className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
@@ -28,10 +29,7 @@ export default function Home() {
        <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
         <div className="container mx-auto flex items-center justify-between p-4">
            <div className="flex items-center gap-2">
-            <BookOpenCheck className="h-8 w-8 text-primary neon-glow" />
-            <h1 className="text-xl font-headline font-bold text-primary neon-glow">
-              Study Buddy AI
-            </h1>
+            <Logo />
           </div>
           <nav className="hidden md:flex items-center gap-4">
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
