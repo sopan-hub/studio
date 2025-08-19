@@ -11,6 +11,7 @@ export const InteractiveGridFooter = () => {
   const [numRows, setNumRows] = useState(0);
   const gridRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
+  const activeTimeouts = useRef(new Map<Element, NodeJS.Timeout>());
 
   useEffect(() => {
     const calculateGridSize = () => {
@@ -32,6 +33,7 @@ export const InteractiveGridFooter = () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      activeTimeouts.current.forEach(timeoutId => clearTimeout(timeoutId));
     }
   }, []);
   
@@ -54,11 +56,16 @@ export const InteractiveGridFooter = () => {
           const index = r * numCols + c;
           if (r >= 0 && r < numRows && c >= 0 && c < numCols) {
             const tile = gridRef.current?.children[index] as HTMLDivElement;
-            if (tile && !tile.classList.contains('active')) {
+            if (tile) {
+              if (activeTimeouts.current.has(tile)) {
+                clearTimeout(activeTimeouts.current.get(tile)!);
+              }
               tile.classList.add('active');
-              setTimeout(() => {
+              const timeoutId = setTimeout(() => {
                 tile.classList.remove('active');
-              }, 1000); // Let it fade for 1 second
+                activeTimeouts.current.delete(tile);
+              }, 800); 
+              activeTimeouts.current.set(tile, timeoutId);
             }
           }
         };
