@@ -38,7 +38,7 @@ h1, h2, h3, h4, h5, h6 {
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 80% 50%;
+    --border: 217 91% 60%;
     --input: 217 33% 17%;
     --ring: 217 91% 60%;
 
@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 80% 50%;
+    --border: 217 91% 60%;
     --input: 217 33% 17%;
     --ring: 217 91% 60%;
   }
