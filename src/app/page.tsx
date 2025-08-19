@@ -15,8 +15,9 @@ import { AiQuizTool } from '@/components/ai-quiz-tool';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
+import { ParticleFooter } from '@/components/particle-footer';
 
-type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
+type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
     <div onClick={onClick} className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] cursor-pointer h-full">
@@ -242,8 +243,9 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="bg-background border-t border-primary/20 py-8">
-        <div className="container mx-auto text-center text-muted-foreground">
+      <footer className="bg-background border-t border-primary/20 py-8 relative overflow-hidden">
+        <ParticleFooter />
+        <div className="container mx-auto text-center text-muted-foreground relative z-10">
           <p className="text-primary neon-glow">&copy; 2024 Study Buddy AI. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
              <a href="mailto:patilsopan4148@gmail.com" className="hover:text-primary hover:neon-glow transition-all" aria-label="Email">
@@ -261,5 +263,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
