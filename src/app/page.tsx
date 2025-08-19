@@ -35,7 +35,7 @@ export default function Home() {
   const handleAuthAction = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     if (user) {
-      signOut();
+      router.push('/dashboard');
     } else {
       setIsLoginDialogOpen(true);
     }
@@ -43,9 +43,10 @@ export default function Home() {
   
   const handleGetStartedClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
+     if (user) {
+      router.push('/dashboard');
+    } else {
+      setIsLoginDialogOpen(true);
     }
   };
 
@@ -62,7 +63,7 @@ export default function Home() {
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
             <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
              <Button onClick={handleAuthAction} variant="ghost" className="hover:text-primary hover:neon-glow transition-all">
-                {user ? 'Log Out' : 'Log In'}
+                {user ? 'Dashboard' : 'Log In'}
             </Button>
           </nav>
         </div>

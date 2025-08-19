@@ -63,14 +63,9 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
         sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-          border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+          accent: 'hsl(var(--background))',
         },
       },
       borderRadius: {
@@ -78,7 +73,7 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
-      keyframes: {
+       keyframes: {
         'accordion-down': {
           from: {
             height: '0',
@@ -96,8 +91,7 @@ export default {
           },
         },
          'blast-in': {
-          '0%': { transform: 'scale(0.5)', opacity: '0' },
-          '80%': { transform: 'scale(1.05)', opacity: '1' },
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
       },
@@ -105,9 +99,39 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'blast-in': 'blast-in 0.4s ease-out forwards',
+        'blast-in': 'blast-in 0.3s ease-out forwards',
+      },
+      perspective: {
+        '1000': '1000px',
+      },
+      transformStyle: {
+        'preserve-3d': 'preserve-3d',
+      },
+      backfaceVisibility: {
+        'hidden': 'hidden',
+      },
+       rotate: {
+        'y-180': 'rotateY(180deg)',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+      require('tailwindcss-animate'),
+      function({ addUtilities }: { addUtilities: any }) {
+      addUtilities({
+        '.perspective-1000': {
+          perspective: '1000px',
+        },
+        '.transform-style-preserve-3d': {
+          transformStyle: 'preserve-3d',
+        },
+        '.backface-hidden': {
+          backfaceVisibility: 'hidden',
+        },
+        '.rotate-y-180': {
+          transform: 'rotateY(180deg)',
+        },
+      })
+    }
+  ],
 } satisfies Config;
