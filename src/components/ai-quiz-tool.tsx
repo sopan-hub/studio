@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { jsPDF } from 'jspdf';
 import "jspdf/dist/polyfills.es.js";
 import { Textarea } from './ui/textarea';
+import { chat } from '@/ai/flows/chat-flow'; // We need a way to extract text
 
 interface AiQuizToolProps {
     onBack: () => void;
@@ -30,24 +31,29 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         }
     }, [file]);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
         if (selectedFile) {
+            setLoading(true);
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const dataUri = e.target?.result as string;
-                if (selectedFile.type.startsWith('text/')) {
-                    const textContentReader = new FileReader();
-                    textContentReader.onload = (e) => {
-                         setFile({ name: selectedFile.name, dataUri, content: e.target?.result as string });
-                    }
-                    textContentReader.readAsText(selectedFile);
-                } else {
-                     toast({
-                        variant: 'destructive',
-                        title: 'File Type Not Supported',
-                        description: 'For now, please upload a text-based file (e.g., .txt, .md).',
+                try {
+                     // Use the chat flow to extract text from any file type
+                    const extractedText = await chat({
+                        question: "Extract all the text content from the provided file. Only return the text, with no additional commentary.",
+                        fileDataUri: dataUri,
                     });
+                     setFile({ name: selectedFile.name, dataUri, content: extractedText });
+                } catch(error) {
+                    console.error("File processing error", error);
+                    toast({
+                        variant: 'destructive',
+                        title: 'File Processing Error',
+                        description: 'Could not read the content from the uploaded file. Please try a different file.',
+                    });
+                } finally {
+                    setLoading(false);
                 }
             };
             reader.readAsDataURL(selectedFile);
@@ -127,7 +133,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
 
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(12);
-            doc.setTextColor(10, 20, 40);
+            doc.setTextColor(10, 20, 40); // Darker text
             const questionLines = doc.splitTextToSize(`${index + 1}. ${q.question}`, usableWidth);
             doc.text(questionLines, margin, currentY);
             currentY += questionLines.length * 5 + 5;
@@ -135,6 +141,10 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(10);
             q.options.forEach(opt => {
+                 if (currentY > 270) {
+                    doc.addPage();
+                    currentY = 20;
+                }
                 doc.text(`- ${opt}`, margin + 5, currentY);
                 currentY += 5;
             });
@@ -195,7 +205,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             className="hidden"
-                            accept="text/*,.pdf"
+                            accept=".txt,.pdf,.md,.docx"
                             disabled={loading}
                         />
                         <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
@@ -240,3 +250,5 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         </Card>
     );
 };
+
+    
