@@ -119,33 +119,38 @@ h1, h2, h3, h4, h5, h6 {
 .interactive-logo {
     width: 100%;
     height: 100%;
+    cursor: pointer;
 }
 
-.interactive-logo .base-circle {
-    fill: hsl(var(--primary) / 0.1);
+.interactive-logo .logo-geometry {
     stroke: hsl(var(--primary));
-    stroke-width: 1;
-    transition: all 0.5s ease-out;
-}
-
-.interactive-logo:hover .base-circle {
-    transform: scale(1.02);
-    filter: url(#glow);
-}
-
-.interactive-logo .brain-path {
+    stroke-width: 8;
     fill: none;
-    stroke: hsl(var(--primary));
-    stroke-width: 2;
+    transition: filter 0.3s ease-in-out;
+}
+
+.interactive-logo:hover .logo-geometry {
+    filter: url(#wobble);
+}
+
+.interactive-logo .circuit-path {
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
-    animation: draw-in 3s ease-out forwards;
+    animation: draw-in 2s ease-out forwards;
+}
+
+.interactive-logo .ai-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 80px;
+    fill: hsl(var(--primary));
+    animation: fade-in 2s ease-out 1.5s forwards;
+    opacity: 0;
 }
 
 .interactive-logo .node {
     fill: hsl(var(--primary));
-    r: 3;
-    animation: pulse-node 4s infinite ease-in-out;
+    animation: pulse-node 3s infinite ease-in-out;
     opacity: 0;
 }
 
@@ -153,16 +158,27 @@ h1, h2, h3, h4, h5, h6 {
     filter: url(#glow);
 }
 
-.interactive-logo .node-1 { animation-delay: 0.5s; }
-.interactive-logo .node-2 { animation-delay: 1s; }
-.interactive-logo .node-3 { animation-delay: 1.5s; }
-.interactive-logo .node-4 { animation-delay: 2s; }
-.interactive-logo .node-5 { animation-delay: 2.5s; }
-.interactive-logo .node-6 { animation-delay: 3s; }
+.interactive-logo .node-1 { animation-delay: 1.2s; }
+.interactive-logo .node-2 { animation-delay: 1.4s; }
+.interactive-logo .node-3 { animation-delay: 1.6s; }
+.interactive-logo .node-4 { animation-delay: 1.8s; }
+.interactive-logo .node-5 { animation-delay: 2.0s; }
+.interactive-logo .node-6 { animation-delay: 2.2s; }
+.interactive-logo .node-7 { animation-delay: 2.4s; }
+.interactive-logo .node-8 { animation-delay: 2.6s; }
+.interactive-logo .node-9 { animation-delay: 2.8s; }
+.interactive-logo .node-10 { animation-delay: 3.0s; }
+
 
 @keyframes draw-in {
     to {
         stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fade-in {
+    to {
+        opacity: 1;
     }
 }
 

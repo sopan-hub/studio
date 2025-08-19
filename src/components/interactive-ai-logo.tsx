@@ -3,43 +3,61 @@ import React from 'react';
 export const InteractiveAiLogo = () => {
   return (
     <div className="interactive-logo-container">
-      <svg viewBox="0 0 200 200" className="interactive-logo">
+      <svg viewBox="0 0 400 400" className="interactive-logo">
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+            <feGaussianBlur stdDeviation="5" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          <filter id="wobble">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="turbulence" />
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="8" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
         </defs>
-        <circle cx="100" cy="100" r="95" className="base-circle" />
+
+        <g className="logo-geometry">
+          {/* Main Chip */}
+          <rect x="100" y="100" width="200" height="200" rx="20" className="circuit-path" style={{animationDelay: '0s'}} />
+          <rect x="120" y="120" width="160" height="160" rx="10" fill="hsl(var(--background))" stroke="hsl(var(--primary))" strokeWidth="4" className="circuit-path" style={{animationDelay: '0.2s'}} />
+          
+          {/* Circuit Lines */}
+          {/* Top */}
+          <path d="M160 100V60" className="circuit-path" style={{animationDelay: '0.4s'}}/>
+          <path d="M200 100V40" className="circuit-path" style={{animationDelay: '0.5s'}}/>
+          <path d="M240 100V60" className="circuit-path" style={{animationDelay: '0.6s'}}/>
+          <circle cx="160" cy="60" r="10" className="node node-1" />
+          <circle cx="200" cy="40" r="10" className="node node-2" />
+          <circle cx="240" cy="60" r="10" className="node node-3" />
+
+          {/* Bottom */}
+          <path d="M160 300v40" className="circuit-path" style={{animationDelay: '0.4s'}}/>
+          <path d="M200 300v60" className="circuit-path" style={{animationDelay: '0.5s'}}/>
+          <path d="M240 300v40" className="circuit-path" style={{animationDelay: '0.6s'}}/>
+          <circle cx="160" cy="340" r="10" className="node node-4" />
+          <circle cx="200" cy="360" r="10" className="node node-5" />
+          <circle cx="240" cy="340" r="10" className="node node-6" />
+
+          {/* Left */}
+          <path d="M100 160H60" className="circuit-path" style={{animationDelay: '0.7s'}}/>
+          <path d="M100 200H40" className="circuit-path" style={{animationDelay: '0.8s'}}/>
+          <path d="M100 240H60" className="circuit-path" style={{animationDelay: '0.9s'}}/>
+          <circle cx="60" cy="160" r="10" className="node node-7" />
+          <circle cx="40" cy="200" r="10" className="node node-8" />
+          <circle cx="60" cy="240" r="10" className="node node-9" />
+
+          {/* Right */}
+          <path d="M300 160h40" className="circuit-path" style={{animationDelay: '0.7s'}}/>
+          <path d="M300 200h60" className="circuit-path" style={{animationDelay: '0.8s'}}/>
+          <path d="M300 240h40" className="circuit-path" style={{animationDelay: '0.9s'}}/>
+          <circle cx="340" cy="160" r="10" className="node node-10" />
+          <circle cx="360" cy="200" r="10" className="node node-1" />
+          <circle cx="340" cy="240" r="10" className="node node-2" />
+        </g>
         
-        {/* Central Brain/Chip */}
-        <path className="brain-path" d="M90 90h20v20H90z" />
-        <circle cx="100" cy="100" r="5" className="node node-1" />
-
-        {/* Pathways */}
-        <path className="brain-path" d="M100 90V70" />
-        <path className="brain-path" d="M100 110v20" />
-        <path className="brain-path" d="M90 100H70" />
-        <path className="brain-path" d="M110 100h20" />
-
-        <path className="brain-path" d="M90 90L75 75" />
-        <path className="brain-path" d="M110 90l15-15" />
-        <path className="brain-path" d="M90 110L75 125" />
-        <path className="brain-path" d="M110 110l15 15" />
-
-        {/* Outer Nodes */}
-        <circle cx="100" cy="70" r="3" className="node node-2" />
-        <circle cx="100" cy="130" r="3" className="node node-3" />
-        <circle cx="70" cy="100" r="3" className="node node-4" />
-        <circle cx="130" cy="100" r="3" className="node node-5" />
-
-        <circle cx="75" cy="75" r="3" className="node node-6" />
-        <circle cx="125" cy="75" r="3" className="node node-2" />
-        <circle cx="75" cy="125" r="3" className="node node-3" />
-        <circle cx="125" cy="125" r="3" className="node node-4" />
+        <text x="200" y="215" textAnchor="middle" className="ai-text">AI</text>
       </svg>
     </div>
   );
