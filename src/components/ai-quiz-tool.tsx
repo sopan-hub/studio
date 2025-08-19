@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Sparkles, Loader2, Upload, XCircle, Paperclip, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { generateQuiz, QuizInput, QuizOutput } from '@/ai/flows/quiz-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { jsPDF } from 'jspdf';
 import "jspdf/dist/polyfills.es.js";
+import { Textarea } from './ui/textarea';
 
 interface AiQuizToolProps {
     onBack: () => void;
@@ -18,9 +19,16 @@ interface AiQuizToolProps {
 export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
     const [quiz, setQuiz] = useState<QuizOutput | null>(null);
     const [loading, setLoading] = useState(false);
+    const [material, setMaterial] = useState("");
     const [file, setFile] = useState<{ name: string, dataUri: string, content: string } | null>(null);
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    useEffect(() => {
+        if (file) {
+            setMaterial(file.content);
+        }
+    }, [file]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
@@ -52,24 +60,30 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
 
     const handleRemoveFile = () => {
         setFile(null);
+        setMaterial(""); // Also clear the text area if the file is removed
         if(fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     }
 
     const handleGenerate = async () => {
-        if (!file?.content) {
+        const inputText = material.trim();
+
+        if (!inputText && !file?.content) {
             toast({
                 variant: "destructive",
                 title: "Input Required",
-                description: "Please upload a text file with your study material.",
+                description: "Please paste your study material or upload a text file.",
             });
             return;
         }
+
+        const contentToUse = inputText || file!.content;
+        
         setLoading(true);
         setQuiz(null);
         try {
-            const input: QuizInput = { material: file.content };
+            const input: QuizInput = { material: contentToUse };
             const result = await generateQuiz(input);
             setQuiz(result);
         } catch (error) {
@@ -152,27 +166,31 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-4">
-                     <div className="p-4 border border-dashed border-primary/40 rounded-lg bg-background/50">
-                        {file ? (
-                             <div className="flex items-center justify-between">
-                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Paperclip className="h-4 w-4" />
-                                    <span>{file.name}</span>
-                               </div>
-                               <Button variant="ghost" size="icon" onClick={handleRemoveFile} disabled={loading}>
-                                    <XCircle className="h-4 w-4" />
-                               </Button>
-                            </div>
-                        ) : (
-                             <div className="flex flex-col items-center justify-center py-6">
-                                <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                                <p className="mb-2 text-sm text-muted-foreground">Upload your study material (e.g., .txt file)</p>
-                                <Button variant="outline" onClick={handleUploadClick} disabled={loading}>
-                                    Choose File
-                                </Button>
-                             </div>
-                        )}
-                          <input
+                    <Textarea
+                        placeholder="Paste your study material here, or upload a file below."
+                        className="min-h-[150px]"
+                        value={material}
+                        onChange={(e) => setMaterial(e.target.value)}
+                        disabled={loading}
+                    />
+
+                    {file && (
+                        <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 border border-primary/20">
+                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Paperclip className="h-4 w-4" />
+                                <span>{file.name}</span>
+                           </div>
+                           <Button variant="ghost" size="icon" onClick={handleRemoveFile} disabled={loading}>
+                                <XCircle className="h-4 w-4" />
+                           </Button>
+                        </div>
+                    )}
+                    
+                    <div className="flex items-center gap-2">
+                        <Button onClick={handleGenerate} disabled={loading} className="self-start neon-glow-button">
+                            {loading ? <><Loader2 className="animate-spin" /> Generating Quiz...</> : <><Sparkles /> Generate Quiz</>}
+                        </Button>
+                        <input
                             type="file"
                             ref={fileInputRef}
                             onChange={handleFileChange}
@@ -180,11 +198,11 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                             accept="text/*,.pdf"
                             disabled={loading}
                         />
-                     </div>
-                    
-                    <Button onClick={handleGenerate} disabled={loading || !file} className="self-start neon-glow-button">
-                        {loading ? <><Loader2 className="animate-spin" /> Generating Quiz...</> : <><Sparkles /> Generate Quiz</>}
-                    </Button>
+                        <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
+                            <Upload />
+                            {file ? 'Change File' : 'Upload File'}
+                        </Button>
+                    </div>
                     
                     <div className="mt-4 min-h-[150px]">
                         {loading && (
