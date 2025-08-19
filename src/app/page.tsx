@@ -72,8 +72,10 @@ export default function Home() {
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
-              <Button onClick={handleGetStartedClick} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
-                  Start Studying Now <ArrowRight className="ml-2" />
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
+                  <Link href="/dashboard" onClick={handleGetStartedClick}>
+                    Start Studying Now <ArrowRight className="ml-2" />
+                  </Link>
               </Button>
             </div>
             <div>
