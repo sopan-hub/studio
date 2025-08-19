@@ -15,35 +15,34 @@ export const InteractiveAiLogo = () => {
         </defs>
         <circle cx="100" cy="100" r="95" className="base-circle" />
 
-        {/* Robot Head Shape */}
-        <path className="brain-path" d="M 60 40 C 50 40 40 50 40 60 V 140 C 40 150 50 160 60 160 H 140 C 150 160 160 150 160 140 V 60 C 160 50 150 40 140 40 H 60 Z" />
+        {/* Robot Head */}
+        <path className="brain-path" d="M 60,90 A 40,40 0 0,1 140,90 V 150 H 60 Z" />
 
         {/* Eyes */}
-        <circle cx="80" cy="90" r="12" className="brain-path" />
-        <circle cx="120" cy="90" r="12" className="brain-path" />
-        <circle cx="80" cy="90" r="4" className="node node-1" />
-        <circle cx="120" cy="90" r="4" className="node node-2" />
+        <circle cx="85" cy="115" r="8" className="brain-path" />
+        <circle cx="115" cy="115" r="8" className="brain-path" />
+        <circle cx="85" cy="115" r="3" className="node node-1" />
+        <circle cx="115" cy="115" r="3" className="node node-2" />
 
-        {/* Mouth */}
-        <path className="brain-path" d="M80 130 H 120" />
+        {/* Graduation Cap */}
+        {/* Cap Top */}
+        <path className="brain-path" d="M 50 80 L 100 60 L 150 80 L 100 100 Z" />
+        {/* Cap Base */}
+        <path className="brain-path" d="M 60 90 Q 100 110 140 90" />
 
-        {/* Antennae */}
-        <path className="brain-path" d="M100 40 V 25" />
-        <circle cx="100" cy="20" className="node node-3" />
-        
-        {/* Ear-like details */}
-        <path className="brain-path" d="M40 80 H 30" />
-        <path className="brain-path" d="M160 80 H 170" />
-        <path className="brain-path" d="M40 120 H 30" />
-        <path className="brain-path" d="M160 120 H 170" />
-        <circle cx="25" cy="80" r="3" className="node node-4" />
-        <circle cx="175" cy="80" r="3" className="node node-5" />
-        <circle cx="25" cy="120" r="3" className="node node-6" />
-        <circle cx="175" cy="120" r="3" className="node node-1" />
+        {/* Tassel */}
+        <path className="brain-path" d="M100,60 V 85" />
+        <path className="brain-path" d="M100,85 L 115 80" />
+        <circle cx="100" cy="60" r="4" className="node node-3" />
+        <circle cx="115" cy="80" r="4" className="node node-4" />
 
-        {/* Chin detail */}
-        <path className="brain-path" d="M90 160 V 170 H 110 V 160" />
-
+         {/* Lightbulb for 'idea' */}
+        <g transform="translate(90, 30)">
+          <path className="brain-path" d="M10 18 A 6 6 0 1 1 10 6 A 4 4 0 0 1 10 18 Z" />
+          <path className="brain-path" d="M10 18 L 10 22" />
+          <path className="brain-path" d="M 7 22 H 13" />
+          <circle cx="10" cy="12" r="2" className="node node-5" />
+        </g>
       </svg>
     </div>
   );
