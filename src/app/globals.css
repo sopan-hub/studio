@@ -156,7 +156,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Blast Animation Styles */
 .interactive-logo.blasting .logo-geometry > *, .interactive-logo.blasting .ai-text {
-    animation-duration: 3s;
+    animation-duration: 2s;
     animation-fill-mode: forwards;
     animation-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
 }

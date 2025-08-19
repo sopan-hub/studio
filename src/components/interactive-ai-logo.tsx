@@ -26,7 +26,7 @@ export const InteractiveAiLogo = () => {
 
     const timer = setTimeout(() => {
       setBlasting(false);
-    }, 3000); // Duration of the blast animation
+    }, 2000); // Duration of the blast animation
 
     return () => clearTimeout(timer);
   }, [blasting]);
