@@ -18,12 +18,15 @@ export function NavMenu() {
   return (
     <>
       {/* Desktop Menu */}
-      <nav className="hidden md:flex items-center gap-2">
+      <nav className="hidden md:flex items-center gap-1">
         {navLinks.map((link) => (
           <Button key={link.href} asChild variant="ghost">
             <Link href={link.href}>{link.label}</Link>
           </Button>
         ))}
+        <Button className="bg-gradient-to-r from-secondary to-accent text-white font-bold ml-2">
+            Get Help
+        </Button>
       </nav>
 
       {/* Mobile Menu */}
@@ -42,6 +45,9 @@ export function NavMenu() {
                   <Link href={link.href}>{link.label}</Link>
                 </Button>
               ))}
+               <Button className="bg-gradient-to-r from-secondary to-accent text-white font-bold mt-4">
+                    Get Help
+                </Button>
             </nav>
           </SheetContent>
         </Sheet>

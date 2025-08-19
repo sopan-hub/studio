@@ -3,82 +3,63 @@
 @tailwind utilities;
 
 body {
-  font-family: 'PT Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
+  background-color: #F9FAFB;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
 }
 
 @layer base {
   :root {
-    --background: 220 40% 5%; /* Deep Blue-Black */
-    --foreground: 210 40% 98%; /* Almost White */
-    --card: 220 40% 10%; /* Slightly lighter Blue-Black */
-    --card-foreground: 210 40% 98%;
-    --popover: 220 40% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 90% 60%; /* Bright Blue */
-    --primary-foreground: 220 40% 5%;
-    --secondary: 220 40% 15%; /* Darker Blue-Gray */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 40% 15%;
-    --muted-foreground: 210 40% 60%; /* Lighter Gray-Blue */
-    --accent: 210 90% 50%; /* Slightly darker Bright Blue */
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 0 0% 100%;
+    --foreground: 224 76% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 76% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 76% 15%;
+    --primary: 224 62% 32%; /* Deep Blue #1E3A8A */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 188 95% 42%; /* Cyan/Teal #06B6D4 */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 210 20% 40%;
+    --accent: 43 96% 58%; /* Soft Yellow #FACC15 */
+    --accent-foreground: 224 76% 15%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 40% 30%; /* Bolder Blue-Gray Border */
-    --input: 220 40% 20%;
-    --ring: 210 90% 60%;
-    --chart-1: 210 90% 55%;
-    --chart-2: 190 80% 50%;
-    --chart-3: 230 85% 65%;
-    --chart-4: 200 75% 55%;
-    --chart-5: 220 95% 70%;
+    --border: 210 20% 85%;
+    --input: 210 20% 92%;
+    --ring: 224 62% 32%;
+    --chart-1: 224 62% 32%;
+    --chart-2: 188 95% 42%;
+    --chart-3: 43 96% 58%;
+    --chart-4: 224 62% 52%;
+    --chart-5: 188 95% 62%;
     --radius: 0.8rem;
-    --sidebar-background: 220 40% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 90% 60%;
-    --sidebar-primary-foreground: 220 40% 5%;
-    --sidebar-accent: 220 40% 15%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 40% 20%;
-    --sidebar-ring: 210 90% 60%;
   }
   .dark {
-    --background: 220 40% 5%; /* Deep Blue-Black */
-    --foreground: 210 40% 98%; /* Almost White */
-    --card: 220 40% 10%; /* Slightly lighter Blue-Black */
-    --card-foreground: 210 40% 98%;
-    --popover: 220 40% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 90% 60%; /* Bright Blue */
-    --primary-foreground: 220 40% 5%;
-    --secondary: 220 40% 15%; /* Darker Blue-Gray */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 40% 15%;
-    --muted-foreground: 210 40% 60%; /* Lighter Gray-Blue */
-    --accent: 210 90% 50%; /* Slightly darker Bright Blue */
-    --accent-foreground: 210 40% 98%;
+    --background: 224 76% 8%;
+    --foreground: 0 0% 98%;
+    --card: 224 76% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 224 76% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 188 95% 42%; /* Cyan/Teal #06B6D4 */
+    --primary-foreground: 224 76% 10%;
+    --secondary: 224 62% 32%; /* Deep Blue #1E3A8A */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 224 76% 18%;
+    --muted-foreground: 210 20% 70%;
+    --accent: 43 96% 58%; /* Soft Yellow #FACC15 */
+    --accent-foreground: 224 76% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 40% 30%; /* Bolder Blue-Gray Border */
-    --input: 220 40% 20%;
-    --ring: 210 90% 60%;
-    --chart-1: 210 90% 55%;
-    --chart-2: 190 80% 50%;
-    --chart-3: 230 85% 65%;
-    --chart-4: 200 75% 55%;
-    --chart-5: 220 95% 70%;
-    --sidebar-background: 220 40% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 90% 60%;
-    --sidebar-primary-foreground: 220 40% 5%;
-    --sidebar-accent: 220 40% 15%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 40% 20%;
-    --sidebar-ring: 210 90% 60%;
+    --border: 224 76% 25%;
+    --input: 224 76% 20%;
+    --ring: 188 95% 42%;
   }
 }
 
@@ -93,9 +74,9 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer components {
     .border-4 {
-        border-width: 4px;
+        border-width: 2px;
     }
     .border-blue-900 {
-        border-color: hsl(220 60% 25%);
+        border-color: hsl(var(--primary) / 0.5);
     }
 }

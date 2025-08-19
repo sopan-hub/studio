@@ -12,27 +12,26 @@ import { FlashcardGenerator } from "@/components/flashcard-generator";
 import { QuizGenerator } from "@/components/quiz-generator";
 import { TutorChat } from "@/components/tutor-chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const FeatureCard = ({ id, title, description, children }: { id: string, title: string, description: string, children: React.ReactNode }) => (
-  <section id={id} className="scroll-mt-20">
-    <Card className="border-4 border-blue-900 shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-2 hover:scale-105 h-[400px] flex flex-col">
-      <div className="cursor-pointer">
-        <CardHeader>
-          <div>
-            <CardTitle className="text-2xl font-headline text-primary">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+  <Card className="shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
+    <Accordion type="single" collapsible className="w-full">
+      <AccordionItem value={id}>
+        <AccordionTrigger className="p-6">
+          <div className="text-left">
+            <CardTitle className="text-xl font-bold text-primary">{title}</CardTitle>
+            <CardDescription className="text-base">{description}</CardDescription>
           </div>
-        </CardHeader>
-      </div>
-      <div className="flex-grow overflow-hidden">
-        <ScrollArea className="h-full w-full">
-          <CardContent>
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="p-6 pt-0">
             {children}
-          </CardContent>
-        </ScrollArea>
-      </div>
-    </Card>
-  </section>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </Card>
 );
 
 
@@ -58,69 +57,71 @@ export default function DashboardPage() {
   
   return (
     <div className="space-y-8">
-      <section className="bg-card p-6 rounded-lg border-4 border-blue-900 shadow-2xl">
-        <h2 className="text-2xl font-headline text-primary mb-4 text-center">AI General Search</h2>
+      <section className="bg-card p-6 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold text-primary mb-4 text-center">AI General Search</h2>
         <TutorChat notes={notes} />
       </section>
 
-       <FeatureCard 
-        id="notes" 
-        title="My Notes" 
-        description="Start by adding your study materials here."
-      >
-          <Tabs defaultValue="paste" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="paste">
-                <ClipboardPaste className="mr-2 h-4 w-4" />
-                Paste Text
-              </TabsTrigger>
-              <TabsTrigger value="upload">
-                <FileText className="mr-2 h-4 w-4" />
-                Upload File
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="paste">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Paste your notes</CardTitle>
-                  <CardDescription>
-                    Copy and paste your notes into the text box below.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Textarea 
-                    placeholder="Paste your notes here..." 
-                    className="min-h-[200px]"
-                    value={pastedNotes}
-                    onChange={handlePaste}
-                  />
-                  <Button onClick={handleSaveNote} disabled={!pastedNotes}>Save Note</Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="upload">
-               <Card>
-                  <CardHeader>
-                      <CardTitle>Upload from your device</CardTitle>
-                      <CardDescription>
-                      Select a file from your device to upload.
-                      </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                      <FileUpload onFileSelect={setUploadedFile} onFileRead={handleFileRead} />
-                      {uploadedFile && (
-                          <div className="mt-4 p-4 border rounded-lg">
-                              <p className="font-semibold">Selected file:</p>
-                              <p>{uploadedFile.name}</p>
-                          </div>
-                      )}
-                  </CardContent>
-               </Card>
-            </TabsContent>
-          </Tabs>
-      </FeatureCard>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="md:col-span-2">
+           <FeatureCard 
+            id="notes" 
+            title="My Notes" 
+            description="Start by adding your study materials here."
+          >
+              <Tabs defaultValue="paste" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="paste">
+                    <ClipboardPaste className="mr-2 h-4 w-4" />
+                    Paste Text
+                  </TabsTrigger>
+                  <TabsTrigger value="upload">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Upload File
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="paste">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Paste your notes</CardTitle>
+                      <CardDescription>
+                        Copy and paste your notes into the text box below.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Textarea 
+                        placeholder="Paste your notes here..." 
+                        className="min-h-[200px]"
+                        value={pastedNotes}
+                        onChange={handlePaste}
+                      />
+                      <Button onClick={handleSaveNote} disabled={!pastedNotes}>Save Note</Button>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="upload">
+                   <Card>
+                      <CardHeader>
+                          <CardTitle>Upload from your device</CardTitle>
+                          <CardDescription>
+                          Select a file from your device to upload.
+                          </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <FileUpload onFileSelect={setUploadedFile} onFileRead={handleFileRead} />
+                          {uploadedFile && (
+                              <div className="mt-4 p-4 border rounded-lg">
+                                  <p className="font-semibold">Selected file:</p>
+                                  <p>{uploadedFile.name}</p>
+                              </div>
+                          )}
+                      </CardContent>
+                   </Card>
+                </TabsContent>
+              </Tabs>
+          </FeatureCard>
+        </div>
+
         <FeatureCard 
           id="summarizer"
           title="AI Summarizer"
