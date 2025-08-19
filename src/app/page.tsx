@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram } from "lucide-react";
+import { ArrowRight, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/logo";
@@ -34,7 +34,11 @@ export default function Home() {
 
   const handleGetStartedClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    router.push('#features');
+    if (user) {
+      router.push('/dashboard');
+    } else {
+      setIsLoginDialogOpen(true);
+    }
   };
 
   return (
@@ -46,11 +50,14 @@ export default function Home() {
            <div className="flex items-center gap-2">
             <Logo />
           </div>
-          <nav className="hidden md:flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
-            <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Study Assistant</Link>
             <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
           </nav>
+           <Button onClick={handleGetStartedClick} className="hidden md:flex neon-glow-button">
+              {user ? 'Go to Dashboard' : 'Get Started'}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
         </div>
       </header>
 
@@ -65,10 +72,8 @@ export default function Home() {
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
-                  <Link href="#features" onClick={handleGetStartedClick}>
-                    Start Studying Now <ArrowRight className="ml-2" />
-                  </Link>
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse" onClick={handleGetStartedClick}>
+                  Start Studying Now <ArrowRight className="ml-2" />
               </Button>
             </div>
             <div>
