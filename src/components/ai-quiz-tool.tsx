@@ -119,37 +119,39 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addText = (text: string, options: { fontSize?: number; isBold?: boolean; color?: string; } = {}) => {
-            const { fontSize = 11, isBold = false, color = "#222222" } = options;
-            doc.setFont('Helvetica', isBold ? 'bold' : 'normal');
-            doc.setFontSize(fontSize);
-            doc.setTextColor(color);
-            
-            const lines = doc.splitTextToSize(text, usableWidth);
-            lines.forEach((line: string) => {
-                 if (currentY > pageHeight - margin) {
-                    doc.addPage();
-                    currentY = margin;
-                 }
-                 doc.text(line, margin, currentY);
-                 currentY += (fontSize / 2) + 2; // Adjust line height based on font size
-            });
-        }
+        const addWrappedText = (text: string, x: number, y: number, options: any) => {
+            const lines = doc.splitTextToSize(text, options.maxWidth || usableWidth);
+            if (y + lines.length * 6 > pageHeight - margin) {
+                doc.addPage();
+                currentY = margin;
+                y = margin;
+            }
+            doc.text(lines, x, y);
+            return y + lines.length * 6;
+        };
+
 
         // Set Title
-        addText(quiz.title, { fontSize: 18, isBold: true, color: "#79B4B7" });
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(18);
+        doc.setTextColor("#79B4B7");
+        currentY = addWrappedText(quiz.title, margin, currentY, { maxWidth: usableWidth });
         currentY += 10;
 
 
         quiz.questions.forEach((q, index) => {
-            if (currentY > pageHeight - margin - 40) { // check for space before adding a new question
+             if (currentY > pageHeight - margin - 40) { // check for space before adding a new question
                 doc.addPage();
                 currentY = margin;
             }
 
             // Question
-            addText(`${index + 1}. ${q.question}`, { fontSize: 12, isBold: true });
-            currentY += 2;
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor("#222222");
+            const questionText = `${index + 1}. ${q.question}`;
+            currentY = addWrappedText(questionText, margin, currentY, { maxWidth: usableWidth });
+            currentY += 4;
 
             // Options
             q.options.forEach(opt => {
@@ -159,11 +161,12 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                 }
                 const isCorrect = opt === q.answer;
                 const optionText = `- ${opt}`;
-                addText(optionText, {
-                    fontSize: 10,
-                    isBold: isCorrect,
-                    color: isCorrect ? "#2E8B57" : "#666666" // Dark Green for correct, gray for others
-                });
+                
+                doc.setFont("Helvetica", isCorrect ? 'bold' : 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(isCorrect ? "#2E8B57" : "#666666");
+
+                currentY = addWrappedText(optionText, margin + 5, currentY, { maxWidth: usableWidth - 5 });
             });
             
             // Answer
@@ -171,7 +174,10 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                 doc.addPage();
                 currentY = margin;
             }
-            addText(`Correct Answer: ${q.answer}`, { fontSize: 10, isBold: true, color: "#2E8B57" });
+            doc.setFont("Helvetica", 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor("#2E8B57");
+            currentY = addWrappedText(`Correct Answer: ${q.answer}`, margin, currentY, { maxWidth: usableWidth });
             currentY += 10; // Extra space between questions
         });
 
@@ -271,3 +277,5 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         </Card>
     );
 };
+
+    

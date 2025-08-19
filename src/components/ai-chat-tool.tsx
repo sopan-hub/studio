@@ -120,46 +120,107 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addText = (text: string, isBold = false, isTitle = false, isQuestion = false) => {
-            doc.setFont('Helvetica', isBold || isTitle ? 'bold' : 'normal');
-            doc.setFontSize(isTitle ? 18 : (isBold ? 12 : 11));
-            
-            // For the main answer, split by paragraphs to preserve them
-            const paragraphs = text.split('\n');
+        const addFormattedText = (text: string, doc: jsPDF) => {
+            const lines = text.split('\n');
 
-            paragraphs.forEach(paragraph => {
-                const lines = doc.splitTextToSize(paragraph, usableWidth);
-                
-                lines.forEach((line: string) => {
-                     if (currentY > pageHeight - margin) {
-                        doc.addPage();
-                        currentY = margin;
-                     }
-                     doc.text(line, margin, currentY);
-                     currentY += isTitle ? 8 : (isBold ? 7 : 6);
-                });
-
-                // Add a small gap between paragraphs, but not for titles/headings
-                if (!isTitle && !isBold) {
-                    currentY += 4;
+            lines.forEach(line => {
+                if (currentY > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
                 }
+
+                let indent = margin;
+                let textToRender = line;
+                
+                // Basic Markdown parsing
+                if (line.startsWith('# ')) {
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(18);
+                    textToRender = line.substring(2);
+                } else if (line.startsWith('## ')) {
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(16);
+                    textToRender = line.substring(3);
+                } else if (line.startsWith('### ')) {
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(14);
+                    textToRender = line.substring(4);
+                } else if (line.startsWith('* ') || line.startsWith('- ')) {
+                    textToRender = `• ${line.substring(2)}`;
+                    indent += 5; // Indent bullet points
+                    doc.setFont('Helvetica', 'normal');
+                    doc.setFontSize(11);
+                } else {
+                    doc.setFont('Helvetica', 'normal');
+                    doc.setFontSize(11);
+                }
+
+                // Handle bold text within lines
+                const boldRegex = /\*\*(.*?)\*\*/g;
+                let parts = textToRender.split(boldRegex);
+
+                let currentX = indent;
+                parts.forEach((part, index) => {
+                    doc.setFont('Helvetica', index % 2 !== 0 ? 'bold' : 'normal');
+                    const partWidth = doc.getTextWidth(part);
+                    
+                    // Manual text splitting for lines
+                    const textLines = doc.splitTextToSize(part, usableWidth - (currentX - margin));
+
+                    textLines.forEach((splitLine: string, lineIndex: number) => {
+                        if (currentY > pageHeight - margin) {
+                            doc.addPage();
+                            currentY = margin;
+                            currentX = indent; // Reset X on new page
+                        }
+
+                        if(lineIndex > 0) { // New line from split
+                            currentX = indent;
+                            currentY += 6;
+                        }
+                        
+                        doc.text(splitLine, currentX, currentY);
+                        currentX += doc.getTextWidth(splitLine);
+                    });
+                });
+                
+                currentY += line.trim() === '' ? 4 : 8; // Add space after line
             });
+        };
 
-             currentY += 4; 
-        }
+        // --- PDF Content ---
 
+        // Title
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(22);
         doc.setTextColor("#79B4B7");
-        addText(`Study Buddy AI - ${title}`, true, true);
-        
+        doc.text(`Study Buddy AI - ${title}`, margin, currentY);
+        currentY += 15;
+
+        // Question
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
         doc.setTextColor(30, 30, 30);
-        addText("Question:", true);
+        doc.text("Question:", margin, currentY);
+        currentY += 8;
 
         const questionToDisplay = question.trim() || (file ? `Content of ${file.name}` : '');
-        addText(questionToDisplay, false, false, true);
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(11);
+        const questionLines = doc.splitTextToSize(questionToDisplay, usableWidth);
+        questionLines.forEach((line: string) => {
+            doc.text(line, margin, currentY);
+            currentY += 6;
+        });
+        currentY += 10;
 
-        addText("Answer:", true);
+        // Answer
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text("Answer:", margin, currentY);
+        currentY += 8;
         
-        addText(answer);
+        addFormattedText(answer, doc);
 
         doc.save(`study-buddy-${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
     };
@@ -251,3 +312,5 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         </Card>
     );
 };
+
+    

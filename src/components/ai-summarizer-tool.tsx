@@ -118,36 +118,82 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addText = (text: string, isBold = false, isTitle = false) => {
-            doc.setFont('Helvetica', isBold || isTitle ? 'bold' : 'normal');
-            doc.setFontSize(isTitle ? 18 : 12);
-            
-            const paragraphs = text.split('\n');
+        const addFormattedText = (text: string, doc: jsPDF) => {
+            const lines = text.split('\n');
 
-            paragraphs.forEach(paragraph => {
-                const lines = doc.splitTextToSize(paragraph, usableWidth);
-                
-                lines.forEach((line: string) => {
-                     if (currentY > pageHeight - margin) {
-                        doc.addPage();
-                        currentY = margin;
-                     }
-                     doc.text(line, margin, currentY);
-                     currentY += 7;
-                });
-
-                if (!isTitle && !isBold) {
-                    currentY += 4;
+            lines.forEach(line => {
+                if (currentY > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
                 }
+
+                let indent = margin;
+                let textToRender = line;
+                
+                // Basic Markdown parsing
+                if (line.startsWith('# ')) {
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(18);
+                    textToRender = line.substring(2);
+                } else if (line.startsWith('## ')) {
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(16);
+                    textToRender = line.substring(3);
+                } else if (line.startsWith('### ')) {
+                    doc.setFont('Helvetica', 'bold');
+                    doc.setFontSize(14);
+                    textToRender = line.substring(4);
+                } else if (line.startsWith('* ') || line.startsWith('- ')) {
+                    textToRender = `• ${line.substring(2)}`;
+                    indent += 5; // Indent bullet points
+                    doc.setFont('Helvetica', 'normal');
+                    doc.setFontSize(11);
+                } else {
+                    doc.setFont('Helvetica', 'normal');
+                    doc.setFontSize(11);
+                }
+
+                // Handle bold text within lines
+                const boldRegex = /\*\*(.*?)\*\*/g;
+                let parts = textToRender.split(boldRegex);
+
+                let currentX = indent;
+                parts.forEach((part, index) => {
+                    doc.setFont('Helvetica', index % 2 !== 0 ? 'bold' : 'normal');
+                    
+                    const textLines = doc.splitTextToSize(part, usableWidth - (currentX - margin));
+
+                    textLines.forEach((splitLine: string, lineIndex: number) => {
+                        if (currentY > pageHeight - margin) {
+                            doc.addPage();
+                            currentY = margin;
+                            currentX = indent;
+                        }
+                         if(lineIndex > 0) {
+                            currentX = indent;
+                            currentY += 6;
+                        }
+                        
+                        doc.text(splitLine, currentX, currentY);
+                        currentX += doc.getTextWidth(splitLine);
+                    });
+                });
+                
+                currentY += line.trim() === '' ? 4 : 8;
             });
-             currentY += 5;
-        }
+        };
+
+        // --- PDF Content ---
         
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(22);
         doc.setTextColor("#79B4B7");
-        addText(summary.title, true, true);
+        const titleLines = doc.splitTextToSize(summary.title, usableWidth);
+        doc.text(titleLines, margin, currentY);
+        currentY += titleLines.length * 10 + 5;
         
         doc.setTextColor(30, 30, 30);
-        addText(summary.summary);
+        addFormattedText(summary.summary, doc);
         
         doc.save(`${summary.title.replace(/\s+/g, '_').toLowerCase()}_summary.pdf`);
     };
@@ -236,3 +282,5 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         </Card>
     );
 };
+
+    
