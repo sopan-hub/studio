@@ -15,7 +15,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useAuth } from "@/hooks/use-auth";
 import { LoginDialog } from "@/components/login-dialog";
 
-const FeatureCard = ({ id, title, description, children, onOpen, isOpen }: { id: string, title: string, description: string, children: React.ReactNode, onOpen?: () => boolean, isOpen?: boolean }) => {
+const FeatureCard = ({ id, title, description, children, onOpen, isOpen, animationDelay }: { id: string, title: string, description: string, children: React.ReactNode, onOpen?: () => boolean, isOpen?: boolean, animationDelay?: string }) => {
   
   const handleTriggerClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (onOpen && !onOpen()) {
@@ -25,7 +25,10 @@ const FeatureCard = ({ id, title, description, children, onOpen, isOpen }: { id:
   };
   
   return (
-    <Card className="bg-card border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
+    <Card 
+      className="bg-card border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in"
+      style={{ animationDelay }}
+    >
       <Accordion type="single" collapsible className="w-full" value={isOpen ? id : ""}>
         <AccordionItem value={id} className="border-b-0">
           <AccordionTrigger onClick={handleTriggerClick} className="p-6 hover:no-underline">
@@ -156,6 +159,7 @@ export default function DashboardPage() {
           description="Generate concise summaries from your notes instantly."
           isOpen={activeFeature === 'summarizer'}
           onOpen={() => checkAuthAndToggle('summarizer')}
+          animationDelay="0.1s"
         >
           <Summarizer notes={notes} />
         </FeatureCard>
@@ -166,6 +170,7 @@ export default function DashboardPage() {
           description="Turn your notes into interactive flashcards for effective learning."
           isOpen={activeFeature === 'flashcards'}
           onOpen={() => checkAuthAndToggle('flashcards')}
+          animationDelay="0.2s"
         >
           <FlashcardGenerator notes={notes} />
         </FeatureCard>
@@ -176,6 +181,7 @@ export default function DashboardPage() {
           description="Test your knowledge with auto-generated quizzes."
           isOpen={activeFeature === 'quizzes'}
           onOpen={() => checkAuthAndToggle('quizzes')}
+          animationDelay="0.3s"
         >
           <QuizGenerator notes={notes} />
         </FeatureCard>
@@ -186,6 +192,7 @@ export default function DashboardPage() {
           description="Your personal AI tutor, ready to answer your questions."
           isOpen={activeFeature === 'tutor'}
           onOpen={() => checkAuthAndToggle('tutor')}
+          animationDelay="0.4s"
         >
           <TutorChat notes={notes} onGenerate={() => checkAuthAndToggle('tutor')} />
         </FeatureCard>
