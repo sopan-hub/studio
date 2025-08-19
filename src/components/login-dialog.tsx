@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { Chrome, KeyRound, Mail, User } from "lucide-react";
+import { KeyRound, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,7 @@ const signInSchema = z.object({
 
 
 export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail, loading } = useAuth();
+  const { signInWithEmail, signUpWithEmail, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("signin");
   const { toast } = useToast();
 
@@ -38,17 +38,6 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "" },
   });
-
-
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
-      toast({ variant: "destructive", title: "Sign-in Error", description: "Could not sign in with Google." });
-    }
-  };
 
   const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
     try {
@@ -155,25 +144,6 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
             </Form>
           </TabsContent>
         </Tabs>
-        
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-          </div>
-        </div>
-
-        <Button 
-          onClick={handleGoogleSignIn} 
-          disabled={loading}
-          className="w-full font-bold"
-          variant="outline"
-        >
-          <Chrome className="mr-2" />
-          Sign in with Google
-        </Button>
       </DialogContent>
     </Dialog>
   );
