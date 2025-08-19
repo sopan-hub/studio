@@ -28,16 +28,24 @@ const GitHubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 )
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
-  const handleGetStartedClick = (e: React.MouseEvent<HTMLElement>) => {
+  const handleAuthAction = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     if (user) {
-      router.push('/dashboard');
+      signOut();
     } else {
       setIsLoginDialogOpen(true);
+    }
+  };
+  
+  const handleGetStartedClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -53,11 +61,10 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
             <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
-          </nav>
-           <Button onClick={handleGetStartedClick} className="hidden md:flex neon-glow-button">
-              {user ? 'Go to Dashboard' : 'Get Started'}
-              <ArrowRight className="ml-2 h-4 w-4" />
+             <Button onClick={handleAuthAction} variant="ghost" className="hover:text-primary hover:neon-glow transition-all">
+                {user ? 'Log Out' : 'Log In'}
             </Button>
+          </nav>
         </div>
       </header>
 
