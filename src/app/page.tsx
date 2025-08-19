@@ -20,7 +20,7 @@ import { ParticleFooter } from '@/components/particle-footer';
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
-    <div onClick={onClick} className="bg-card p-6 rounded-lg border-2 border-border hover:border-primary/80 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.4)] hover:-translate-y-1 cursor-pointer h-full flex flex-col">
+    <div onClick={onClick} className="bg-card p-6 rounded-lg border-2 border-primary/20 hover:border-primary/80 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.4)] hover:-translate-y-1 cursor-pointer h-full flex flex-col">
         <div className="flex items-center gap-4 mb-4">
             <div className="text-primary bg-primary/10 p-2 rounded-lg">{icon}</div>
             <h3 className="text-xl font-bold text-foreground neon-glow">{title}</h3>
@@ -128,15 +128,15 @@ export default function Home() {
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => { /* can decide what to do after login, e.g. open the last clicked feature */ }}/>
       {/* Header */}
        <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
-        <div className="container mx-auto flex items-center justify-between p-4 gap-4">
+        <div className="container mx-auto flex items-center justify-between p-4 gap-2 md:gap-4">
            <div className="flex items-center gap-2">
             <Logo />
           </div>
-          <div className="flex-1 max-w-lg">
+          <div className="flex-1 max-w-xs md:max-w-lg">
              <form onSubmit={handleGlobalSearch} className="relative">
                 <Input 
                     type="search"
-                    placeholder="AI General Search..."
+                    placeholder="AI Search..."
                     className="w-full pl-10"
                     value={globalSearchQuery}
                     onChange={(e) => setGlobalSearchQuery(e.target.value)}
@@ -150,6 +150,11 @@ export default function Home() {
                 {user ? 'Log Out' : 'Log In'}
             </Button>
           </nav>
+           <div className="md:hidden">
+            <Button onClick={handleLoginLogout} variant="ghost" size="sm">
+              {user ? 'Log Out' : 'Log In'}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -243,7 +248,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="bg-background border-t border-primary/20 py-8 relative">
+      <footer className="bg-background border-t border-primary/20 py-8 md:py-12 relative">
         <ParticleFooter />
         <div className="container mx-auto text-center text-muted-foreground relative z-10">
           <p>&copy; 2024 Study Buddy AI. All rights reserved.</p>
