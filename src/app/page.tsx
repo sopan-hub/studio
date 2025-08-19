@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram, LogIn, Lightbulb, Pilcrow, Search } from "lucide-react";
+import { ArrowLeft, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram, LogIn, Lightbulb, Pilcrow, Search, Layers, Variable, Code, Languages } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/logo";
@@ -16,7 +16,7 @@ import { AiToolPlaceholder } from '@/components/ai-tool-placeholder';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 
-type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'tracker' | 'organizer' | 'explainer' | 'outliner' | null;
+type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
     <div onClick={onClick} className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] cursor-pointer h-full">
@@ -108,14 +108,16 @@ export default function Home() {
             return <AiQuizTool onBack={() => setActiveFeature(null)} />;
         case 'planner':
             return <AiToolPlaceholder title="Study Planner & Reminders" onBack={() => setActiveFeature(null)} inputType="text" />;
-        case 'tracker':
-            return <AiToolPlaceholder title="Progress Tracker" onBack={() => setActiveFeature(null)} inputType="none" />;
-        case 'organizer':
-            return <AiToolPlaceholder title="Save & Organize" onBack={() => setActiveFeature(null)} inputType="none" />;
         case 'explainer':
             return <AiToolPlaceholder title="Concept Explainer" onBack={() => setActiveFeature(null)} inputType="text" />;
-        case 'outliner':
-            return <AiToolPlaceholder title="Essay Outline Generator" onBack={() => setActiveFeature(null)} inputType="text" />;
+        case 'flashcards':
+            return <AiToolPlaceholder title="AI Flashcard Maker" onBack={() => setActiveFeature(null)} inputType="text-file" />;
+        case 'math':
+            return <AiToolPlaceholder title="Math Problem Solver" onBack={() => setActiveFeature(null)} inputType="text" />;
+        case 'code':
+            return <AiToolPlaceholder title="Code Explainer" onBack={() => setActiveFeature(null)} inputType="text" />;
+        case 'translator':
+            return <AiToolPlaceholder title="Document Translator" onBack={() => setActiveFeature(null)} inputType="file" />;
         default:
             return null;
     }
@@ -211,28 +213,28 @@ export default function Home() {
                         description="Break down complex topics and concepts into easy-to-understand explanations."
                     />
                     <FeatureCard
-                        onClick={() => handleFeatureClick('outliner')}
-                        icon={<Pilcrow size={24}/>}
-                        title="Essay Outline Generator"
-                        description="Generate structured outlines for your essays, reports, and assignments."
+                        onClick={() => handleFeatureClick('flashcards')}
+                        icon={<Layers size={24}/>}
+                        title="AI Flashcard Maker"
+                        description="Turn your study notes into interactive flashcards for effective revision."
                     />
                     <FeatureCard
-                        onClick={() => handleFeatureClick('planner')}
-                        icon={<CalendarClock size={24}/>}
-                        title="Study Planner"
-                        description="Organize your study schedule and get timely reminders to stay on track."
+                        onClick={() => handleFeatureClick('math')}
+                        icon={<Variable size={24}/>}
+                        title="Math Problem Solver"
+                        description="Get step-by-step solutions for complex math problems, from algebra to calculus."
                     />
                     <FeatureCard
-                        onClick={() => handleFeatureClick('tracker')}
-                        icon={<BarChart3 size={24}/>}
-                        title="Progress Tracker"
-                        description="Monitor your learning progress and identify areas for improvement."
+                        onClick={() => handleFeatureClick('code')}
+                        icon={<Code size={24}/>}
+                        title="Code Explainer"
+                        description="Understand code snippets in any programming language with detailed explanations."
                     />
                     <FeatureCard
-                        onClick={() => handleFeatureClick('organizer')}
-                        icon={<Bookmark size={24}/>}
-                        title="Save & Organize"
-                        description="Keep all your notes, quizzes, and summaries neatly organized and accessible."
+                        onClick={() => handleFeatureClick('translator')}
+                        icon={<Languages size={24}/>}
+                        title="Document Translator"
+                        description="Translate your study documents into multiple languages instantly."
                     />
                 </div>
             )}
@@ -258,3 +260,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
