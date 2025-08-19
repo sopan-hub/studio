@@ -127,17 +127,22 @@ h1, h2, h3, h4, h5, h6 {
     stroke-width: 8;
     fill: none;
     transition: filter 0.3s ease-in-out;
+    transform-origin: center;
 }
 
-.interactive-logo:hover .logo-geometry {
+.interactive-logo:hover .logo-geometry, .blasting .logo-geometry {
     filter: url(#wobble) url(#glow);
+}
+
+.blasting .logo-geometry {
+    animation: blast-out 0.5s ease-out forwards;
 }
 
 .interactive-logo .circuit-path {
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
-    animation: draw-in 2s ease-out infinite;
-    animation-delay: 1s; /* Stagger start */
+    animation: draw-in 4s ease-out infinite;
+    animation-delay: 1s;
 }
 
 .interactive-logo .ai-text {
@@ -145,8 +150,8 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     font-size: 80px;
     fill: hsl(var(--primary));
-    animation: fade-in 2s ease-out infinite;
-    animation-delay: 1.5s; /* Start after draw-in begins */
+    animation: fade-in 4s ease-out infinite;
+    animation-delay: 1.5s;
     opacity: 0;
 }
 
@@ -208,4 +213,15 @@ h1, h2, h3, h4, h5, h6 {
         transform: scale(1.5);
         opacity: 1;
     }
+}
+
+@keyframes blast-out {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5) rotate(90deg);
+    opacity: 0;
+  }
 }

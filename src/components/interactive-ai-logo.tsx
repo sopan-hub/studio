@@ -1,9 +1,28 @@
-import React from 'react';
+
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
 export const InteractiveAiLogo = () => {
+  const [isBlasting, setIsBlasting] = useState(false);
+
+  const handleClick = () => {
+    setIsBlasting(true);
+  };
+  
+  useEffect(() => {
+    if (isBlasting) {
+      const timer = setTimeout(() => {
+        setIsBlasting(false);
+      }, 500); // Must match the animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [isBlasting]);
+
   return (
-    <div className="interactive-logo-container">
-      <svg viewBox="0 0 400 400" className="interactive-logo">
+    <div className="interactive-logo-container" onClick={handleClick}>
+      <svg viewBox="0 0 400 400" className={cn("interactive-logo", { "blasting": isBlasting })}>
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="5" result="coloredBlur" />
