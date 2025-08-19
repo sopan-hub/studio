@@ -6,23 +6,35 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, ClipboardPaste } from "lucide-react";
+import { FileText, ClipboardPaste, ChevronDown } from "lucide-react";
 import { Summarizer } from "@/components/summarizer";
 import { FlashcardGenerator } from "@/components/flashcard-generator";
 import { QuizGenerator } from "@/components/quiz-generator";
 import { TutorChat } from "@/components/tutor-chat";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const FeatureCard = ({ id, title, description, children }: { id: string, title: string, description: string, children: React.ReactNode }) => (
+const FeatureCard = ({ id, title, description, children, isOpen, onOpenChange }: { id: string, title: string, description: string, children: React.ReactNode, isOpen: boolean, onOpenChange: (isOpen: boolean) => void }) => (
   <section id={id} className="mb-16 scroll-mt-20">
-    <Card className="border-2 border-border shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1">
-      <CardHeader>
-        <CardTitle className="text-2xl font-headline text-primary">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {children}
-      </CardContent>
-    </Card>
+    <Collapsible open={isOpen} onOpenChange={onOpenChange}>
+      <Card className="border-2 border-border shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1">
+        <CollapsibleTrigger asChild>
+          <div className="cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl font-headline text-primary">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+              </div>
+              <ChevronDown className={`h-6 w-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+            </CardHeader>
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent>
+            {children}
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   </section>
 );
 
@@ -31,6 +43,17 @@ export default function DashboardPage() {
   const [notes, setNotes] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [pastedNotes, setPastedNotes] = useState("");
+  const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
+    notes: true,
+    summarizer: false,
+    flashcards: false,
+    quizzes: false,
+    tutor: false,
+  });
+
+  const handleToggleSection = (sectionId: string) => {
+    setOpenSections(prev => ({ ...prev, [sectionId]: !prev[sectionId] }));
+  };
 
   const handleFileRead = (content: string) => {
     setNotes(content);
@@ -49,7 +72,13 @@ export default function DashboardPage() {
   
   return (
     <div className="space-y-16">
-       <FeatureCard id="notes" title="My Notes" description="Start by adding your study materials here.">
+       <FeatureCard 
+        id="notes" 
+        title="My Notes" 
+        description="Start by adding your study materials here."
+        isOpen={openSections.notes}
+        onOpenChange={() => handleToggleSection('notes')}
+      >
           <Tabs defaultValue="paste" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="paste">
@@ -106,6 +135,8 @@ export default function DashboardPage() {
         id="summarizer"
         title="AI Summarizer"
         description="Generate concise summaries from your notes instantly."
+        isOpen={openSections.summarizer}
+        onOpenChange={() => handleToggleSection('summarizer')}
       >
         <Summarizer notes={notes} />
       </FeatureCard>
@@ -114,6 +145,8 @@ export default function DashboardPage() {
         id="flashcards"
         title="AI Flashcards"
         description="Turn your notes into interactive flashcards for effective learning."
+        isOpen={openSections.flashcards}
+        onOpenChange={() => handleToggleSection('flashcards')}
       >
         <FlashcardGenerator notes={notes} />
       </FeatureCard>
@@ -122,6 +155,8 @@ export default function DashboardPage() {
         id="quizzes"
         title="AI Quiz Generator"
         description="Test your knowledge with auto-generated quizzes."
+        isOpen={openSections.quizzes}
+        onOpenChange={() => handleToggleSection('quizzes')}
       >
         <QuizGenerator notes={notes} />
       </FeatureCard>
@@ -130,6 +165,8 @@ export default function DashboardPage() {
         id="tutor"
         title="AI Tutor Chat"
         description="Your personal AI tutor, ready to answer your questions."
+        isOpen={openSections.tutor}
+        onOpenChange={() => handleToggleSection('tutor')}
       >
         <TutorChat notes={notes} />
       </FeatureCard>
