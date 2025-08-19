@@ -130,13 +130,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .interactive-logo:hover .logo-geometry {
-    filter: url(#wobble);
+    filter: url(#wobble) url(#glow);
 }
 
 .interactive-logo .circuit-path {
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
-    animation: draw-in 2s ease-out forwards;
+    animation: draw-in 2s ease-out infinite;
+    animation-delay: 1s; /* Stagger start */
 }
 
 .interactive-logo .ai-text {
@@ -144,13 +145,14 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     font-size: 80px;
     fill: hsl(var(--primary));
-    animation: fade-in 2s ease-out 1.5s forwards;
+    animation: fade-in 2s ease-out infinite;
+    animation-delay: 1.5s; /* Start after draw-in begins */
     opacity: 0;
 }
 
 .interactive-logo .node {
     fill: hsl(var(--primary));
-    animation: pulse-node 3s infinite ease-in-out;
+    animation: pulse-node 2s infinite ease-in-out;
     opacity: 0;
 }
 
@@ -171,14 +173,26 @@ h1, h2, h3, h4, h5, h6 {
 
 
 @keyframes draw-in {
-    to {
+    0% {
+        stroke-dashoffset: 1000;
+    }
+    50% {
         stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: 1000;
     }
 }
 
 @keyframes fade-in {
-    to {
+     0% {
+        opacity: 0;
+    }
+    50% {
         opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }
 
