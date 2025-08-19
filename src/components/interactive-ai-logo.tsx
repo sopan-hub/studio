@@ -16,7 +16,7 @@ export const InteractiveAiLogo = () => {
     if (!blasting) return;
 
     // Set random CSS variables for each element to use in the animation
-    document.querySelectorAll('.interactive-logo.blasting .circuit-path, .interactive-logo.blasting .node, .interactive-logo.blasting .ai-text').forEach(el => {
+    document.querySelectorAll('.interactive-logo.blasting .logo-geometry > *, .interactive-logo.blasting .ai-text').forEach(el => {
         const htmlEl = el as HTMLElement;
         htmlEl.style.setProperty('--randX', `${(Math.random() - 0.5) * 2}`);
         htmlEl.style.setProperty('--randY', `${(Math.random() - 0.5) * 2}`);
