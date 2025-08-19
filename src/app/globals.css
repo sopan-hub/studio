@@ -12,39 +12,39 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    --background: 120 23% 97%;
-    --foreground: 224 71% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
-    --primary: 124 27% 42%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 128 33% 90%;
-    --secondary-foreground: 124 27% 32%;
-    --muted: 120 15% 92%;
-    --muted-foreground: 224 71% 25%;
-    --accent: 183 27% 60%;
-    --accent-foreground: 224 71% 4%;
-    --destructive: 0 84.2% 60.2%;
+    --background: 220 40% 5%; /* Deep Blue-Black */
+    --foreground: 210 40% 98%; /* Almost White */
+    --card: 220 40% 10%; /* Slightly lighter Blue-Black */
+    --card-foreground: 210 40% 98%;
+    --popover: 220 40% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 90% 60%; /* Bright Blue */
+    --primary-foreground: 220 40% 5%;
+    --secondary: 220 40% 15%; /* Darker Blue-Gray */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 40% 15%;
+    --muted-foreground: 210 40% 60%; /* Lighter Gray-Blue */
+    --accent: 210 90% 50%; /* Slightly darker Bright Blue */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 120 10% 88%;
-    --input: 120 10% 88%;
-    --ring: 124 27% 42%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 220 40% 20%; /* Blue-Gray Border */
+    --input: 220 40% 20%;
+    --ring: 210 90% 60%;
+    --chart-1: 210 90% 55%;
+    --chart-2: 190 80% 50%;
+    --chart-3: 230 85% 65%;
+    --chart-4: 200 75% 55%;
+    --chart-5: 220 95% 70%;
     --radius: 0.8rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 224 71% 10%;
-    --sidebar-primary: 124 27% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 120 23% 95%;
-    --sidebar-accent-foreground: 224 71% 4%;
-    --sidebar-border: 120 10% 88%;
-    --sidebar-ring: 124 27% 42%;
+    --sidebar-background: 220 40% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 90% 60%;
+    --sidebar-primary-foreground: 220 40% 5%;
+    --sidebar-accent: 220 40% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 40% 20%;
+    --sidebar-ring: 210 90% 60%;
   }
   .dark {
     --background: 220 40% 5%; /* Deep Blue-Black */
