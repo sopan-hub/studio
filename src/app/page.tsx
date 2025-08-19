@@ -243,7 +243,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="bg-background border-t border-primary/20 py-8 relative overflow-hidden">
+      <footer className="bg-background border-t border-primary/20 py-8 relative">
         <ParticleFooter />
         <div className="container mx-auto text-center text-muted-foreground relative z-10">
           <p className="text-primary neon-glow">&copy; 2024 Study Buddy AI. All rights reserved.</p>
