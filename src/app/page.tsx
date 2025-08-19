@@ -20,7 +20,7 @@ import { ParticleFooter } from '@/components/particle-footer';
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
-    <div onClick={onClick} className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:-translate-y-1 cursor-pointer h-full flex flex-col">
+    <div onClick={onClick} className="bg-card p-6 rounded-lg border-2 border-border hover:border-primary/80 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.4)] hover:-translate-y-1 cursor-pointer h-full flex flex-col">
         <div className="flex items-center gap-4 mb-4">
             <div className="text-primary bg-primary/10 p-2 rounded-lg">{icon}</div>
             <h3 className="text-xl font-bold text-foreground neon-glow">{title}</h3>
