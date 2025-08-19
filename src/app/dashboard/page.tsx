@@ -15,7 +15,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useAuth } from "@/hooks/use-auth";
 import { LoginDialog } from "@/components/login-dialog";
 
-const FeatureCard = ({ id, title, description, children, onOpen }: { id: string, title: string, description: string, children: React.ReactNode, onOpen?: () => boolean }) => {
+const FeatureCard = ({ id, title, description, children, onOpen, isOpen }: { id: string, title: string, description: string, children: React.ReactNode, onOpen?: () => boolean, isOpen?: boolean }) => {
   
   const handleTriggerClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (onOpen && !onOpen()) {
@@ -26,7 +26,7 @@ const FeatureCard = ({ id, title, description, children, onOpen }: { id: string,
   
   return (
     <Card className="bg-card border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full" value={isOpen ? id : ""}>
         <AccordionItem value={id} className="border-b-0">
           <AccordionTrigger onClick={handleTriggerClick} className="p-6 hover:no-underline">
             <div className="text-left">
@@ -52,6 +52,7 @@ export default function DashboardPage() {
   const [pastedNotes, setPastedNotes] = useState("");
   const { user, loading } = useAuth();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [activeFeature, setActiveFeature] = useState<string | null>(null);
 
 
   const handleFileRead = (content: string) => {
@@ -69,11 +70,12 @@ export default function DashboardPage() {
     alert("Note saved!");
   };
 
-  const checkAuth = () => {
+  const checkAuthAndToggle = (featureId: string) => {
     if (!user) {
       setIsLoginDialogOpen(true);
       return false;
     }
+    setActiveFeature(prev => prev === featureId ? null : featureId);
     return true;
   };
   
@@ -83,7 +85,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <section className="bg-card p-6 rounded-lg border border-primary/20">
         <h2 className="text-3xl font-bold text-primary mb-4 text-center neon-glow">AI General Search</h2>
-        <TutorChat notes={notes} onGenerate={checkAuth}/>
+        <TutorChat notes={notes} onGenerate={() => checkAuthAndToggle('tutor-main')}/>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -92,6 +94,8 @@ export default function DashboardPage() {
             id="notes" 
             title="My Notes" 
             description="Start by adding your study materials here."
+            isOpen={activeFeature === 'notes'}
+            onOpen={() => { setActiveFeature(prev => prev === 'notes' ? null : 'notes'); return true; }}
           >
               <Tabs defaultValue="paste" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
@@ -150,7 +154,8 @@ export default function DashboardPage() {
           id="summarizer"
           title="AI Summarizer"
           description="Generate concise summaries from your notes instantly."
-          onOpen={checkAuth}
+          isOpen={activeFeature === 'summarizer'}
+          onOpen={() => checkAuthAndToggle('summarizer')}
         >
           <Summarizer notes={notes} />
         </FeatureCard>
@@ -159,7 +164,8 @@ export default function DashboardPage() {
           id="flashcards"
           title="AI Flashcards"
           description="Turn your notes into interactive flashcards for effective learning."
-          onOpen={checkAuth}
+          isOpen={activeFeature === 'flashcards'}
+          onOpen={() => checkAuthAndToggle('flashcards')}
         >
           <FlashcardGenerator notes={notes} />
         </FeatureCard>
@@ -168,7 +174,8 @@ export default function DashboardPage() {
           id="quizzes"
           title="AI Quiz Generator"
           description="Test your knowledge with auto-generated quizzes."
-          onOpen={checkAuth}
+          isOpen={activeFeature === 'quizzes'}
+          onOpen={() => checkAuthAndToggle('quizzes')}
         >
           <QuizGenerator notes={notes} />
         </FeatureCard>
@@ -177,9 +184,10 @@ export default function DashboardPage() {
           id="tutor"
           title="AI Tutor Chat"
           description="Your personal AI tutor, ready to answer your questions."
-          onOpen={checkAuth}
+          isOpen={activeFeature === 'tutor'}
+          onOpen={() => checkAuthAndToggle('tutor')}
         >
-          <TutorChat notes={notes} onGenerate={checkAuth} />
+          <TutorChat notes={notes} onGenerate={() => checkAuthAndToggle('tutor')} />
         </FeatureCard>
       </div>
     </div>

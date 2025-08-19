@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound, Mail, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,8 +25,9 @@ const signInSchema = z.object({
 
 
 export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
-  const { signInWithEmail, signUpWithEmail, loading } = useAuth();
+  const { signInWithEmail, signUpWithEmail } = useAuth();
   const [activeTab, setActiveTab] = useState("signin");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
@@ -40,6 +41,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
   });
 
   const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
+    setLoading(true);
     try {
       await signUpWithEmail(values.email, values.password);
       onOpenChange(false);
@@ -47,16 +49,21 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
     } catch (error) {
       console.error("Sign-up Error:", error);
       toast({ variant: "destructive", title: "Sign-up Error", description: "This email might already be in use." });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignIn = async (values: z.infer<typeof signInSchema>) => {
+    setLoading(true);
     try {
       await signInWithEmail(values.email, values.password);
       onOpenChange(false);
     } catch (error) {
       console.error("Sign-in Error:", error);
       toast({ variant: "destructive", title: "Sign-in Error", description: "Invalid email or password." });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,7 +112,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
                   </FormItem>
                 )} />
                 <Button type="submit" disabled={loading} className="w-full neon-glow-button">
-                  {loading ? 'Signing In...' : 'Sign In'}
+                  {loading ? <Loader2 className="animate-spin" /> : 'Sign In'}
                 </Button>
               </form>
             </Form>
@@ -138,7 +145,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
                   </FormItem>
                 )} />
                 <Button type="submit" disabled={loading} className="w-full neon-glow-button">
-                  {loading ? 'Creating Account...' : 'Sign Up'}
+                  {loading ? <Loader2 className="animate-spin" /> : 'Sign Up'}
                 </Button>
               </form>
             </Form>

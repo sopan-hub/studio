@@ -37,27 +37,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signUpWithEmail = async (email: string, pass: string) => {
-    setLoading(true);
-    try {
-      await createUserWithEmailAndPassword(auth, email, pass);
-    } catch (error) {
-      console.error("Error signing up with email", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    await createUserWithEmailAndPassword(auth, email, pass);
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (error) {
-      console.error("Error signing in with email", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const handleSignOut = async () => {
@@ -68,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  if (loading && !user) {
+  if (loading) {
     return (
         <div className="flex items-center justify-center min-h-screen bg-background">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
