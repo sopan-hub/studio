@@ -14,35 +14,32 @@ export const InteractiveAiLogo = () => {
           </filter>
         </defs>
         <circle cx="100" cy="100" r="95" className="base-circle" />
+        
+        {/* Central Brain/Chip */}
+        <path className="brain-path" d="M90 90h20v20H90z" />
+        <circle cx="100" cy="100" r="5" className="node node-1" />
 
-        {/* Robot Head */}
-        <path className="brain-path" d="M 60,90 A 40,40 0 0,1 140,90 V 150 H 60 Z" />
+        {/* Pathways */}
+        <path className="brain-path" d="M100 90V70" />
+        <path className="brain-path" d="M100 110v20" />
+        <path className="brain-path" d="M90 100H70" />
+        <path className="brain-path" d="M110 100h20" />
 
-        {/* Eyes */}
-        <circle cx="85" cy="115" r="8" className="brain-path" />
-        <circle cx="115" cy="115" r="8" className="brain-path" />
-        <circle cx="85" cy="115" r="3" className="node node-1" />
-        <circle cx="115" cy="115" r="3" className="node node-2" />
+        <path className="brain-path" d="M90 90L75 75" />
+        <path className="brain-path" d="M110 90l15-15" />
+        <path className="brain-path" d="M90 110L75 125" />
+        <path className="brain-path" d="M110 110l15 15" />
 
-        {/* Graduation Cap */}
-        {/* Cap Top */}
-        <path className="brain-path" d="M 50 80 L 100 60 L 150 80 L 100 100 Z" />
-        {/* Cap Base */}
-        <path className="brain-path" d="M 60 90 Q 100 110 140 90" />
+        {/* Outer Nodes */}
+        <circle cx="100" cy="70" r="3" className="node node-2" />
+        <circle cx="100" cy="130" r="3" className="node node-3" />
+        <circle cx="70" cy="100" r="3" className="node node-4" />
+        <circle cx="130" cy="100" r="3" className="node node-5" />
 
-        {/* Tassel */}
-        <path className="brain-path" d="M100,60 V 85" />
-        <path className="brain-path" d="M100,85 L 115 80" />
-        <circle cx="100" cy="60" r="4" className="node node-3" />
-        <circle cx="115" cy="80" r="4" className="node node-4" />
-
-         {/* Lightbulb for 'idea' */}
-        <g transform="translate(90, 30)">
-          <path className="brain-path" d="M10 18 A 6 6 0 1 1 10 6 A 4 4 0 0 1 10 18 Z" />
-          <path className="brain-path" d="M10 18 L 10 22" />
-          <path className="brain-path" d="M 7 22 H 13" />
-          <circle cx="10" cy="12" r="2" className="node node-5" />
-        </g>
+        <circle cx="75" cy="75" r="3" className="node node-6" />
+        <circle cx="125" cy="75" r="3" className="node node-2" />
+        <circle cx="75" cy="125" r="3" className="node node-3" />
+        <circle cx="125" cy="125" r="3" className="node node-4" />
       </svg>
     </div>
   );
