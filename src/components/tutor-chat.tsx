@@ -7,11 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "./ui/scroll-area";
 
 const formSchema = z.object({
   query: z.string().min(10, {
@@ -60,13 +59,12 @@ export function TutorChat({ notes }: { notes: string }) {
             name="query"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="sr-only">Your Question</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                     <Input
                       placeholder="Ask your AI tutor anything..."
-                      className="pl-10 h-12 text-lg"
+                      className="pl-10 h-12 text-lg bg-background"
                       {...field}
                     />
                   </div>
@@ -76,7 +74,7 @@ export function TutorChat({ notes }: { notes: string }) {
             )}
           />
           <div className="text-center">
-            <Button type="submit" disabled={isLoading} size="lg">
+            <Button type="submit" disabled={isLoading} size="lg" className="neon-glow-button">
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -95,10 +93,10 @@ export function TutorChat({ notes }: { notes: string }) {
       )}
 
       {answer && (
-        <Card className="mt-8">
+        <Card className="mt-8 bg-card border border-primary/20">
           <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2">
-              <Sparkles className="text-primary" />
+            <CardTitle className="font-headline flex items-center gap-2 text-primary neon-glow">
+              <Sparkles />
               AI Tutor's Answer
             </CardTitle>
           </CardHeader>

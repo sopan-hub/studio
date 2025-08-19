@@ -4,7 +4,6 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #F9FAFB;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -14,52 +13,65 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 76% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 76% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 76% 15%;
-    --primary: 224 62% 32%; /* Deep Blue #1E3A8A */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 188 95% 42%; /* Cyan/Teal #06B6D4 */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 210 20% 40%;
-    --accent: 43 96% 58%; /* Soft Yellow #FACC15 */
-    --accent-foreground: 224 76% 15%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 210 20% 85%;
-    --input: 210 20% 92%;
-    --ring: 224 62% 32%;
-    --chart-1: 224 62% 32%;
-    --chart-2: 188 95% 42%;
-    --chart-3: 43 96% 58%;
-    --chart-4: 224 62% 52%;
-    --chart-5: 188 95% 62%;
+    --background: 240 10% 3.9%; /* Jet Black */
+    --foreground: 210 40% 98%; /* Muted Blue-Gray */
+
+    --card: 222 47% 11%; /* Dark Gray-Blue */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%; /* Neon Blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 91% 60%; /* Neon Blue for secondary as well */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222 47% 11%;
+    --muted-foreground: 215 28% 63%;
+
+    --accent: 217 91% 60%; /* Neon Blue */
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 91% 40%; /* Brighter blue for borders */
+    --input: 217 91% 30%;
+    --ring: 217 91% 60%;
+
     --radius: 0.8rem;
   }
+
   .dark {
-    --background: 224 76% 8%;
-    --foreground: 0 0% 98%;
-    --card: 224 76% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 224 76% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 188 95% 42%; /* Cyan/Teal #06B6D4 */
-    --primary-foreground: 224 76% 10%;
-    --secondary: 224 62% 32%; /* Deep Blue #1E3A8A */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 224 76% 18%;
-    --muted-foreground: 210 20% 70%;
-    --accent: 43 96% 58%; /* Soft Yellow #FACC15 */
-    --accent-foreground: 224 76% 10%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 224 76% 25%;
-    --input: 224 76% 20%;
-    --ring: 188 95% 42%;
+    --background: 240 10% 3.9%; /* Jet Black */
+    --foreground: 210 40% 98%; /* Muted Blue-Gray */
+
+    --card: 222 47% 11%; /* Dark Gray-Blue */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%; /* Neon Blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 91% 60%; /* Neon Blue */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222 47% 11%;
+    --muted-foreground: 215 28% 63%;
+
+    --accent: 217 91% 60%; /* Neon Blue */
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 91% 40%;
+    --input: 217 91% 30%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -73,10 +85,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @layer components {
-    .border-4 {
-        border-width: 2px;
-    }
-    .border-blue-900 {
-        border-color: hsl(var(--primary) / 0.5);
-    }
+  .neon-glow {
+    text-shadow:
+      0 0 5px hsl(var(--primary) / 0.8),
+      0 0 10px hsl(var(--primary) / 0.8),
+      0 0 20px hsl(var(--primary) / 0.5);
+  }
+  .neon-glow-button {
+    box-shadow:
+      0 0 5px hsl(var(--primary)),
+      0 0 10px hsl(var(--primary)),
+      0 0 20px hsl(var(--primary) / 0.5);
+    transition: all 0.3s ease-in-out;
+  }
+  .neon-glow-button:hover {
+     box-shadow:
+      0 0 10px hsl(var(--primary)),
+      0 0 20px hsl(var(--primary)),
+      0 0 40px hsl(var(--primary) / 0.5);
+  }
 }

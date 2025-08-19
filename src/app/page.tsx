@@ -6,10 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
-  <div className="bg-card p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+  <div className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
     <div className="flex items-center gap-4 mb-4">
-      <div className="bg-secondary/10 text-secondary p-3 rounded-lg">{icon}</div>
-      <h3 className="text-xl font-bold text-primary">{title}</h3>
+      <div className="text-primary">{icon}</div>
+      <h3 className="text-xl font-bold text-primary neon-glow">{title}</h3>
     </div>
     <p className="text-muted-foreground">{description}</p>
   </div>
@@ -19,20 +19,20 @@ export default function Home() {
   return (
     <div className="bg-background text-foreground">
       {/* Header */}
-       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b">
+       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
         <div className="container mx-auto flex items-center justify-between p-4">
            <div className="flex items-center gap-2">
-            <BookOpenCheck className="h-8 w-8 text-secondary" />
-            <h1 className="text-xl font-headline font-bold text-foreground">
+            <BookOpenCheck className="h-8 w-8 text-primary neon-glow" />
+            <h1 className="text-xl font-headline font-bold text-primary neon-glow">
               Study Buddy AI
             </h1>
           </div>
           <nav className="hidden md:flex items-center gap-4">
-            <Link href="#features" className="hover:text-primary transition-colors">Features</Link>
-            <Link href="/dashboard" className="hover:text-primary transition-colors">Study Assistant</Link>
-            <Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link>
+            <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
+            <Link href="/dashboard" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Study Assistant</Link>
+            <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
           </nav>
-          <Button asChild className="bg-gradient-to-r from-secondary to-accent text-white font-bold">
+          <Button asChild className="bg-primary/90 text-primary-foreground font-bold neon-glow-button">
             <Link href="/dashboard">Get Started</Link>
           </Button>
         </div>
@@ -43,13 +43,13 @@ export default function Home() {
         <section className="container mx-auto py-16 md:py-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-primary leading-tight">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-primary leading-tight neon-glow">
                 Your Personal AI Study Buddy
               </h1>
               <p className="text-lg text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
                 <Link href="/dashboard">
                   Start Studying Now <ArrowRight className="ml-2" />
                 </Link>
@@ -61,18 +61,18 @@ export default function Home() {
                 alt="AI Assistant Illustration" 
                 width={600} 
                 height={400} 
-                className="rounded-lg shadow-2xl"
-                data-ai-hint="futuristic student AI"
+                className="rounded-lg shadow-2xl shadow-primary/20"
+                data-ai-hint="futuristic student AI neon"
               />
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-16 bg-white dark:bg-card">
+        <section id="features" className="py-16 bg-background">
            <div className="container mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary">Powerful Features to Boost Your Learning</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-primary neon-glow">Powerful Features to Boost Your Learning</h2>
               <p className="text-lg text-muted-foreground mt-2">Everything you need to succeed in your studies, powered by AI.</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -110,6 +110,15 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <footer className="bg-background border-t border-primary/20 py-8">
+        <div className="container mx-auto text-center text-muted-foreground">
+          <p className="text-primary neon-glow">&copy; 2024 Study Buddy AI. All rights reserved.</p>
+          <div className="flex justify-center gap-4 mt-4">
+            <Link href="#" className="hover:text-primary hover:neon-glow transition-all">Privacy Policy</Link>
+            <Link href="#" className="hover:text-primary hover:neon-glow transition-all">Terms of Service</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

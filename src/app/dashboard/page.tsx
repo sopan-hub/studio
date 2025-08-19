@@ -11,17 +11,16 @@ import { Summarizer } from "@/components/summarizer";
 import { FlashcardGenerator } from "@/components/flashcard-generator";
 import { QuizGenerator } from "@/components/quiz-generator";
 import { TutorChat } from "@/components/tutor-chat";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const FeatureCard = ({ id, title, description, children }: { id: string, title: string, description: string, children: React.ReactNode }) => (
-  <Card className="shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
+  <Card className="bg-card border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
     <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value={id}>
-        <AccordionTrigger className="p-6">
+      <AccordionItem value={id} className="border-b-0">
+        <AccordionTrigger className="p-6 hover:no-underline">
           <div className="text-left">
-            <CardTitle className="text-xl font-bold text-primary">{title}</CardTitle>
-            <CardDescription className="text-base">{description}</CardDescription>
+            <CardTitle className="text-xl font-bold text-primary neon-glow">{title}</CardTitle>
+            <CardDescription className="text-base text-muted-foreground">{description}</CardDescription>
           </div>
         </AccordionTrigger>
         <AccordionContent>
@@ -57,8 +56,8 @@ export default function DashboardPage() {
   
   return (
     <div className="space-y-8">
-      <section className="bg-card p-6 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold text-primary mb-4 text-center">AI General Search</h2>
+      <section className="bg-card p-6 rounded-lg border border-primary/20">
+        <h2 className="text-3xl font-bold text-primary mb-4 text-center neon-glow">AI General Search</h2>
         <TutorChat notes={notes} />
       </section>
 
@@ -95,7 +94,7 @@ export default function DashboardPage() {
                         value={pastedNotes}
                         onChange={handlePaste}
                       />
-                      <Button onClick={handleSaveNote} disabled={!pastedNotes}>Save Note</Button>
+                      <Button onClick={handleSaveNote} disabled={!pastedNotes} className="neon-glow-button">Save Note</Button>
                     </CardContent>
                   </Card>
                 </TabsContent>
