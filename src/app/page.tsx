@@ -49,10 +49,10 @@ export default function Home() {
         <section className="container mx-auto py-16 md:py-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-primary leading-tight neon-glow">
+              <h1 className="text-5xl md:text-6xl font-extrabold text-primary leading-tight neon-glow">
                 Your Personal AI Study Buddy
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
