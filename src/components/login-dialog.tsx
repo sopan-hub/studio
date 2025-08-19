@@ -30,7 +30,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 )
 
 
-export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
+export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: boolean, onOpenChange: (open: boolean) => void, onLoginSuccess?: () => void }) {
   const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const [activeTab, setActiveTab] = useState("signin");
   const [loading, setLoading] = useState(false);
@@ -46,11 +46,18 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
     defaultValues: { email: "", password: "" },
   });
 
+  const handleSuccess = () => {
+    onOpenChange(false);
+    if(onLoginSuccess) {
+      onLoginSuccess();
+    }
+  }
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
       await signInWithGoogle();
-      onOpenChange(false);
+      handleSuccess();
     } catch (error) {
       console.error("Google Sign-in Error:", error);
       toast({ variant: "destructive", title: "Sign-in Error", description: "Could not sign in with Google." });
@@ -63,8 +70,8 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
     setLoading(true);
     try {
       await signUpWithEmail(values.email, values.password);
-      onOpenChange(false);
       toast({ title: "Welcome!", description: "Your account has been created successfully." });
+      handleSuccess();
     } catch (error: any) {
       console.error("Sign-up Error:", error);
       const message = error.code === 'auth/email-already-in-use' ? "This email might already be in use." : "An unknown error occurred.";
@@ -78,7 +85,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
     setLoading(true);
     try {
       await signInWithEmail(values.email, values.password);
-      onOpenChange(false);
+      handleSuccess();
     } catch (error) {
       console.error("Sign-in Error:", error);
       toast({ variant: "destructive", title: "Sign-in Error", description: "Invalid email or password." });

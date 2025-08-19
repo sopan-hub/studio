@@ -11,8 +11,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { LoginDialog } from '@/components/login-dialog';
 import { InteractiveAiLogo } from '@/components/interactive-ai-logo';
 
-const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
-  <div className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
+const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
+  <div className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] cursor-pointer" onClick={onClick}>
     <div className="flex items-center gap-4 mb-4">
       <div className="text-primary">{icon}</div>
       <h3 className="text-xl font-bold text-primary neon-glow">{title}</h3>
@@ -32,7 +32,15 @@ export default function Home() {
   const router = useRouter();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
-  const handleAuthAction = (e: React.MouseEvent<HTMLElement>) => {
+  const handleAuthAction = () => {
+    if (user) {
+      router.push('/dashboard');
+    } else {
+      setIsLoginDialogOpen(true);
+    }
+  };
+  
+  const handleLoginLogout = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     if (user) {
       signOut();
@@ -40,18 +48,10 @@ export default function Home() {
       setIsLoginDialogOpen(true);
     }
   };
-  
-  const handleGetStartedClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <div className="bg-background text-foreground">
-      <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
+      <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => router.push('/dashboard')}/>
       {/* Header */}
        <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
         <div className="container mx-auto flex items-center justify-between p-4">
@@ -60,9 +60,11 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
-            <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
-             <Button onClick={handleAuthAction} variant="ghost" className="hover:text-primary hover:neon-glow transition-all">
+             <Button onClick={handleLoginLogout} variant="ghost" className="hover:text-primary hover:neon-glow transition-all">
                 {user ? 'Log Out' : 'Log In'}
+            </Button>
+            <Button onClick={handleAuthAction} className="neon-glow-button">
+              {user ? 'Go to Dashboard' : 'Get Started'} <ArrowRight className="ml-2" />
             </Button>
           </nav>
         </div>
@@ -79,7 +81,7 @@ export default function Home() {
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse" onClick={handleGetStartedClick}>
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse" onClick={handleAuthAction}>
                   Start Studying Now <ArrowRight className="ml-2" />
               </Button>
             </div>
@@ -101,31 +103,37 @@ export default function Home() {
                   icon={<BotMessageSquare size={24}/>}
                   title="Ask Any Question (AI Chat)"
                   description="Get instant, detailed answers to your questions from an expert AI tutor."
+                  onClick={handleAuthAction}
                 />
                 <FeatureCard 
                   icon={<FileText size={24}/>}
                   title="Generate Notes & Summaries"
                   description="Automatically create concise summaries and organized notes from any text."
+                   onClick={handleAuthAction}
                 />
                  <FeatureCard 
                   icon={<BrainCircuit size={24}/>}
                   title="Smart Quiz Maker"
                   description="Test your knowledge with custom quizzes generated from your study materials."
+                   onClick={handleAuthAction}
                 />
                  <FeatureCard 
                   icon={<CalendarClock size={24}/>}
                   title="Study Planner & Reminders"
                   description="Organize your study schedule and get timely reminders to stay on track."
+                   onClick={handleAuthAction}
                 />
                  <FeatureCard 
                   icon={<BarChart3 size={24}/>}
                   title="Progress Tracker"
                   description="Monitor your learning progress and identify areas for improvement."
+                   onClick={handleAuthAction}
                 />
                  <FeatureCard 
                   icon={<Bookmark size={24}/>}
                   title="Save & Organize"
                   description="Keep all your notes, quizzes, and summaries neatly organized and accessible."
+                   onClick={handleAuthAction}
                 />
             </div>
           </div>
