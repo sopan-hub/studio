@@ -1,35 +1,10 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 export const InteractiveAiLogo = () => {
-  const [blasting, setBlasting] = useState(false);
-
-  const handleClick = () => {
-    if (blasting) return;
-    setBlasting(true);
-  };
-
-  useEffect(() => {
-    if (!blasting) return;
-
-    // Set random CSS variables for each element to use in the animation
-    document.querySelectorAll('.interactive-logo.blasting .logo-geometry > *, .interactive-logo.blasting .ai-text').forEach(el => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.style.setProperty('--randX', `${(Math.random() - 0.5) * 2}`);
-        htmlEl.style.setProperty('--randY', `${(Math.random() - 0.5) * 2}`);
-        htmlEl.style.setProperty('--randR', `${(Math.random() - 0.5) * 2}`);
-    });
-
-
-    const timer = setTimeout(() => {
-      setBlasting(false);
-    }, 3000); // Duration of the blast animation
-
-    return () => clearTimeout(timer);
-  }, [blasting]);
 
   const circuitPieces = [
     { type: 'rect', props: { x: "100", y: "100", width: "200", height: "200", rx: "20" }, className: 'logo-main-chip' },
@@ -56,7 +31,7 @@ export const InteractiveAiLogo = () => {
 
   return (
     <div className="interactive-logo-container">
-      <svg viewBox="0 0 400 400" className={cn("interactive-logo", blasting && 'blasting')} onClick={handleClick}>
+      <svg viewBox="0 0 400 400" className="interactive-logo">
         <g className="logo-geometry">
            {/* Inner square */}
           <rect x="120" y="120" width="160" height="160" rx="10" fill="hsl(var(--background))" stroke="hsl(var(--primary))" strokeWidth="4" className={'circuit-path logo-inner-chip'} />
