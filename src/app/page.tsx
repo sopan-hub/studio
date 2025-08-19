@@ -11,34 +11,12 @@ import { useAuth } from '@/hooks/use-auth';
 import { LoginDialog } from '@/components/login-dialog';
 import { InteractiveAiLogo } from '@/components/interactive-ai-logo';
 import { AiChatTool } from '@/components/ai-chat-tool';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
+import { AiQuizTool } from '@/components/ai-quiz-tool';
+import { AiToolPlaceholder } from '@/components/ai-tool-placeholder';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
 
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'tracker' | 'organizer' | 'explainer' | 'outliner' | null;
-
-const AiToolPlaceholder = ({ title, onBack }: { title: string; onBack: () => void }) => (
-    <Card className="w-full bg-card border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in">
-        <CardHeader>
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
-                    <ArrowLeft />
-                </Button>
-                <CardTitle className="text-2xl font-bold text-primary neon-glow">{title}</CardTitle>
-            </div>
-        </CardHeader>
-        <CardContent>
-            <div className="flex flex-col gap-4">
-                <Textarea placeholder={`Input for ${title}...`} className="min-h-[200px]" />
-                <Button className="self-start neon-glow-button">Generate</Button>
-                <div className="mt-4 p-4 border border-dashed border-primary/40 rounded-lg min-h-[150px] bg-background/50">
-                    <p className="text-muted-foreground">AI output will appear here...</p>
-                </div>
-            </div>
-        </CardContent>
-    </Card>
-);
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
     <div onClick={onClick} className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] cursor-pointer h-full">
@@ -125,19 +103,19 @@ export default function Home() {
                         onSearchPerformed={() => setGlobalSearchQuery("")}
                     />;
         case 'summarizer':
-            return <AiToolPlaceholder title="Generate Notes & Summaries" onBack={() => setActiveFeature(null)} />;
+            return <AiToolPlaceholder title="Generate Notes & Summaries" onBack={() => setActiveFeature(null)} inputType="text-file" />;
         case 'quiz':
-            return <AiToolPlaceholder title="Smart Quiz Maker" onBack={() => setActiveFeature(null)} />;
+            return <AiQuizTool onBack={() => setActiveFeature(null)} />;
         case 'planner':
-            return <AiToolPlaceholder title="Study Planner & Reminders" onBack={() => setActiveFeature(null)} />;
+            return <AiToolPlaceholder title="Study Planner & Reminders" onBack={() => setActiveFeature(null)} inputType="text" />;
         case 'tracker':
-            return <AiToolPlaceholder title="Progress Tracker" onBack={() => setActiveFeature(null)} />;
+            return <AiToolPlaceholder title="Progress Tracker" onBack={() => setActiveFeature(null)} inputType="none" />;
         case 'organizer':
-            return <AiToolPlaceholder title="Save & Organize" onBack={() => setActiveFeature(null)} />;
+            return <AiToolPlaceholder title="Save & Organize" onBack={() => setActiveFeature(null)} inputType="none" />;
         case 'explainer':
-            return <AiToolPlaceholder title="Concept Explainer" onBack={() => setActiveFeature(null)} />;
+            return <AiToolPlaceholder title="Concept Explainer" onBack={() => setActiveFeature(null)} inputType="text" />;
         case 'outliner':
-            return <AiToolPlaceholder title="Essay Outline Generator" onBack={() => setActiveFeature(null)} />;
+            return <AiToolPlaceholder title="Essay Outline Generator" onBack={() => setActiveFeature(null)} inputType="text" />;
         default:
             return null;
     }

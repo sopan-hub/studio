@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import { jsPDF } from 'jspdf';
+import "jspdf/dist/polyfills.es.js"; // Required for jsPDF in some environments
 
 interface AiChatToolProps {
     onBack: () => void;
@@ -23,40 +24,6 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
     const [file, setFile] = useState<{ name: string, dataUri: string } | null>(null);
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (initialQuestion) {
-            setQuestion(initialQuestion);
-            handleGenerate();
-            if (onSearchPerformed) {
-                onSearchPerformed();
-            }
-        }
-    }, [initialQuestion]);
-
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = event.target.files?.[0];
-        if (selectedFile) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const dataUri = e.target?.result as string;
-                setFile({ name: selectedFile.name, dataUri });
-            };
-            reader.readAsDataURL(selectedFile);
-        }
-    };
-
-    const handleUploadClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    const handleRemoveFile = () => {
-        setFile(null);
-        if(fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    }
 
     const handleGenerate = async () => {
         if (!question.trim()) {
@@ -87,6 +54,42 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
             setLoading(false);
         }
     };
+    
+    // Effect to auto-trigger generation when initialQuestion is set by global search
+    useEffect(() => {
+        if (initialQuestion && !loading) { // also check loading status
+            setQuestion(initialQuestion);
+            handleGenerate().then(() => {
+                 if (onSearchPerformed) {
+                    onSearchPerformed();
+                }
+            });
+        }
+    }, [initialQuestion]);
+
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = event.target.files?.[0];
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUri = e.target?.result as string;
+                setFile({ name: selectedFile.name, dataUri });
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+    };
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleRemoveFile = () => {
+        setFile(null);
+        if(fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    }
 
     const handleDownloadPdf = () => {
         if (!answer) {
@@ -98,28 +101,38 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
             return;
         }
 
-        const doc = new jsPDF();
+        const doc = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-        doc.setFont("Inter", "bold");
-        doc.setFontSize(16);
-        doc.text("Study Buddy AI - Your Answer", 14, 22);
+        const margin = 15;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const usableWidth = pageWidth - (margin * 2);
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.setTextColor(45, 100, 245); // Primary color
+        doc.text("Study Buddy AI - Your Answer", margin, 20);
         
-        doc.setFont("Inter", "bold");
+        doc.setFont('Helvetica', 'bold');
         doc.setFontSize(12);
-        doc.text("Question:", 14, 40);
+        doc.setTextColor(10, 20, 40); // Darker text
+        doc.text("Question:", margin, 35);
         
-        doc.setFont("Inter", "normal");
-        const questionLines = doc.splitTextToSize(question, 180);
-        doc.text(questionLines, 14, 48);
+        doc.setFont('Helvetica', 'normal');
+        const questionLines = doc.splitTextToSize(question, usableWidth);
+        doc.text(questionLines, margin, 42);
         
-        const lastQuestionY = 48 + (questionLines.length * 7);
+        const lastQuestionY = 42 + (questionLines.length * 5); // Approximate height
 
-        doc.setFont("Inter", "bold");
-        doc.text("Answer:", 14, lastQuestionY + 10);
+        doc.setFont('Helvetica', 'bold');
+        doc.text("Answer:", margin, lastQuestionY + 10);
         
-        doc.setFont("Inter", "normal");
-        const answerLines = doc.splitTextToSize(answer, 180);
-        doc.text(answerLines, 14, lastQuestionY + 18);
+        doc.setFont('Helvetica', 'normal');
+        const answerLines = doc.splitTextToSize(answer, usableWidth);
+        doc.text(answerLines, margin, lastQuestionY + 17);
 
         doc.save("study-buddy-answer.pdf");
     };
@@ -194,6 +207,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
                                 <Button
                                     variant="outline"
                                     size="icon"
+                                    title="Download as PDF"
                                     onClick={handleDownloadPdf}
                                     className="absolute top-2 right-2"
                                 >
