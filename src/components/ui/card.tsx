@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { ParticleBackground } from "./particle-background"
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -12,8 +13,10 @@ const Card = React.forwardRef<
       "relative rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden",
       className
     )}
-    {...props}
-  />
+  >
+    <ParticleBackground />
+    <div className="relative z-10 h-full" {...props} />
+  </div>
 ))
 Card.displayName = "Card"
 

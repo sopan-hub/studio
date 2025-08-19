@@ -4,76 +4,75 @@
 @tailwind components;
 
 body {
-  font-family: 'PT Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
 }
 
 @layer base {
   :root {
-    --background: 120 23% 97%; /* Very Light Green - #F4F9F4 */
-    --foreground: 210 10% 23%; /* Dark Slate Gray */
+    --background: 220 20% 5%;
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 210 10% 23%;
+    --card: 224 20% 10%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 23%;
+    --popover: 224 20% 10%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 128 30% 71%; /* Soft Green - #A7D1AB */
-    --primary-foreground: 210 10% 23%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 182 25% 60%; /* Muted Teal - #79B4B7 */
-    --secondary-foreground: 210 10% 23%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
     
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 182 25% 60%; /* Muted Teal */
-    --accent-foreground: 210 10% 23%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 128 30% 71%; /* Soft Green */
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
-    /* Keeping dark mode as a fallback, but default is light */
-    --background: 222 47% 11%;
+    --background: 220 20% 5%;
     --foreground: 210 40% 98%;
 
-    --card: 222 47% 11%;
+    --card: 224 20% 10%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 47% 11%;
+    --popover: 224 20% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 128 30% 71%;
+    --primary: 217 91% 60%;
     --primary-foreground: 222 47% 11%;
 
-    --secondary: 182 25% 60%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
     
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 128 30% 71%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -87,19 +86,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @layer components {
-  /* Removing neon glow effects for a minimal look */
+  /* Neon Glow Effects */
   .neon-glow {
-    text-shadow: none;
+    text-shadow: 0 0 5px hsl(var(--primary) / 0.8), 0 0 10px hsl(var(--primary) / 0.6);
   }
   .neon-glow-button {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    box-shadow: 0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary) / 0.8), inset 0 0 5px hsl(var(--primary) / 0.6);
     transition: all 0.2s ease-in-out;
   }
   .neon-glow-button:hover {
-     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-     transform: translateY(-1px);
+     box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.8), inset 0 0 10px hsl(var(--primary) / 0.6);
+     transform: translateY(-2px);
   }
 }
+
 
 .interactive-logo-container {
     display: flex;
@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
 .interactive-logo {
     width: 100%;
     height: 100%;
-    cursor: default; /* Not clickable anymore */
+    cursor: pointer;
 }
 
 /* Default state styles */
@@ -122,70 +122,136 @@ h1, h2, h3, h4, h5, h6 {
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
-.interactive-logo .logo-geometry {
+.interactive-logo:not(.blasting) .logo-geometry {
     stroke: hsl(var(--primary));
     stroke-width: 8;
     fill: none;
     transform-origin: center;
 }
 
-.interactive-logo .circuit-path {
+.interactive-logo:not(.blasting) .circuit-path {
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
-    animation: draw-in 4s ease-out infinite;
-    animation-delay: calc(var(--piece-index, 0) * 50ms);
+    animation: draw-in 3s ease-out forwards;
 }
 
-.interactive-logo .ai-text {
+.interactive-logo:not(.blasting) .ai-text {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
     font-size: 80px;
     fill: hsl(var(--primary));
-    animation: fade-in 4s ease-out infinite 1.5s;
+    animation: fade-in 2s ease-out 1s forwards;
     opacity: 0;
 }
 
-.interactive-logo .node {
+.interactive-logo:not(.blasting) .node {
     fill: hsl(var(--primary));
-    animation: pulse-node 2s infinite ease-in-out;
+    animation: pulse-node 1.5s infinite ease-in-out;
     opacity: 0;
 }
+.interactive-logo:not(.blasting) .node-1 { animation-delay: 1.2s; }
+.interactive-logo:not(.blasting) .node-2 { animation-delay: 1.4s; }
+.interactive-logo:not(.blasting) .node-3 { animation-delay: 1.6s; }
 
-.interactive-logo .node-1 { animation-delay: 1.2s; }
-.interactive-logo .node-2 { animation-delay: 1.4s; }
-.interactive-logo .node-3 { animation-delay: 1.6s; }
-.interactive-logo .node-4 { animation-delay: 1.8s; }
-.interactive-logo .node-5 { animation-delay: 2.0s; }
-.interactive-logo .node-6 { animation-delay: 2.2s; }
-.interactive-logo .node-7 { animation-delay: 2.4s; }
-.interactive-logo .node-8 { animation-delay: 2.6s; }
-.interactive-logo .node-9 { animation-delay: 2.8s; }
-.interactive-logo .node-10 { animation-delay: 3.0s; }
 
+/* Blast Animation Styles */
+.interactive-logo.blasting .logo-geometry > *, .interactive-logo.blasting .ai-text {
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+}
+
+.interactive-logo.blasting .logo-main-chip { animation-name: blast-chip; }
+.interactive-logo.blasting .ai-text { animation-name: blast-text; }
+.interactive-logo.blasting .circuit-path { animation-name: blast-path; }
+.interactive-logo.blasting .node { animation-name: blast-node; }
+.interactive-logo.blasting .logo-inner-chip { animation-name: blast-inner-chip; }
 
 /* Animation keyframes */
 @keyframes draw-in {
-    0% { stroke-dashoffset: 1000; }
-    50% { stroke-dashoffset: 0; }
-    100% { stroke-dashoffset: 1000; }
+    to { stroke-dashoffset: 0; }
 }
-
 @keyframes fade-in {
-     0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+    to { opacity: 1; }
 }
-
 @keyframes pulse-node {
-    0%, 100% { transform: scale(1); opacity: 0; }
-    25%, 75% { opacity: 1; }
-    50% { transform: scale(1.5); opacity: 1; }
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); }
 }
 
-/* --- Removing Blast Animation and Particle Footer --- */
+@keyframes blast-chip {
+    0% { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; }
+    100% { transform: translate(50px, -70px) scale(0.1) rotate(90deg); opacity: 0; }
+}
+
+@keyframes blast-inner-chip {
+     0% { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; }
+    100% { transform: translate(-40px, 60px) scale(0.2) rotate(-80deg); opacity: 0; }
+}
+
+@keyframes blast-text {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(0, 20px) scale(0); opacity: 0; }
+}
+
+@keyframes blast-path {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { 
+        transform: translate(calc(var(--randX) * 200px), calc(var(--randY) * 200px)) scale(0.5) rotate(calc(var(--randR) * 180deg)); 
+        opacity: 0; 
+    }
+}
+
+@keyframes blast-node {
+    0% { transform: scale(1); opacity: 1; }
+    100% { 
+        transform: scale(0) translate(calc(var(--randX) * 150px), calc(var(--randY) * 150px)); 
+        opacity: 0; 
+    }
+}
+
+
+/* --- Particle Footer --- */
 .particle-footer {
-  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
+/* Card particles */
 .card-particle-background {
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none; /* So it doesn't interfere with card content */
+    z-index: 0; /* Behind card content */
+}
+
+.card-particle {
+    position: absolute;
+    background-color: hsl(var(--primary) / 0.3);
+    border-radius: 50%;
+    animation-name: float-up;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-150px) translateX(var(--drift-x)) scale(0);
+        opacity: 0;
+    }
 }

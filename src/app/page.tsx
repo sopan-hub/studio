@@ -20,10 +20,10 @@ import { ParticleFooter } from '@/components/particle-footer';
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
-    <div onClick={onClick} className="bg-card p-6 rounded-lg border hover:border-primary transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer h-full flex flex-col">
+    <div onClick={onClick} className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.5)] hover:-translate-y-2 cursor-pointer h-full flex flex-col">
         <div className="flex items-center gap-4 mb-4">
             <div className="text-primary bg-primary/10 p-2 rounded-lg">{icon}</div>
-            <h3 className="text-xl font-bold text-foreground">{title}</h3>
+            <h3 className="text-xl font-bold text-foreground neon-glow">{title}</h3>
         </div>
         <p className="text-muted-foreground flex-grow">{description}</p>
     </div>
@@ -127,7 +127,7 @@ export default function Home() {
     <div className="bg-background text-foreground">
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => { /* can decide what to do after login, e.g. open the last clicked feature */ }}/>
       {/* Header */}
-       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b">
+       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
         <div className="container mx-auto flex items-center justify-between p-4 gap-4">
            <div className="flex items-center gap-2">
             <Logo />
@@ -159,9 +159,9 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 text-center md:text-left">
               <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-                <span className="text-primary">Your Personal</span>
+                <span className="text-primary neon-glow">Your Personal</span>
                 <br/>
-                <span className="text-primary">AI Study Buddy</span>
+                <span className="text-primary neon-glow">AI Study Buddy</span>
               </h1>
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
@@ -179,7 +179,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="features" ref={featuresRef} className="py-16 bg-white/50">
+        <section id="features" ref={featuresRef} className="py-16 bg-background/50">
            <div className="container mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold">Powerful Features to Boost Your Learning</h2>
@@ -243,7 +243,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="bg-background border-t py-8 relative">
+      <footer className="bg-background border-t border-primary/20 py-8 relative">
         <ParticleFooter />
         <div className="container mx-auto text-center text-muted-foreground relative z-10">
           <p>&copy; 2024 Study Buddy AI. All rights reserved.</p>
