@@ -79,7 +79,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: bool
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold text-primary neon-glow">
+          <DialogTitle className="text-center text-2xl font-bold text-foreground">
             {activeTab === 'signin' ? 'Sign In' : 'Create Account'}
           </DialogTitle>
           <DialogDescription className="text-center">
@@ -100,7 +100,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: bool
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input placeholder="you@example.com" {...field} className="pl-10"/>
                       </div>
                     </FormControl>
@@ -112,7 +112,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: bool
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                        <div className="relative">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input type="password" placeholder="••••••••" {...field} className="pl-10"/>
                       </div>
                     </FormControl>
@@ -133,7 +133,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: bool
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                           <Input placeholder="you@example.com" {...field} className="pl-10" />
                       </div>
                     </FormControl>
@@ -145,7 +145,7 @@ export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: bool
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input type="password" placeholder="••••••••" {...field} className="pl-10" />
                       </div>
                     </FormControl>

@@ -142,24 +142,24 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
              currentY += 5;
         }
         
-        doc.setTextColor(45, 100, 245);
+        doc.setTextColor("#79B4B7");
         addText(summary.title, true, true);
         
-        doc.setTextColor(10, 20, 40);
+        doc.setTextColor(30, 30, 30);
         addText(summary.summary);
         
         doc.save(`${summary.title.replace(/\s+/g, '_').toLowerCase()}_summary.pdf`);
     };
 
     return (
-        <Card className="w-full bg-card border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in">
+        <Card className="w-full bg-card shadow-lg animate-blast-in">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
                             <ArrowLeft />
                         </Button>
-                        <CardTitle className="text-2xl font-bold text-primary neon-glow">Generate Notes & Summaries</CardTitle>
+                        <CardTitle className="text-2xl font-bold text-foreground">Generate Notes & Summaries</CardTitle>
                     </div>
                      <Button variant="outline" onClick={handleDownloadPdf} disabled={!summary || loading}>
                         <Download className="mr-2" />
@@ -173,14 +173,14 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                     <div className="flex flex-col gap-4">
                         <Textarea
                             placeholder="Paste your study material here, or upload a file below."
-                            className="min-h-[300px] flex-grow"
+                            className="min-h-[300px] flex-grow bg-white"
                             value={material}
                             onChange={(e) => setMaterial(e.target.value)}
                             disabled={loading}
                         />
 
                         {file && (
-                            <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 border border-primary/20">
+                            <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Paperclip className="h-4 w-4" />
                                     <span>{file.name}</span>
@@ -219,13 +219,13 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                             </div>
                         )}
                         {summary && (
-                            <div className="p-4 border border-primary/40 rounded-lg bg-background/50 h-full overflow-y-auto">
-                                <h3 className="text-xl font-bold text-primary neon-glow mb-4">{summary.title}</h3>
+                            <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto">
+                                <h3 className="text-xl font-bold text-secondary mb-4">{summary.title}</h3>
                                 <p className="whitespace-pre-wrap text-card-foreground">{summary.summary}</p>
                             </div>
                         )}
                         {!loading && !summary && (
-                             <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg border-primary/40 bg-background/50">
+                             <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">Your generated summary will appear here.</p>
                             </div>
                         )}

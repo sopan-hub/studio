@@ -4,75 +4,76 @@
 @tailwind components;
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'PT Sans', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 700;
 }
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%; /* Jet Black */
-    --foreground: 210 40% 98%; /* Muted Blue-Gray */
+    --background: 120 23% 97%; /* Very Light Green - #F4F9F4 */
+    --foreground: 210 10% 23%; /* Dark Slate Gray */
 
-    --card: 222 47% 11%; /* Dark Gray-Blue */
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 210 10% 23%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 10% 23%;
 
-    --primary: 217 91% 60%; /* Neon Blue */
-    --primary-foreground: 210 40% 98%;
+    --primary: 128 30% 71%; /* Soft Green - #A7D1AB */
+    --primary-foreground: 210 10% 23%;
 
-    --secondary: 217 91% 60%; /* Neon Blue for secondary as well */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 182 25% 60%; /* Muted Teal - #79B4B7 */
+    --secondary-foreground: 210 10% 23%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --muted: 222 47% 11%;
-    --muted-foreground: 215 28% 63%;
+    --accent: 182 25% 60%; /* Muted Teal */
+    --accent-foreground: 210 10% 23%;
 
-    --accent: 217 91% 60%; /* Neon Blue */
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 63% 31%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 91% 40%; /* Brighter blue for borders */
-    --input: 217 91% 30%;
-    --ring: 217 91% 60%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 128 30% 71%; /* Soft Green */
 
-    --radius: 0.8rem;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 240 10% 3.9%; /* Jet Black */
-    --foreground: 210 40% 98%; /* Muted Blue-Gray */
+    /* Keeping dark mode as a fallback, but default is light */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --card: 222 47% 11%; /* Dark Gray-Blue */
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%; /* Neon Blue */
-    --primary-foreground: 210 40% 98%;
+    --primary: 128 30% 71%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 217 91% 60%; /* Neon Blue */
+    --secondary: 182 25% 60%;
     --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --muted: 222 47% 11%;
-    --muted-foreground: 215 28% 63%;
-
-    --accent: 217 91% 60%; /* Neon Blue */
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 91% 40%;
-    --input: 217 91% 30%;
-    --ring: 217 91% 60%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 128 30% 71%;
   }
 }
 
@@ -86,24 +87,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @layer components {
+  /* Removing neon glow effects for a minimal look */
   .neon-glow {
-    text-shadow:
-      0 0 1px hsl(var(--primary) / 0.8),
-      0 0 2px hsl(var(--primary) / 0.6),
-      0 0 4px hsl(var(--primary) / 0.4);
+    text-shadow: none;
   }
   .neon-glow-button {
-    box-shadow:
-      0 0 2px hsl(var(--primary)),
-      0 0 4px hsl(var(--primary)),
-      0 0 8px hsl(var(--primary) / 0.3);
-    transition: all 0.3s ease-in-out;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    transition: all 0.2s ease-in-out;
   }
   .neon-glow-button:hover {
-     box-shadow:
-      0 0 4px hsl(var(--primary)),
-      0 0 8px hsl(var(--primary)),
-      0 0 16px hsl(var(--primary) / 0.4);
+     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+     transform: translateY(-1px);
   }
 }
 
@@ -112,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     align-items: center;
     width: 100%;
-    max-width: 400px; /* Or adjust as needed */
+    max-width: 400px; 
     margin: auto;
     aspect-ratio: 1 / 1;
 }
@@ -120,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
 .interactive-logo {
     width: 100%;
     height: 100%;
-    cursor: pointer;
+    cursor: default; /* Not clickable anymore */
 }
 
 /* Default state styles */
@@ -135,11 +129,6 @@ h1, h2, h3, h4, h5, h6 {
     transform-origin: center;
 }
 
-.interactive-logo:hover .logo-main-chip,
-.interactive-logo:hover .logo-inner-chip {
-    filter: url(#glow);
-}
-
 .interactive-logo .circuit-path {
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
@@ -148,7 +137,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .interactive-logo .ai-text {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 700;
     font-size: 80px;
     fill: hsl(var(--primary));
@@ -192,99 +181,11 @@ h1, h2, h3, h4, h5, h6 {
     50% { transform: scale(1.5); opacity: 1; }
 }
 
-
-/* --- Blast Animation --- */
-.blasting .circuit-path,
-.blasting .node,
-.blasting .ai-text {
-    /* Stop looping animations */
-    animation-name: none;
-    opacity: 1;
-}
-
-.blasting .blast-piece {
-    transform-origin: center;
-    animation: blast-piece-fly-out 1.5s ease-out forwards;
-    animation-delay: calc(var(--piece-index) * 10ms);
-}
-
-.blasting .blast-piece-center {
-    transform-origin: center;
-    animation: blast-center-fly-out 1s ease-out forwards;
-}
-
-
-@keyframes blast-piece-fly-out {
-  0% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
-  100% {
-    /* Random-ish looking transform using sine/cosine of the index */
-    transform: translate(calc(cos(var(--piece-index) * 20deg) * 300px), calc(sin(var(--piece-index) * 20deg) * 300px))
-               rotate(calc(var(--piece-index) * 30deg))
-               scale(0);
-    opacity: 0;
-  }
-}
-
-@keyframes blast-center-fly-out {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(0);
-        opacity: 0;
-    }
-}
-
-/* --- Particle Footer --- */
+/* --- Removing Blast Animation and Particle Footer --- */
 .particle-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%; 
-  min-height: 200px;
-  pointer-events: auto; /* Required for mouse events on canvas */
-  z-index: 0;
+  display: none;
 }
 
-
-/* --- Card Particle Background --- */
 .card-particle-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-}
-
-.card-particle {
-    position: absolute;
-    border-radius: 50%;
-    background-color: hsl(var(--primary) / 0.2);
-    opacity: 0;
-    animation: card-particle-float 15s infinite linear;
-}
-
-@keyframes card-particle-float {
-    0% {
-        transform: translateY(100%) translateX(0) scale(1);
-        opacity: 0;
-    }
-    20% {
-        opacity: 1;
-    }
-    80% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-100px) translateX(var(--drift-x)) scale(0);
-        opacity: 0;
-    }
+    display: none;
 }

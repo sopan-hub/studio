@@ -147,10 +147,10 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
              currentY += 4; 
         }
 
-        doc.setTextColor(45, 100, 245);
+        doc.setTextColor("#79B4B7");
         addText(`Study Buddy AI - ${title}`, true, true);
         
-        doc.setTextColor(10, 20, 40);
+        doc.setTextColor(30, 30, 30);
         addText("Question:", true);
 
         const questionToDisplay = question.trim() || (file ? `Content of ${file.name}` : '');
@@ -165,14 +165,14 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
 
 
     return (
-        <Card className="w-full bg-card border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in">
+        <Card className="w-full bg-card shadow-lg animate-blast-in">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
                             <ArrowLeft />
                         </Button>
-                        <CardTitle className="text-2xl font-bold text-primary neon-glow">{title}</CardTitle>
+                        <CardTitle className="text-2xl font-bold text-foreground">{title}</CardTitle>
                     </div>
                      <Button
                         variant="outline"
@@ -188,14 +188,14 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                 <div className="flex flex-col gap-4">
                     <Textarea
                         placeholder="Ask your AI tutor anything... (Optionally, upload a file for context)"
-                        className="min-h-[150px]"
+                        className="min-h-[150px] bg-white"
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         disabled={loading}
                     />
 
                     {file && (
-                        <div className="flex items-center justify-between p-2 rounded-md bg-muted/50 border border-primary/20">
+                        <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Paperclip className="h-4 w-4" />
                                 <span>{file.name}</span>
@@ -231,7 +231,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                         </Button>
                     </div>
 
-                    <div className="mt-4 p-4 border border-dashed border-primary/40 rounded-lg min-h-[150px] bg-background/50 relative overflow-y-auto">
+                    <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[150px] bg-background/50 relative overflow-y-auto">
                         {loading ? (
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Loader2 className="animate-spin h-5 w-5" />

@@ -20,12 +20,12 @@ import { ParticleFooter } from '@/components/particle-footer';
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
 const FeatureCard = ({ icon, title, description, onClick }: { icon: React.ReactNode, title: string, description: string, onClick: () => void }) => (
-    <div onClick={onClick} className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)] cursor-pointer h-full">
+    <div onClick={onClick} className="bg-card p-6 rounded-lg border hover:border-primary transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer h-full flex flex-col">
         <div className="flex items-center gap-4 mb-4">
-        <div className="text-primary">{icon}</div>
-        <h3 className="text-xl font-bold text-primary neon-glow">{title}</h3>
+            <div className="text-primary bg-primary/10 p-2 rounded-lg">{icon}</div>
+            <h3 className="text-xl font-bold text-foreground">{title}</h3>
         </div>
-        <p className="text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground flex-grow">{description}</p>
     </div>
 );
 
@@ -127,7 +127,7 @@ export default function Home() {
     <div className="bg-background text-foreground">
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => { /* can decide what to do after login, e.g. open the last clicked feature */ }}/>
       {/* Header */}
-       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
+       <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b">
         <div className="container mx-auto flex items-center justify-between p-4 gap-4">
            <div className="flex items-center gap-2">
             <Logo />
@@ -145,23 +145,23 @@ export default function Home() {
              </form>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
-             <Button onClick={handleLoginLogout} variant="ghost" className="hover:text-primary hover:neon-glow transition-all">
+            <Link href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary transition-all">Features</Link>
+             <Button onClick={handleLoginLogout} variant="ghost" className="hover:text-primary transition-all">
                 {user ? 'Log Out' : 'Log In'}
             </Button>
           </nav>
         </div>
       </header>
 
-      <main className="pt-20">
+      <main className="pt-24">
         {/* Hero Section */}
         <section className="container mx-auto py-16 md:py-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 text-center md:text-left">
               <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-                <span className="text-primary neon-glow">Your Personal</span>
+                <span className="text-primary">Your Personal</span>
                 <br/>
-                <span className="text-primary neon-glow">AI Study Buddy</span>
+                <span className="text-primary">AI Study Buddy</span>
               </h1>
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
@@ -179,10 +179,10 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="features" ref={featuresRef} className="py-16 bg-background">
+        <section id="features" ref={featuresRef} className="py-16 bg-white/50">
            <div className="container mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary neon-glow">Powerful Features to Boost Your Learning</h2>
+              <h2 className="text-3xl md:text-4xl font-bold">Powerful Features to Boost Your Learning</h2>
               <p className="text-lg text-muted-foreground mt-2">Everything you need to succeed in your studies, powered by AI.</p>
             </div>
             
@@ -243,18 +243,18 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="bg-background border-t border-primary/20 py-8 relative">
+      <footer className="bg-background border-t py-8 relative">
         <ParticleFooter />
         <div className="container mx-auto text-center text-muted-foreground relative z-10">
-          <p className="text-primary neon-glow">&copy; 2024 Study Buddy AI. All rights reserved.</p>
+          <p>&copy; 2024 Study Buddy AI. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
-             <a href="mailto:patilsopan4148@gmail.com" className="hover:text-primary hover:neon-glow transition-all" aria-label="Email">
+             <a href="mailto:patilsopan4148@gmail.com" className="hover:text-primary transition-all" aria-label="Email">
               <Mail className="h-6 w-6" />
             </a>
-            <a href="https://github.com/sopan-hub" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:neon-glow transition-all" aria-label="GitHub">
+            <a href="https://github.com/sopan-hub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-all" aria-label="GitHub">
                 <GitHubIcon className="h-6 w-6" />
             </a>
-            <a href="https://www.instagram.com/sopan.147/profilecard/?igsh=MXJ3NTF6c3BnM2Fucg==" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:neon-glow transition-all" aria-label="Instagram">
+            <a href="https://www.instagram.com/sopan.147/profilecard/?igsh=MXJ3NTF6c3BnM2Fucg==" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-all" aria-label="Instagram">
               <Instagram className="h-6 w-6" />
             </a>
           </div>
@@ -263,7 +263,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-
-    
