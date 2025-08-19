@@ -7,14 +7,36 @@ import { useRef } from "react";
 
 interface FileUploadProps {
     onFileSelect: (file: File | null) => void;
+    onFileRead: (content: string) => void;
 }
 
-export function FileUpload({ onFileSelect }: FileUploadProps) {
+export function FileUpload({ onFileSelect, onFileRead }: FileUploadProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFile = (file: File | null) => {
+        if (file) {
+            onFileSelect(file);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target?.result as string;
+                onFileRead(text);
+            };
+            if (file.type === "application/pdf") {
+                // For simplicity, we'll just show an alert. PDF parsing is complex.
+                alert("PDF parsing is not implemented in this example.");
+                onFileRead("");
+            } else {
+                reader.readAsText(file);
+            }
+        } else {
+            onFileSelect(null);
+            onFileRead("");
+        }
+    }
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
-        onFileSelect(file);
+        handleFile(file);
     };
 
     const handleBrowseClick = () => {
@@ -25,7 +47,7 @@ export function FileUpload({ onFileSelect }: FileUploadProps) {
         event.preventDefault();
         event.stopPropagation();
         const file = event.dataTransfer.files?.[0] || null;
-        onFileSelect(file);
+        handleFile(file);
     };
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -46,7 +68,7 @@ export function FileUpload({ onFileSelect }: FileUploadProps) {
                     ref={fileInputRef} 
                     onChange={handleFileChange}
                     className="hidden"
-                    accept=".pdf,.docx,.txt"
+                    accept=".docx,.txt"
                 />
                 <div className="flex flex-col items-center justify-center space-y-4">
                     <div className="bg-secondary p-4 rounded-full">
@@ -59,7 +81,7 @@ export function FileUpload({ onFileSelect }: FileUploadProps) {
                         or click to browse your files
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        Supports: PDF, DOCX, TXT
+                        Supports: DOCX, TXT
                     </p>
                     <Button variant="outline" type="button" onClick={(e) => { e.stopPropagation(); handleBrowseClick();}}>Browse Files</Button>
                 </div>

@@ -2,42 +2,34 @@
 
 import { generateQuizzes } from "@/ai/flows/generate-quizzes";
 import type { Quiz } from "@/lib/types";
-import { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Loader2, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { QuizView } from "./quiz-view";
 
-const formSchema = z.object({
-  notes: z.string().min(50, {
-    message: "Please enter at least 50 characters to generate a quiz.",
-  }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-export function QuizGenerator() {
+export function QuizGenerator({ notes }: { notes: string }) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      notes: "",
-    },
-  });
-
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  useEffect(() => {
+    setQuiz(null);
+  }, [notes]);
+  
+  const handleSubmit = async () => {
+    if (notes.length < 50) {
+        toast({
+            variant: "destructive",
+            title: "Notes are too short",
+            description: "Please provide at least 50 characters to generate a quiz.",
+        });
+        return;
+    }
     setIsLoading(true);
     setQuiz(null);
     try {
-      const result = await generateQuizzes(data);
+      const result = await generateQuizzes({ notes });
       setQuiz(result);
     } catch (error) {
       console.error("Quiz generation error:", error);
@@ -53,35 +45,16 @@ export function QuizGenerator() {
 
   return (
     <div className="space-y-8">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-lg">Your Notes</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Paste your study notes here to create a quiz..."
-                    className="min-h-[200px] bg-card"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Wand2 className="mr-2 h-4 w-4" />
-            )}
-            Generate Quiz
-          </Button>
-        </form>
-      </Form>
+      <div className="text-center">
+        <Button onClick={handleSubmit} disabled={isLoading || !notes}>
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Wand2 className="mr-2 h-4 w-4" />
+          )}
+          Generate Quiz
+        </Button>
+      </div>
       
       {isLoading && (
         <div className="flex justify-center items-center py-20">
@@ -91,7 +64,7 @@ export function QuizGenerator() {
 
       {quiz && (
         <div className="mt-8">
-          <h2 className="text-2xl font-bold font-headline mb-4">Your Quiz</h2>
+          <h2 className="text-2xl font-bold font-headline mb-4 text-center">Your Quiz</h2>
           <QuizView multipleChoice={quiz.multipleChoice} shortAnswer={quiz.shortAnswer} />
         </div>
       )}

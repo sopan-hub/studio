@@ -11,18 +11,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Textarea } from "./ui/textarea";
 
 const formSchema = z.object({
   query: z.string().min(10, {
     message: "Please enter a question of at least 10 characters.",
   }),
-  notes: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function TutorChat() {
+export function TutorChat({ notes }: { notes: string }) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -31,7 +29,6 @@ export function TutorChat() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       query: "",
-      notes: "",
     },
   });
 
@@ -39,7 +36,7 @@ export function TutorChat() {
     setIsLoading(true);
     setAnswer(null);
     try {
-      const result = await tutorChat(data);
+      const result = await tutorChat({ ...data, notes });
       setAnswer(result.answer);
     } catch (error) {
       console.error("Tutor chat error:", error);
@@ -57,23 +54,6 @@ export function TutorChat() {
     <div className="space-y-8 max-w-3xl mx-auto">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Context (Optional)</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Paste any relevant notes here to give the AI tutor more context..."
-                    className="min-h-[100px] bg-card"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="query"
