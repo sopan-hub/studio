@@ -2,17 +2,15 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged, User, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, onAuthStateChanged, User, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
 
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -21,7 +19,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signInWithGoogle: async () => {},
   signUpWithEmail: async () => {},
   signInWithEmail: async () => {},
   signOut: async () => {},
@@ -39,10 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
-
-  const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider);
-  };
 
   const signUpWithEmail = async (email: string, pass: string) => {
     await createUserWithEmailAndPassword(auth, email, pass);
@@ -69,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, signOut: handleSignOut }}>
+    <AuthContext.Provider value={{ user, loading, signUpWithEmail, signInWithEmail, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   );
