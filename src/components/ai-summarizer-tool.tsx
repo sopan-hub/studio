@@ -43,6 +43,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                         fileDataUri: dataUri,
                     });
                      setFile({ name: selectedFile.name, dataUri, content: extractedText });
+                     toast({ title: "File Uploaded", description: `Extracted text from ${selectedFile.name}` });
                 } catch(error) {
                     console.error("File processing error", error);
                     toast({
@@ -73,21 +74,19 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
     const handleGenerate = async () => {
         const inputText = material.trim();
 
-        if (!inputText && !file?.content) {
+        if (!inputText) {
             toast({
                 variant: "destructive",
                 title: "Input Required",
-                description: "Please paste your study material or upload a text file.",
+                description: "Please paste your study material or upload a file.",
             });
             return;
         }
-
-        const contentToUse = inputText || file!.content;
         
         setLoading(true);
         setSummary(null);
         try {
-            const input: SummaryInput = { material: contentToUse };
+            const input: SummaryInput = { material: inputText };
             const result = await generateSummary(input);
             setSummary(result);
         } catch (error) {
@@ -122,17 +121,25 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
             doc.setFont('Helvetica', isBold || isTitle ? 'bold' : 'normal');
             doc.setFontSize(isTitle ? 18 : 12);
             
-            const lines = doc.splitTextToSize(text, usableWidth);
-            
-            lines.forEach((line: string) => {
-                 if (currentY > pageHeight - margin) {
-                    doc.addPage();
-                    currentY = margin;
-                 }
-                 doc.text(line, margin, currentY);
-                 currentY += 7;
+            const paragraphs = text.split('\n');
+
+            paragraphs.forEach(paragraph => {
+                const lines = doc.splitTextToSize(paragraph, usableWidth);
+                
+                lines.forEach((line: string) => {
+                     if (currentY > pageHeight - margin) {
+                        doc.addPage();
+                        currentY = margin;
+                     }
+                     doc.text(line, margin, currentY);
+                     currentY += 7;
+                });
+
+                if (!isTitle && !isBold) {
+                    currentY += 4;
+                }
             });
-             currentY += 5; // Add a bit of space after a block of text
+             currentY += 5;
         }
         
         doc.setTextColor(45, 100, 245);
@@ -193,7 +200,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                                 ref={fileInputRef}
                                 onChange={handleFileChange}
                                 className="hidden"
-                                accept=".txt,.pdf,.md,.docx,.csv"
+                                accept=".txt,.pdf,.md,.doc,.docx"
                                 disabled={loading}
                             />
                             <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">

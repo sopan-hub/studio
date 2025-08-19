@@ -26,9 +26,6 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     
-    const combinedQuestion = file ? `${question}\n\nFile Content:\n[Content of ${file.name}]` : question;
-
-
     const handleGenerate = async () => {
         if (!question.trim() && !file) {
             toast({
@@ -42,7 +39,6 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         setLoading(true);
         setAnswer("");
         try {
-            // If there's a file but no question, use a default question.
             const questionToSend = question.trim() || (file ? `Summarize the content of the attached file: ${file.name}` : '');
 
             const input: ChatInput = {
@@ -60,22 +56,22 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             });
         } finally {
             setLoading(false);
+            if (onSearchPerformed) {
+                onSearchPerformed();
+            }
         }
     };
     
     // Effect to auto-trigger generation when initialQuestion is set by global search
     useEffect(() => {
-        if (initialQuestion && !loading) { // also check loading status
+        if (initialQuestion && !loading) {
             setQuestion(initialQuestion);
-            // Don't auto-generate if it's not the main chat tool
+             // Only auto-submit for the main global search
             if (title === "Ask Any Question (AI Chat)") {
-                 handleGenerate().then(() => {
-                    if (onSearchPerformed) {
-                        onSearchPerformed();
-                    }
-                });
+                 handleGenerate();
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialQuestion, title]);
 
 
@@ -123,31 +119,42 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addText = (text: string, isBold = false, isTitle = false) => {
+        const addText = (text: string, isBold = false, isTitle = false, isQuestion = false) => {
             doc.setFont('Helvetica', isBold || isTitle ? 'bold' : 'normal');
             doc.setFontSize(isTitle ? 18 : (isBold ? 12 : 11));
             
-            const lines = doc.splitTextToSize(text, usableWidth);
-            
-            lines.forEach((line: string) => {
-                 if (currentY > pageHeight - margin) {
-                    doc.addPage();
-                    currentY = margin;
-                 }
-                 doc.text(line, margin, currentY);
-                 currentY += isTitle ? 8 : 6;
+            // For the main answer, split by paragraphs to preserve them
+            const paragraphs = text.split('\n');
+
+            paragraphs.forEach(paragraph => {
+                const lines = doc.splitTextToSize(paragraph, usableWidth);
+                
+                lines.forEach((line: string) => {
+                     if (currentY > pageHeight - margin) {
+                        doc.addPage();
+                        currentY = margin;
+                     }
+                     doc.text(line, margin, currentY);
+                     currentY += isTitle ? 8 : (isBold ? 7 : 6);
+                });
+
+                // Add a small gap between paragraphs, but not for titles/headings
+                if (!isTitle && !isBold) {
+                    currentY += 4;
+                }
             });
-             currentY += 4; // Add a bit of space after a block of text
+
+             currentY += 4; 
         }
 
-        doc.setTextColor(45, 100, 245); // Primary color for the main title
+        doc.setTextColor(45, 100, 245);
         addText(`Study Buddy AI - ${title}`, true, true);
         
-        doc.setTextColor(10, 20, 40); // Darker text for content
+        doc.setTextColor(10, 20, 40);
         addText("Question:", true);
 
         const questionToDisplay = question.trim() || (file ? `Content of ${file.name}` : '');
-        addText(questionToDisplay);
+        addText(questionToDisplay, false, false, true);
 
         addText("Answer:", true);
         

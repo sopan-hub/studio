@@ -45,6 +45,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                         fileDataUri: dataUri,
                     });
                      setFile({ name: selectedFile.name, dataUri, content: extractedText });
+                     toast({ title: "File Uploaded", description: `Extracted text from ${selectedFile.name}` });
                 } catch(error) {
                     console.error("File processing error", error);
                     toast({
@@ -75,21 +76,19 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
     const handleGenerate = async () => {
         const inputText = material.trim();
 
-        if (!inputText && !file?.content) {
+        if (!inputText) {
             toast({
                 variant: "destructive",
                 title: "Input Required",
-                description: "Please paste your study material or upload a text file.",
+                description: "Please paste your study material or upload a file.",
             });
             return;
         }
-
-        const contentToUse = inputText || file!.content;
         
         setLoading(true);
         setQuiz(null);
         try {
-            const input: QuizInput = { material: contentToUse };
+            const input: QuizInput = { material: inputText };
             const result = await generateQuiz(input);
             setQuiz(result);
         } catch (error) {
@@ -120,59 +119,60 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
+        const addText = (text: string, options: { fontSize?: number; isBold?: boolean; color?: [number, number, number]; } = {}) => {
+            const { fontSize = 11, isBold = false, color = [10, 20, 40] } = options;
+            doc.setFont('Helvetica', isBold ? 'bold' : 'normal');
+            doc.setFontSize(fontSize);
+            doc.setTextColor(color[0], color[1], color[2]);
+            
+            const lines = doc.splitTextToSize(text, usableWidth);
+            lines.forEach((line: string) => {
+                 if (currentY > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
+                 }
+                 doc.text(line, margin, currentY);
+                 currentY += (fontSize / 2) + 2; // Adjust line height based on font size
+            });
+        }
+
         // Set Title
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(18);
-        doc.setTextColor(45, 100, 245); // Primary color
-        const titleLines = doc.splitTextToSize(quiz.title, usableWidth);
-        doc.text(titleLines, margin, currentY);
-        currentY += (titleLines.length * 8) + 10;
+        addText(quiz.title, { fontSize: 18, isBold: true, color: [45, 100, 245] });
+        currentY += 10;
 
 
         quiz.questions.forEach((q, index) => {
-            if (currentY > pageHeight - margin - 30) { // check for space before adding content
+            if (currentY > pageHeight - margin - 40) { // check for space before adding a new question
                 doc.addPage();
                 currentY = margin;
             }
 
             // Question
-            doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.setTextColor(10, 20, 40); // Darker text
-            const questionLines = doc.splitTextToSize(`${index + 1}. ${q.question}`, usableWidth);
-            doc.text(questionLines, margin, currentY);
-            currentY += questionLines.length * 5 + 5;
+            addText(`${index + 1}. ${q.question}`, { fontSize: 12, isBold: true });
+            currentY += 2;
 
             // Options
-            doc.setFont('Helvetica', 'normal');
-            doc.setFontSize(10);
             q.options.forEach(opt => {
-                 if (currentY > pageHeight - margin) {
+                 if (currentY > pageHeight - margin - 10) {
                     doc.addPage();
                     currentY = margin;
                 }
+                const isCorrect = opt === q.answer;
                 const optionText = `- ${opt}`;
-                const optionLines = doc.splitTextToSize(optionText, usableWidth - 5);
-                if(opt === q.answer) {
-                    doc.setTextColor(34, 139, 34); // Green for correct answer
-                } else {
-                    doc.setTextColor(100, 100, 100); // Gray for other options
-                }
-                doc.text(optionLines, margin + 5, currentY);
-                currentY += optionLines.length * 5;
+                addText(optionText, {
+                    fontSize: 10,
+                    isBold: isCorrect,
+                    color: isCorrect ? [34, 139, 34] : [100, 100, 100]
+                });
             });
             
             // Answer
-            doc.setFont('Helvetica', 'bold');
-            doc.setTextColor(34, 139, 34); // Green for the answer
-            const answerText = `Answer: ${q.answer}`;
-            const answerLines = doc.splitTextToSize(answerText, usableWidth - 5);
-             if (currentY > pageHeight - margin) {
+             if (currentY > pageHeight - margin - 10) {
                 doc.addPage();
                 currentY = margin;
             }
-            doc.text(answerLines, margin + 5, currentY);
-            currentY += answerLines.length * 5 + 10; // Extra space between questions
+            addText(`Correct Answer: ${q.answer}`, { fontSize: 10, isBold: true, color: [34, 139, 34] });
+            currentY += 10; // Extra space between questions
         });
 
         doc.save(`${quiz.title.replace(/\s+/g, '_').toLowerCase()}_quiz.pdf`);
@@ -225,7 +225,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             className="hidden"
-                            accept=".txt,.pdf,.md,.docx,.csv"
+                            accept=".txt,.pdf,.md,.doc,.docx"
                             disabled={loading}
                         />
                         <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
@@ -243,6 +243,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                         )}
                         {quiz && (
                             <Accordion type="single" collapsible className="w-full">
+                                <h3 className="text-xl font-bold text-primary neon-glow mb-4">{quiz.title}</h3>
                                 {quiz.questions.map((q, index) => (
                                     <AccordionItem value={`item-${index}`} key={index}>
                                         <AccordionTrigger>{index + 1}. {q.question}</AccordionTrigger>
