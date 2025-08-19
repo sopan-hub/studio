@@ -194,56 +194,73 @@ export default function Home() {
             {activeFeature ? (
                 renderActiveFeature()
             ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <FeatureCard 
-                        onClick={() => handleFeatureClick('chat')}
-                        icon={<BotMessageSquare size={24}/>}
-                        title="Ask Any Question"
-                        description="Get instant, detailed answers to your questions from an expert AI tutor."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('summarizer')}
-                        icon={<FileText size={24}/>}
-                        title="Generate Summaries"
-                        description="Automatically create concise summaries and organized notes from any text."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('quiz')}
-                        icon={<BrainCircuit size={24}/>}
-                        title="Smart Quiz Maker"
-                        description="Test your knowledge with custom quizzes generated from your study materials."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('explainer')}
-                        icon={<Lightbulb size={24}/>}
-                        title="Concept Explainer"
-                        description="Break down complex topics and concepts into easy-to-understand explanations."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('flashcards')}
-                        icon={<Layers size={24}/>}
-                        title="AI Flashcard Maker"
-                        description="Turn your study notes into interactive flashcards for effective revision."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('math')}
-                        icon={<Variable size={24}/>}
-                        title="Math Problem Solver"
-                        description="Get step-by-step solutions for complex math problems, from algebra to calculus."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('code')}
-                        icon={<Code size={24}/>}
-                        title="Code Explainer"
-                        description="Understand code snippets in any programming language with detailed explanations."
-                    />
-                    <FeatureCard
-                        onClick={() => handleFeatureClick('translator')}
-                        icon={<Languages size={24}/>}
-                        title="Document Translator"
-                        description="Translate your study documents into multiple languages instantly."
-                    />
-                </div>
+                <>
+                    <div className="max-w-2xl mx-auto mb-12">
+                        <form onSubmit={handleGlobalSearch} className="relative">
+                            <Input 
+                                type="search"
+                                placeholder="Have a question? Ask our AI assistant..."
+                                className="w-full pl-12 pr-4 py-6 text-lg rounded-full border-2 border-primary/40 focus:border-primary focus:ring-primary/40"
+                                value={globalSearchQuery}
+                                onChange={(e) => setGlobalSearchQuery(e.target.value)}
+                            />
+                            <button type="submit" className="absolute left-4 top-1/2 -translate-y-1/2">
+                                <Search className="h-6 w-6 text-primary" />
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <FeatureCard 
+                            onClick={() => handleFeatureClick('chat')}
+                            icon={<BotMessageSquare size={24}/>}
+                            title="Ask Any Question"
+                            description="Get instant, detailed answers to your questions from an expert AI tutor."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('summarizer')}
+                            icon={<FileText size={24}/>}
+                            title="Generate Summaries"
+                            description="Automatically create concise summaries and organized notes from any text."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('quiz')}
+                            icon={<BrainCircuit size={24}/>}
+                            title="Smart Quiz Maker"
+                            description="Test your knowledge with custom quizzes generated from your study materials."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('explainer')}
+                            icon={<Lightbulb size={24}/>}
+                            title="Concept Explainer"
+                            description="Break down complex topics and concepts into easy-to-understand explanations."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('flashcards')}
+                            icon={<Layers size={24}/>}
+                            title="AI Flashcard Maker"
+                            description="Turn your study notes into interactive flashcards for effective revision."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('math')}
+                            icon={<Variable size={24}/>}
+                            title="Math Problem Solver"
+                            description="Get step-by-step solutions for complex math problems, from algebra to calculus."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('code')}
+                            icon={<Code size={24}/>}
+                            title="Code Explainer"
+                            description="Understand code snippets in any programming language with detailed explanations."
+                        />
+                        <FeatureCard
+                            onClick={() => handleFeatureClick('translator')}
+                            icon={<Languages size={24}/>}
+                            title="Document Translator"
+                            description="Translate your study documents into multiple languages instantly."
+                        />
+                    </div>
+                </>
             )}
           </div>
         </section>
