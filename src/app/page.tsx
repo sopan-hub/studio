@@ -32,7 +32,7 @@ export default function Home() {
   const router = useRouter();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
-  const handleGetStartedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleGetStartedClick = (e: React.MouseEvent<HTMLElement>) => {
     if (!user) {
       e.preventDefault();
       setIsLoginDialogOpen(true);
@@ -72,10 +72,8 @@ export default function Home() {
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
-                <Link href="#features">
+              <Button onClick={handleGetStartedClick} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
                   Start Studying Now <ArrowRight className="ml-2" />
-                </Link>
               </Button>
             </div>
             <div>
