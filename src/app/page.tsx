@@ -1,10 +1,15 @@
+
 "use client";
 
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/logo";
+import { useAuth } from '@/hooks/use-auth';
+import { LoginDialog } from '@/components/login-dialog';
+import { InteractiveAiLogo } from '@/components/interactive-ai-logo';
 
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
   <div className="bg-card p-6 rounded-lg border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
@@ -23,8 +28,22 @@ const GitHubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 )
 
 export default function Home() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+
+  const handleGetStartedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!user) {
+      e.preventDefault();
+      setIsLoginDialogOpen(true);
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
   return (
     <div className="bg-background text-foreground">
+      <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
       {/* Header */}
        <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
         <div className="container mx-auto flex items-center justify-between p-4">
@@ -36,8 +55,8 @@ export default function Home() {
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Study Assistant</Link>
             <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
           </nav>
-          <Button asChild className="bg-primary/90 text-primary-foreground font-bold neon-glow-button">
-            <Link href="/dashboard">Get Started</Link>
+          <Button onClick={handleGetStartedClick} className="bg-primary/90 text-primary-foreground font-bold neon-glow-button">
+            Get Started
           </Button>
         </div>
       </header>
@@ -60,14 +79,7 @@ export default function Home() {
               </Button>
             </div>
             <div>
-              <Image 
-                src="https://placehold.co/600x400.png"
-                alt="AI Assistant Illustration" 
-                width={600} 
-                height={400} 
-                className="rounded-lg shadow-2xl shadow-primary/20"
-                data-ai-hint="futuristic student AI neon"
-              />
+              <InteractiveAiLogo />
             </div>
           </div>
         </section>

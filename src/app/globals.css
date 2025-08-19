@@ -1,6 +1,6 @@
 @tailwind base;
-@tailwind components;
 @tailwind utilities;
+@tailwind components;
 
 body {
   font-family: 'Inter', sans-serif;
@@ -87,21 +87,95 @@ h1, h2, h3, h4, h5, h6 {
 @layer components {
   .neon-glow {
     text-shadow:
-      0 0 2px hsl(var(--primary) / 0.7),
-      0 0 4px hsl(var(--primary) / 0.5),
-      0 0 8px hsl(var(--primary) / 0.3);
+      0 0 1px hsl(var(--primary) / 0.8),
+      0 0 2px hsl(var(--primary) / 0.6),
+      0 0 4px hsl(var(--primary) / 0.4);
   }
   .neon-glow-button {
     box-shadow:
-      0 0 3px hsl(var(--primary)),
-      0 0 6px hsl(var(--primary)),
-      0 0 12px hsl(var(--primary) / 0.3);
+      0 0 2px hsl(var(--primary)),
+      0 0 4px hsl(var(--primary)),
+      0 0 8px hsl(var(--primary) / 0.3);
     transition: all 0.3s ease-in-out;
   }
   .neon-glow-button:hover {
      box-shadow:
-      0 0 5px hsl(var(--primary)),
-      0 0 10px hsl(var(--primary)),
-      0 0 20px hsl(var(--primary) / 0.4);
+      0 0 4px hsl(var(--primary)),
+      0 0 8px hsl(var(--primary)),
+      0 0 16px hsl(var(--primary) / 0.4);
   }
+}
+
+.interactive-logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 400px; /* Or adjust as needed */
+    margin: auto;
+    aspect-ratio: 1 / 1;
+}
+
+.interactive-logo {
+    width: 100%;
+    height: 100%;
+}
+
+.interactive-logo .base-circle {
+    fill: hsl(var(--primary) / 0.1);
+    stroke: hsl(var(--primary));
+    stroke-width: 1;
+    transition: all 0.5s ease-out;
+}
+
+.interactive-logo:hover .base-circle {
+    transform: scale(1.02);
+    filter: url(#glow);
+}
+
+.interactive-logo .brain-path {
+    fill: none;
+    stroke: hsl(var(--primary));
+    stroke-width: 2;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw-in 3s ease-out forwards;
+}
+
+.interactive-logo .node {
+    fill: hsl(var(--primary));
+    r: 3;
+    animation: pulse-node 4s infinite ease-in-out;
+    opacity: 0;
+}
+
+.interactive-logo:hover .node {
+    filter: url(#glow);
+}
+
+.interactive-logo .node-1 { animation-delay: 0.5s; }
+.interactive-logo .node-2 { animation-delay: 1s; }
+.interactive-logo .node-3 { animation-delay: 1.5s; }
+.interactive-logo .node-4 { animation-delay: 2s; }
+.interactive-logo .node-5 { animation-delay: 2.5s; }
+.interactive-logo .node-6 { animation-delay: 3s; }
+
+@keyframes draw-in {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes pulse-node {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+    25%, 75% {
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
 }
