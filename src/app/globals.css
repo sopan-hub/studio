@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind utilities;
 @tailwind components;
@@ -122,27 +123,28 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
 }
 
+/* Default state styles */
+.interactive-logo .logo-geometry > *, .interactive-logo .ai-text {
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
 .interactive-logo .logo-geometry {
     stroke: hsl(var(--primary));
     stroke-width: 8;
     fill: none;
-    transition: filter 0.3s ease-in-out;
     transform-origin: center;
 }
 
-.interactive-logo:hover .logo-geometry, .blasting .logo-geometry {
-    filter: url(#wobble) url(#glow);
-}
-
-.blasting .logo-geometry {
-    animation: blast-out 0.5s ease-out forwards;
+.interactive-logo:hover .logo-main-chip,
+.interactive-logo:hover .logo-inner-chip {
+    filter: url(#glow);
 }
 
 .interactive-logo .circuit-path {
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
     animation: draw-in 4s ease-out infinite;
-    animation-delay: 1s;
+    animation-delay: calc(var(--piece-index, 0) * 50ms);
 }
 
 .interactive-logo .ai-text {
@@ -150,8 +152,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     font-size: 80px;
     fill: hsl(var(--primary));
-    animation: fade-in 4s ease-out infinite;
-    animation-delay: 1.5s;
+    animation: fade-in 4s ease-out infinite 1.5s;
     opacity: 0;
 }
 
@@ -159,10 +160,6 @@ h1, h2, h3, h4, h5, h6 {
     fill: hsl(var(--primary));
     animation: pulse-node 2s infinite ease-in-out;
     opacity: 0;
-}
-
-.interactive-logo:hover .node {
-    filter: url(#glow);
 }
 
 .interactive-logo .node-1 { animation-delay: 1.2s; }
@@ -177,51 +174,67 @@ h1, h2, h3, h4, h5, h6 {
 .interactive-logo .node-10 { animation-delay: 3.0s; }
 
 
+/* Animation keyframes */
 @keyframes draw-in {
-    0% {
-        stroke-dashoffset: 1000;
-    }
-    50% {
-        stroke-dashoffset: 0;
-    }
-    100% {
-        stroke-dashoffset: 1000;
-    }
+    0% { stroke-dashoffset: 1000; }
+    50% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 1000; }
 }
 
 @keyframes fade-in {
-     0% {
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
+     0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
 }
 
 @keyframes pulse-node {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0;
-    }
-    25%, 75% {
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 1;
-    }
+    0%, 100% { transform: scale(1); opacity: 0; }
+    25%, 75% { opacity: 1; }
+    50% { transform: scale(1.5); opacity: 1; }
 }
 
-@keyframes blast-out {
+
+/* --- Blast Animation --- */
+.blasting .circuit-path,
+.blasting .node,
+.blasting .ai-text {
+    /* Stop looping animations */
+    animation-name: none;
+    opacity: 1;
+}
+
+.blasting .blast-piece {
+    transform-origin: center;
+    animation: blast-piece-fly-out 1.5s ease-out forwards;
+    animation-delay: calc(var(--piece-index) * 10ms);
+}
+
+.blasting .blast-piece-center {
+    transform-origin: center;
+    animation: blast-center-fly-out 1s ease-out forwards;
+}
+
+
+@keyframes blast-piece-fly-out {
   0% {
-    transform: scale(1) rotate(0deg);
+    transform: translate(0, 0) rotate(0deg) scale(1);
     opacity: 1;
   }
   100% {
-    transform: scale(2.5) rotate(90deg);
+    /* Random-ish looking transform using sine/cosine of the index */
+    transform: translate(calc(cos(var(--piece-index) * 20deg) * 300px), calc(sin(var(--piece-index) * 20deg) * 300px))
+               rotate(calc(var(--piece-index) * 30deg))
+               scale(0);
     opacity: 0;
   }
+}
+
+@keyframes blast-center-fly-out {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
 }
