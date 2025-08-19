@@ -156,16 +156,19 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Blast Animation Styles */
 .interactive-logo.blasting .logo-geometry > *, .interactive-logo.blasting .ai-text {
-    animation-duration: 2s;
+    animation-duration: 3s;
     animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+    animation-timing-function: ease-out;
 }
 
-.interactive-logo.blasting .logo-main-chip { animation-name: blast-chip; }
-.interactive-logo.blasting .ai-text { animation-name: blast-text; }
-.interactive-logo.blasting .circuit-path { animation-name: blast-path; }
-.interactive-logo.blasting .node { animation-name: blast-node; }
-.interactive-logo.blasting .logo-inner-chip { animation-name: blast-inner-chip; }
+.interactive-logo.blasting .logo-main-chip,
+.interactive-logo.blasting .logo-inner-chip,
+.interactive-logo.blasting .circuit-path,
+.interactive-logo.blasting .node,
+.interactive-logo.blasting .ai-text {
+    animation-name: charge-up, blast-off;
+}
+
 
 /* Animation keyframes */
 @keyframes draw-in {
@@ -179,34 +182,37 @@ h1, h2, h3, h4, h5, h6 {
     50% { transform: scale(1.5); }
 }
 
-@keyframes blast-chip {
-    0% { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; }
-    100% { transform: translate(50px, -70px) scale(0.1) rotate(90deg); opacity: 0; }
-}
-
-@keyframes blast-inner-chip {
-     0% { transform: translate(0, 0) scale(1) rotate(0); opacity: 1; }
-    100% { transform: translate(-40px, 60px) scale(0.2) rotate(-80deg); opacity: 0; }
-}
-
-@keyframes blast-text {
-    0% { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(0, 20px) scale(0); opacity: 0; }
-}
-
-@keyframes blast-path {
-    0% { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { 
-        transform: translate(calc(var(--randX) * 200px), calc(var(--randY) * 200px)) scale(0.5) rotate(calc(var(--randR) * 180deg)); 
-        opacity: 0; 
+@keyframes charge-up {
+    0% {
+        stroke: hsl(var(--primary));
+        fill: hsl(var(--primary));
+        filter: blur(0px) brightness(1);
+        transform: scale(1);
+    }
+    33% {
+        stroke: white;
+        fill: white;
+        filter: blur(4px) brightness(3);
+        text-shadow: 0 0 20px #fff, 0 0 30px #fff;
+        transform: scale(1.1);
+    }
+    100% {
+        /* Hold the bright state until blast-off takes over */
+        stroke: white;
+        fill: white;
+        filter: blur(4px) brightness(3);
+        text-shadow: 0 0 20px #fff, 0 0 30px #fff;
     }
 }
 
-@keyframes blast-node {
-    0% { transform: scale(1); opacity: 1; }
-    100% { 
-        transform: scale(0) translate(calc(var(--randX) * 150px), calc(var(--randY) * 150px)); 
-        opacity: 0; 
+@keyframes blast-off {
+    0%, 33% { /* Wait for charge-up to finish */
+        transform: translate(0, 0) scale(1.1) rotate(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(var(--randX) * 250px), calc(var(--randY) * 250px)) scale(0) rotate(calc(var(--randR) * 360deg));
+        opacity: 0;
     }
 }
 
