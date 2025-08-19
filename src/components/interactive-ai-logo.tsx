@@ -14,41 +14,45 @@ export const InteractiveAiLogo = () => {
           </filter>
         </defs>
         <circle cx="100" cy="100" r="95" className="base-circle" />
+        {/* Symmetrical Brain-like structure */}
         <path
           className="brain-path"
-          d="M100 20 C 70 20, 50 40, 50 70 S 70 120, 100 120 S 130 100, 150 70 S 130 20, 100 20"
-        />
-        <path
-          className="brain-path"
-          d="M100 120 Q 80 140, 70 160 T 60 180"
-        />
-         <path
-          className="brain-path"
-          d="M100 120 Q 120 140, 130 160 T 140 180"
+          d="M100 30 C 60 30, 40 70, 40 100 C 40 130, 60 170, 100 170"
         />
         <path
           className="brain-path"
-          d="M75 50 C 65 60, 65 80, 75 90"
-        />
-        <path
-          className="brain-path"
-          d="M125 50 C 135 60, 135 80, 125 90"
-        />
-         <path
-          className="brain-path"
-          d="M90 70 L 110 70"
+          d="M100 30 C 140 30, 160 70, 160 100 C 160 130, 140 170, 100 170"
         />
 
-        <circle cx="100" cy="20" className="node node-1" />
-        <circle cx="50" cy="70" className="node node-2" />
-        <circle cx="150" cy="70" className="node node-3" />
-        <circle cx="100" cy="120" className="node node-4" />
-        <circle cx="60" cy="180" className="node node-5" />
-        <circle cx="140" cy="180" className="node node-6" />
-        <circle cx="75" cy="50" className="node node-1" />
-        <circle cx="75" cy="90" className="node node-2" />
-        <circle cx="125" cy="50" className="node node-3" />
-        <circle cx="125" cy="90" className="node node-4" />
+        {/* Central Vertical line */}
+        <path
+          className="brain-path"
+          d="M100 30 V 170"
+        />
+
+        {/* Horizontal connections */}
+        <path className="brain-path" d="M70 60 H 130" />
+        <path className="brain-path" d="M60 80 H 140" />
+        <path className="brain-path" d="M50 100 H 150" />
+        <path className="brain-path" d="M60 120 H 140" />
+        <path className="brain-path" d="M70 140 H 130" />
+
+        {/* Nodes */}
+        <circle cx="100" cy="30" className="node node-1" />
+        <circle cx="100" cy="170" className="node node-2" />
+
+        <circle cx="70" cy="60" className="node node-3" />
+        <circle cx="130" cy="60" className="node node-4" />
+        <circle cx="60" cy="80" className="node node-5" />
+        <circle cx="140" cy="80" className="node node-6" />
+
+        <circle cx="50" cy="100" className="node node-1" />
+        <circle cx="150" cy="100" className="node node-2" />
+
+        <circle cx="60" cy="120" className="node node-3" />
+        <circle cx="140" cy="120" className="node node-4" />
+        <circle cx="70" cy="140" className="node node-5" />
+        <circle cx="130" cy="140" className="node node-6" />
 
       </svg>
     </div>
