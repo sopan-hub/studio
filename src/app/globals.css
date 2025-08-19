@@ -169,15 +169,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-
-/* --- Particle Footer --- */
-.particle-footer {
+/* --- Interactive Grid Footer --- */
+.interactive-grid-footer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
+  overflow: hidden;
+}
+
+.grid-tile {
+  width: 100%;
+  height: 100%;
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--primary) / 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.grid-tile.active {
+  background-color: hsl(var(--primary) / 0.8);
+  box-shadow: 0 0 10px hsl(var(--primary));
+  z-index: 2;
 }
 
 /* Card particles */

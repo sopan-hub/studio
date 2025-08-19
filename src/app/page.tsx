@@ -15,7 +15,7 @@ import { AiQuizTool } from '@/components/ai-quiz-tool';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
-import { ParticleFooter } from '@/components/particle-footer';
+import { InteractiveGridFooter } from '@/components/interactive-grid-footer';
 
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
@@ -249,7 +249,7 @@ export default function Home() {
         </section>
       </main>
       <footer className="bg-background border-t border-primary/20 py-8 md:py-12 relative">
-        <ParticleFooter />
+        <InteractiveGridFooter />
         <div className="container mx-auto text-center text-muted-foreground relative z-10">
           <p>&copy; 2024 Study Buddy AI. All rights reserved.</p>
           <div className="flex justify-center gap-6 mt-4">
