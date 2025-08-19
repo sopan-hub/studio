@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram, LogIn, Lightbulb, Pilcrow } from "lucide-react";
+import { ArrowLeft, BookOpenCheck, BrainCircuit, FileText, BotMessageSquare, CalendarClock, BarChart3, Bookmark, Mail, Instagram, LogIn, Lightbulb, Pilcrow, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Logo } from "@/components/logo";
@@ -13,10 +13,11 @@ import { InteractiveAiLogo } from '@/components/interactive-ai-logo';
 import { AiChatTool } from '@/components/ai-chat-tool';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'tracker' | 'organizer' | 'explainer' | 'outliner' | null;
 
-// Placeholder components for the actual tools
 const AiToolPlaceholder = ({ title, onBack }: { title: string; onBack: () => void }) => (
     <Card className="w-full bg-card border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in">
         <CardHeader>
@@ -57,15 +58,20 @@ const GitHubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Home() {
   const { user, signOut } = useAuth();
-  const router = useRouter();
+  const { toast } = useToast();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState<FeatureKey>(null);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState("");
+  const featuresRef = useRef<HTMLElement>(null);
 
   const handleFeatureClick = (feature: FeatureKey) => {
     if (!user) {
         setIsLoginDialogOpen(true);
     } else {
         setActiveFeature(feature);
+        if (featuresRef.current) {
+            featuresRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
     }
   };
   
@@ -81,16 +87,43 @@ export default function Home() {
 
   const handleStartStudying = (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
-      const featuresSection = document.getElementById('features');
-      if (featuresSection) {
-          featuresSection.scrollIntoView({ behavior: 'smooth' });
-      }
+      document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   }
+
+  const handleGlobalSearch = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!globalSearchQuery.trim()) {
+          toast({ variant: 'destructive', title: "Search query can't be empty." });
+          return;
+      }
+      if (!user) {
+        setIsLoginDialogOpen(true);
+        return;
+      }
+      setActiveFeature('chat');
+      // The AiChatTool will need to be able to accept a default query.
+      // We will pass it via a prop.
+      // We'll manage this interaction when we switch to the component.
+      if (featuresRef.current) {
+          featuresRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+  };
+  
+  // Effect to reset active feature if user logs out
+  useEffect(() => {
+    if (!user) {
+        setActiveFeature(null);
+    }
+  }, [user]);
 
   const renderActiveFeature = () => {
     switch (activeFeature) {
         case 'chat':
-            return <AiChatTool onBack={() => setActiveFeature(null)} />;
+            return <AiChatTool 
+                        onBack={() => setActiveFeature(null)} 
+                        initialQuestion={globalSearchQuery}
+                        onSearchPerformed={() => setGlobalSearchQuery("")}
+                    />;
         case 'summarizer':
             return <AiToolPlaceholder title="Generate Notes & Summaries" onBack={() => setActiveFeature(null)} />;
         case 'quiz':
@@ -115,9 +148,21 @@ export default function Home() {
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} onLoginSuccess={() => { /* can decide what to do after login, e.g. open the last clicked feature */ }}/>
       {/* Header */}
        <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-sm z-50 border-b border-primary/20">
-        <div className="container mx-auto flex items-center justify-between p-4">
+        <div className="container mx-auto flex items-center justify-between p-4 gap-4">
            <div className="flex items-center gap-2">
             <Logo />
+          </div>
+          <div className="flex-1 max-w-lg">
+             <form onSubmit={handleGlobalSearch} className="relative">
+                <Input 
+                    type="search"
+                    placeholder="AI General Search..."
+                    className="w-full pl-10"
+                    value={globalSearchQuery}
+                    onChange={(e) => setGlobalSearchQuery(e.target.value)}
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+             </form>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
@@ -152,7 +197,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-16 bg-background">
+        <section id="features" ref={featuresRef} className="py-16 bg-background">
            <div className="container mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-primary neon-glow">Powerful Features to Boost Your Learning</h2>

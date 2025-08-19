@@ -1,21 +1,39 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Sparkles, Loader2, Upload, XCircle, Paperclip } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Upload, XCircle, Paperclip, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
+import { jsPDF } from 'jspdf';
 
-export const AiChatTool = ({ onBack }: { onBack: () => void }) => {
-    const [question, setQuestion] = useState("");
+interface AiChatToolProps {
+    onBack: () => void;
+    initialQuestion?: string;
+    onSearchPerformed?: () => void;
+}
+
+export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: AiChatToolProps) => {
+    const [question, setQuestion] = useState(initialQuestion);
     const [answer, setAnswer] = useState("");
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState<{ name: string, dataUri: string } | null>(null);
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (initialQuestion) {
+            setQuestion(initialQuestion);
+            handleGenerate();
+            if (onSearchPerformed) {
+                onSearchPerformed();
+            }
+        }
+    }, [initialQuestion]);
+
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
@@ -69,6 +87,43 @@ export const AiChatTool = ({ onBack }: { onBack: () => void }) => {
             setLoading(false);
         }
     };
+
+    const handleDownloadPdf = () => {
+        if (!answer) {
+            toast({
+                variant: "destructive",
+                title: "Nothing to Download",
+                description: "Please generate an answer first.",
+            });
+            return;
+        }
+
+        const doc = new jsPDF();
+
+        doc.setFont("Inter", "bold");
+        doc.setFontSize(16);
+        doc.text("Study Buddy AI - Your Answer", 14, 22);
+        
+        doc.setFont("Inter", "bold");
+        doc.setFontSize(12);
+        doc.text("Question:", 14, 40);
+        
+        doc.setFont("Inter", "normal");
+        const questionLines = doc.splitTextToSize(question, 180);
+        doc.text(questionLines, 14, 48);
+        
+        const lastQuestionY = 48 + (questionLines.length * 7);
+
+        doc.setFont("Inter", "bold");
+        doc.text("Answer:", 14, lastQuestionY + 10);
+        
+        doc.setFont("Inter", "normal");
+        const answerLines = doc.splitTextToSize(answer, 180);
+        doc.text(answerLines, 14, lastQuestionY + 18);
+
+        doc.save("study-buddy-answer.pdf");
+    };
+
 
     return (
         <Card className="w-full bg-card border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in">
@@ -127,14 +182,24 @@ export const AiChatTool = ({ onBack }: { onBack: () => void }) => {
                         </Button>
                     </div>
 
-                    <div className="mt-4 p-4 border border-dashed border-primary/40 rounded-lg min-h-[150px] bg-background/50">
+                    <div className="mt-4 p-4 border border-dashed border-primary/40 rounded-lg min-h-[150px] bg-background/50 relative">
                         {loading ? (
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Loader2 className="animate-spin h-5 w-5" />
                                 Thinking...
                             </div>
                         ) : answer ? (
-                            <p className="whitespace-pre-wrap">{answer}</p>
+                            <>
+                                <p className="whitespace-pre-wrap">{answer}</p>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleDownloadPdf}
+                                    className="absolute top-2 right-2"
+                                >
+                                    <Download className="h-4 w-4" />
+                                </Button>
+                            </>
                         ) : (
                            <p className="text-muted-foreground">AI output will appear here...</p>
                         )}
