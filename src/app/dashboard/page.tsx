@@ -12,11 +12,12 @@ import { FlashcardGenerator } from "@/components/flashcard-generator";
 import { QuizGenerator } from "@/components/quiz-generator";
 import { TutorChat } from "@/components/tutor-chat";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FeatureCard = ({ id, title, description, children, isOpen, onOpenChange }: { id: string, title: string, description: string, children: React.ReactNode, isOpen: boolean, onOpenChange: (isOpen: boolean) => void }) => (
   <section id={id} className="scroll-mt-20">
     <Collapsible open={isOpen} onOpenChange={onOpenChange}>
-      <Card className="border-4 border-blue-900 shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1 h-full flex flex-col">
+      <Card className="border-4 border-blue-900 shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1 h-[450px] flex flex-col">
         <CollapsibleTrigger asChild>
           <div className="cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -28,10 +29,12 @@ const FeatureCard = ({ id, title, description, children, isOpen, onOpenChange }:
             </CardHeader>
           </div>
         </CollapsibleTrigger>
-        <CollapsibleContent className="flex-grow">
-          <CardContent>
-            {children}
-          </CardContent>
+        <CollapsibleContent className="flex-grow overflow-hidden">
+          <ScrollArea className="h-full w-full">
+            <CardContent>
+              {children}
+            </CardContent>
+          </ScrollArea>
         </CollapsibleContent>
       </Card>
     </Collapsible>
@@ -72,6 +75,11 @@ export default function DashboardPage() {
   
   return (
     <div className="space-y-8">
+      <section className="bg-card p-6 rounded-lg border-4 border-blue-900 shadow-2xl">
+        <h2 className="text-2xl font-headline text-primary mb-4 text-center">AI General Search</h2>
+        <TutorChat notes={notes} />
+      </section>
+
        <FeatureCard 
         id="notes" 
         title="My Notes" 

@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "./ui/scroll-area";
 
 const formSchema = z.object({
   query: z.string().min(10, {
@@ -59,7 +60,7 @@ export function TutorChat({ notes }: { notes: string }) {
             name="query"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Your Question</FormLabel>
+                <FormLabel className="sr-only">Your Question</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
