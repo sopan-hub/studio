@@ -1,16 +1,5 @@
-import DashboardHeader from "@/components/dashboard-header";
-import { FlashcardGenerator } from "@/components/flashcard-generator";
-
+// This page is no longer used and will be removed in a future update.
+// All functionality has been consolidated into /src/app/dashboard/page.tsx.
 export default function FlashcardsPage() {
-  return (
-    <div>
-      <DashboardHeader
-        title="AI Flashcards"
-        description="Turn your notes into interactive flashcards for effective learning."
-      />
-      <div className="mt-8">
-        <FlashcardGenerator />
-      </div>
-    </div>
-  );
+  return null;
 }

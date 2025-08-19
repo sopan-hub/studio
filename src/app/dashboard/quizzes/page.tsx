@@ -1,16 +1,5 @@
-import DashboardHeader from "@/components/dashboard-header";
-import { QuizGenerator } from "@/components/quiz-generator";
-
+// This page is no longer used and will be removed in a future update.
+// All functionality has been consolidated into /src/app/dashboard/page.tsx.
 export default function QuizzesPage() {
-  return (
-    <div>
-      <DashboardHeader
-        title="AI Quiz Generator"
-        description="Test your knowledge with auto-generated quizzes."
-      />
-      <div className="mt-8">
-        <QuizGenerator />
-      </div>
-    </div>
-  );
+  return null;
 }

@@ -1,16 +1,5 @@
-import DashboardHeader from "@/components/dashboard-header";
-import { Summarizer } from "@/components/summarizer";
-
+// This page is no longer used and will be removed in a future update.
+// All functionality has been consolidated into /src/app/dashboard/page.tsx.
 export default function SummariesPage() {
-  return (
-    <div>
-      <DashboardHeader
-        title="AI Summarizer"
-        description="Generate concise summaries from your notes instantly."
-      />
-      <div className="mt-8">
-        <Summarizer />
-      </div>
-    </div>
-  );
+  return null;
 }

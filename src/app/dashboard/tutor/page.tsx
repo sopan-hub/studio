@@ -1,16 +1,5 @@
-import DashboardHeader from "@/components/dashboard-header";
-import { TutorChat } from "@/components/tutor-chat";
-
+// This page is no longer used and will be removed in a future update.
+// All functionality has been consolidated into /src/app/dashboard/page.tsx.
 export default function TutorPage() {
-  return (
-    <div>
-      <DashboardHeader
-        title="AI Tutor Chat"
-        description="Your personal AI tutor, ready to answer your questions."
-      />
-      <div className="mt-8">
-        <TutorChat />
-      </div>
-    </div>
-  );
+  return null;
 }
