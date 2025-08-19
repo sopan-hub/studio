@@ -33,7 +33,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-4">
             <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Features</Link>
-            <Link href="/dashboard" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Study Assistant</Link>
+            <Link href="#features" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Study Assistant</Link>
             <Link href="#pricing" className="text-muted-foreground hover:text-primary hover:neon-glow transition-all">Pricing</Link>
           </nav>
           <Button asChild className="bg-primary/90 text-primary-foreground font-bold neon-glow-button">
@@ -54,7 +54,7 @@ export default function Home() {
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
-                <Link href="/dashboard">
+                <Link href="#features">
                   Start Studying Now <ArrowRight className="ml-2" />
                 </Link>
               </Button>
