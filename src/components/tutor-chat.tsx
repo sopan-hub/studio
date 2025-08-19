@@ -20,7 +20,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function TutorChat({ notes }: { notes: string }) {
+export function TutorChat({ notes, onGenerate }: { notes: string, onGenerate?: () => boolean; }) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -33,6 +33,9 @@ export function TutorChat({ notes }: { notes: string }) {
   });
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    if (onGenerate && !onGenerate()) {
+      return;
+    }
     setIsLoading(true);
     setAnswer(null);
     try {

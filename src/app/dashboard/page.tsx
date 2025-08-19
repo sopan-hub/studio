@@ -12,32 +12,47 @@ import { FlashcardGenerator } from "@/components/flashcard-generator";
 import { QuizGenerator } from "@/components/quiz-generator";
 import { TutorChat } from "@/components/tutor-chat";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useAuth } from "@/hooks/use-auth";
+import { LoginDialog } from "@/components/login-dialog";
 
-const FeatureCard = ({ id, title, description, children }: { id: string, title: string, description: string, children: React.ReactNode }) => (
-  <Card className="bg-card border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value={id} className="border-b-0">
-        <AccordionTrigger className="p-6 hover:no-underline">
-          <div className="text-left">
-            <CardTitle className="text-xl font-bold text-primary neon-glow">{title}</CardTitle>
-            <CardDescription className="text-base text-muted-foreground">{description}</CardDescription>
-          </div>
-        </AccordionTrigger>
-        <AccordionContent>
-          <div className="p-6 pt-0">
-            {children}
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  </Card>
-);
+const FeatureCard = ({ id, title, description, children, onOpen }: { id: string, title: string, description: string, children: React.ReactNode, onOpen?: () => boolean }) => {
+  
+  const handleTriggerClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (onOpen && !onOpen()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+  
+  return (
+    <Card className="bg-card border border-primary/20 hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value={id} className="border-b-0">
+          <AccordionTrigger onClick={handleTriggerClick} className="p-6 hover:no-underline">
+            <div className="text-left">
+              <CardTitle className="text-xl font-bold text-primary neon-glow">{title}</CardTitle>
+              <CardDescription className="text-base text-muted-foreground">{description}</CardDescription>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="p-6 pt-0">
+              {children}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </Card>
+  );
+};
 
 
 export default function DashboardPage() {
   const [notes, setNotes] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [pastedNotes, setPastedNotes] = useState("");
+  const { user, loading } = useAuth();
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+
 
   const handleFileRead = (content: string) => {
     setNotes(content);
@@ -53,12 +68,22 @@ export default function DashboardPage() {
     console.log("Saving notes:", notes);
     alert("Note saved!");
   };
+
+  const checkAuth = () => {
+    if (!user) {
+      setIsLoginDialogOpen(true);
+      return false;
+    }
+    return true;
+  };
   
   return (
+    <>
+    <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
     <div className="space-y-8">
       <section className="bg-card p-6 rounded-lg border border-primary/20">
         <h2 className="text-3xl font-bold text-primary mb-4 text-center neon-glow">AI General Search</h2>
-        <TutorChat notes={notes} />
+        <TutorChat notes={notes} onGenerate={checkAuth}/>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -125,6 +150,7 @@ export default function DashboardPage() {
           id="summarizer"
           title="AI Summarizer"
           description="Generate concise summaries from your notes instantly."
+          onOpen={checkAuth}
         >
           <Summarizer notes={notes} />
         </FeatureCard>
@@ -133,6 +159,7 @@ export default function DashboardPage() {
           id="flashcards"
           title="AI Flashcards"
           description="Turn your notes into interactive flashcards for effective learning."
+          onOpen={checkAuth}
         >
           <FlashcardGenerator notes={notes} />
         </FeatureCard>
@@ -141,6 +168,7 @@ export default function DashboardPage() {
           id="quizzes"
           title="AI Quiz Generator"
           description="Test your knowledge with auto-generated quizzes."
+          onOpen={checkAuth}
         >
           <QuizGenerator notes={notes} />
         </FeatureCard>
@@ -149,10 +177,12 @@ export default function DashboardPage() {
           id="tutor"
           title="AI Tutor Chat"
           description="Your personal AI tutor, ready to answer your questions."
+          onOpen={checkAuth}
         >
-          <TutorChat notes={notes} />
+          <TutorChat notes={notes} onGenerate={checkAuth} />
         </FeatureCard>
       </div>
     </div>
+    </>
   );
 }
