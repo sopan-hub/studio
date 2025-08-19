@@ -14,9 +14,9 @@ import { TutorChat } from "@/components/tutor-chat";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const FeatureCard = ({ id, title, description, children, isOpen, onOpenChange }: { id: string, title: string, description: string, children: React.ReactNode, isOpen: boolean, onOpenChange: (isOpen: boolean) => void }) => (
-  <section id={id} className="mb-16 scroll-mt-20">
+  <section id={id} className="scroll-mt-20">
     <Collapsible open={isOpen} onOpenChange={onOpenChange}>
-      <Card className="border-2 border-border shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1">
+      <Card className="border-4 border-blue-900 shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1 h-full flex flex-col">
         <CollapsibleTrigger asChild>
           <div className="cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -28,7 +28,7 @@ const FeatureCard = ({ id, title, description, children, isOpen, onOpenChange }:
             </CardHeader>
           </div>
         </CollapsibleTrigger>
-        <CollapsibleContent>
+        <CollapsibleContent className="flex-grow">
           <CardContent>
             {children}
           </CardContent>
@@ -71,7 +71,7 @@ export default function DashboardPage() {
   };
   
   return (
-    <div className="space-y-16">
+    <div className="space-y-8">
        <FeatureCard 
         id="notes" 
         title="My Notes" 
@@ -101,7 +101,7 @@ export default function DashboardPage() {
                 <CardContent className="space-y-4">
                   <Textarea 
                     placeholder="Paste your notes here..." 
-                    className="min-h-[300px]"
+                    className="min-h-[200px]"
                     value={pastedNotes}
                     onChange={handlePaste}
                   />
@@ -131,45 +131,47 @@ export default function DashboardPage() {
           </Tabs>
       </FeatureCard>
 
-      <FeatureCard 
-        id="summarizer"
-        title="AI Summarizer"
-        description="Generate concise summaries from your notes instantly."
-        isOpen={openSections.summarizer}
-        onOpenChange={() => handleToggleSection('summarizer')}
-      >
-        <Summarizer notes={notes} />
-      </FeatureCard>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <FeatureCard 
+          id="summarizer"
+          title="AI Summarizer"
+          description="Generate concise summaries from your notes instantly."
+          isOpen={openSections.summarizer}
+          onOpenChange={() => handleToggleSection('summarizer')}
+        >
+          <Summarizer notes={notes} />
+        </FeatureCard>
 
-      <FeatureCard
-        id="flashcards"
-        title="AI Flashcards"
-        description="Turn your notes into interactive flashcards for effective learning."
-        isOpen={openSections.flashcards}
-        onOpenChange={() => handleToggleSection('flashcards')}
-      >
-        <FlashcardGenerator notes={notes} />
-      </FeatureCard>
-      
-      <FeatureCard
-        id="quizzes"
-        title="AI Quiz Generator"
-        description="Test your knowledge with auto-generated quizzes."
-        isOpen={openSections.quizzes}
-        onOpenChange={() => handleToggleSection('quizzes')}
-      >
-        <QuizGenerator notes={notes} />
-      </FeatureCard>
-      
-      <FeatureCard
-        id="tutor"
-        title="AI Tutor Chat"
-        description="Your personal AI tutor, ready to answer your questions."
-        isOpen={openSections.tutor}
-        onOpenChange={() => handleToggleSection('tutor')}
-      >
-        <TutorChat notes={notes} />
-      </FeatureCard>
+        <FeatureCard
+          id="flashcards"
+          title="AI Flashcards"
+          description="Turn your notes into interactive flashcards for effective learning."
+          isOpen={openSections.flashcards}
+          onOpenChange={() => handleToggleSection('flashcards')}
+        >
+          <FlashcardGenerator notes={notes} />
+        </FeatureCard>
+        
+        <FeatureCard
+          id="quizzes"
+          title="AI Quiz Generator"
+          description="Test your knowledge with auto-generated quizzes."
+          isOpen={openSections.quizzes}
+          onOpenChange={() => handleToggleSection('quizzes')}
+        >
+          <QuizGenerator notes={notes} />
+        </FeatureCard>
+        
+        <FeatureCard
+          id="tutor"
+          title="AI Tutor Chat"
+          description="Your personal AI tutor, ready to answer your questions."
+          isOpen={openSections.tutor}
+          onOpenChange={() => handleToggleSection('tutor')}
+        >
+          <TutorChat notes={notes} />
+        </FeatureCard>
+      </div>
     </div>
   );
 }

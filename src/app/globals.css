@@ -28,7 +28,7 @@ h1, h2, h3, h4, h5, h6 {
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 40% 20%; /* Blue-Gray Border */
+    --border: 220 40% 30%; /* Bolder Blue-Gray Border */
     --input: 220 40% 20%;
     --ring: 210 90% 60%;
     --chart-1: 210 90% 55%;
@@ -63,7 +63,7 @@ h1, h2, h3, h4, h5, h6 {
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 40% 20%; /* Blue-Gray Border */
+    --border: 220 40% 30%; /* Bolder Blue-Gray Border */
     --input: 220 40% 20%;
     --ring: 210 90% 60%;
     --chart-1: 210 90% 55%;
@@ -89,4 +89,13 @@ h1, h2, h3, h4, h5, h6 {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer components {
+    .border-4 {
+        border-width: 4px;
+    }
+    .border-blue-900 {
+        border-color: hsl(220 60% 25%);
+    }
 }
