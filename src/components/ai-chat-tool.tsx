@@ -30,19 +30,23 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
 
 
     const handleGenerate = async () => {
-        if (!question.trim()) {
+        if (!question.trim() && !file) {
             toast({
                 variant: "destructive",
                 title: "Input Required",
-                description: "Please enter a question before generating an answer.",
+                description: "Please enter a question or upload a file.",
             });
             return;
         }
+        
         setLoading(true);
         setAnswer("");
         try {
+            // If there's a file but no question, use a default question.
+            const questionToSend = question.trim() || (file ? `Summarize the content of the attached file: ${file.name}` : '');
+
             const input: ChatInput = {
-                question: question,
+                question: questionToSend,
                 fileDataUri: file?.dataUri,
             }
             const result = await chat(input);
@@ -129,7 +133,9 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         doc.text("Question:", margin, 35);
         
         doc.setFont('Helvetica', 'normal');
-        const questionLines = doc.splitTextToSize(question, usableWidth);
+        // Use the question that was actually sent to the AI
+        const questionToDisplay = question.trim() || (file ? `Summarize the content of the attached file: ${file.name}` : '');
+        const questionLines = doc.splitTextToSize(questionToDisplay, usableWidth);
         doc.text(questionLines, margin, 42);
         
         const lastQuestionY = 42 + (questionLines.length * 5); // Approximate height
@@ -229,5 +235,3 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         </Card>
     );
 };
-
-    
