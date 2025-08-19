@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FileUpload } from "@/components/file-upload";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,6 +57,12 @@ export default function DashboardPage() {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
 
+  useEffect(() => {
+    // If not loading and no user, open the login dialog
+    if (!loading && !user) {
+      setIsLoginDialogOpen(true);
+    }
+  }, [user, loading]);
 
   const handleFileRead = (content: string) => {
     setNotes(content);
@@ -81,6 +87,11 @@ export default function DashboardPage() {
     setActiveFeature(prev => prev === featureId ? null : featureId);
     return true;
   };
+
+  // Do not render anything if loading and no user yet
+  if (loading || !user) {
+    return <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />;
+  }
   
   return (
     <>
