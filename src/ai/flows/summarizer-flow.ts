@@ -18,7 +18,7 @@ export type SummaryInput = z.infer<typeof SummaryInputSchema>;
 
 const SummaryOutputSchema = z.object({
     title: z.string().describe("A suitable title for the summary based on the material."),
-    summary: z.string().describe("A concise and well-structured summary of the key points in the material."),
+    summary: z.string().describe("A concise and well-structured summary of the key points in the material, formatted in Markdown."),
 });
 export type SummaryOutput = z.infer<typeof SummaryOutputSchema>;
 
@@ -35,7 +35,7 @@ const summarizerPrompt = ai.definePrompt({
 
         The output should have:
         1. A relevant and engaging title.
-        2. A summary that captures the main ideas, key concepts, and important details. The summary should be well-organized, using paragraphs and bullet points where appropriate to improve readability.
+        2. A summary that captures the main ideas, key concepts, and important details. The summary must be well-organized and formatted using Markdown (e.g., headings, subheadings, bullet points, bold text) to improve readability.
 
         Study Material:
         ---

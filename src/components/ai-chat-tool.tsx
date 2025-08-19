@@ -10,6 +10,7 @@ import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import { jsPDF } from 'jspdf';
 import "jspdf/dist/polyfills.es.js"; // Required for jsPDF in some environments
+import ReactMarkdown from 'react-markdown';
 
 interface AiChatToolProps {
     onBack: () => void;
@@ -238,7 +239,9 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                                 Thinking...
                             </div>
                         ) : answer ? (
-                            <p className="whitespace-pre-wrap">{answer}</p>
+                             <div className="markdown-content">
+                                <ReactMarkdown>{answer}</ReactMarkdown>
+                            </div>
                         ) : (
                            <p className="text-muted-foreground">AI output will appear here...</p>
                         )}

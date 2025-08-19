@@ -35,7 +35,7 @@ const chatFlow = ai.defineFlow(
     
     // Construct the prompt parts
     const promptParts: any[] = [
-      { text: "You are an expert AI assistant. Answer the user's question." },
+      { text: "You are an expert AI assistant. Answer the user's question. Format your response using Markdown for clear, organized presentation. Use headings, lists, and bold text where appropriate." },
       { text: `Question: ${question}` },
     ];
 

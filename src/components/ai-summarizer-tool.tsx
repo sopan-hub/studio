@@ -11,6 +11,7 @@ import { jsPDF } from 'jspdf';
 import "jspdf/dist/polyfills.es.js";
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow';
+import ReactMarkdown from 'react-markdown';
 
 interface AiSummarizerToolProps {
     onBack: () => void;
@@ -219,9 +220,9 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                             </div>
                         )}
                         {summary && (
-                            <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto">
+                            <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-xl font-bold text-secondary mb-4">{summary.title}</h3>
-                                <p className="whitespace-pre-wrap text-card-foreground">{summary.summary}</p>
+                                <ReactMarkdown>{summary.summary}</ReactMarkdown>
                             </div>
                         )}
                         {!loading && !summary && (
