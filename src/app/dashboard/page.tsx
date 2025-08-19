@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FeatureCard = ({ id, title, description, children }: { id: string, title: string, description: string, children: React.ReactNode }) => (
   <section id={id} className="scroll-mt-20">
-    <Card className="border-4 border-blue-900 shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-2 hover:scale-105 h-[450px] flex flex-col">
+    <Card className="border-4 border-blue-900 shadow-2xl transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-2 hover:scale-105 h-[400px] flex flex-col">
       <div className="cursor-pointer">
         <CardHeader>
           <div>
