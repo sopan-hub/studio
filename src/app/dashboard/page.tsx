@@ -82,15 +82,15 @@ export default function DashboardPage() {
   const checkAuthAndToggle = (featureId: string) => {
     if (!user) {
       setIsLoginDialogOpen(true);
-      return false;
+      return false; // Important: prevent accordion from opening
     }
     setActiveFeature(prev => prev === featureId ? null : featureId);
-    return true;
+    return true; // Allow accordion to open
   };
 
-  // Do not render anything if loading and no user yet
+  // Do not render anything if loading, show dialog if not logged in
   if (loading || !user) {
-    return <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />;
+    return <LoginDialog open={!loading && !user} onOpenChange={setIsLoginDialogOpen} />;
   }
   
   return (
