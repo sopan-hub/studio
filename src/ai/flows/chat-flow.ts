@@ -31,30 +31,25 @@ const chatFlow = ai.defineFlow(
     inputSchema: ChatInputSchema,
     outputSchema: z.string(),
   },
-  async (input) => {
+  async ({ question, fileDataUri }) => {
     
-    const prompt = `
-      You are an expert AI assistant. Answer the user's question. 
-      If a file is provided, use its content as the primary context for your answer.
+    // Construct the prompt parts
+    const promptParts: any[] = [
+      { text: "You are an expert AI assistant. Answer the user's question." },
+      { text: `Question: ${question}` },
+    ];
 
-      Question: {{{question}}}
-
-      {{#if fileDataUri}}
-      File Content:
-      {{media url=fileDataUri}}
-      {{/if}}
-    `;
+    if (fileDataUri) {
+      promptParts.push({ text: "Use the following file as the primary context for your answer." });
+      promptParts.push({ media: { url: fileDataUri } });
+    }
 
     const llmResponse = await ai.generate({
-      prompt: prompt,
+      prompt: promptParts,
       model: 'googleai/gemini-2.0-flash',
       config: {
         temperature: 0.5,
       },
-      input: {
-        question: input.question,
-        fileDataUri: input.fileDataUri,
-      }
     });
 
     return llmResponse.text;
