@@ -70,7 +70,7 @@ export default function Home() {
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
               </p>
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 neon-glow-button animate-pulse">
-                  <Link href="/dashboard" onClick={handleGetStartedClick}>
+                  <Link href="#features">
                     Start Studying Now <ArrowRight className="ml-2" />
                   </Link>
               </Button>
