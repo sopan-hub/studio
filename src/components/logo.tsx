@@ -11,21 +11,15 @@ const AiLogo = (props: React.SVGProps<SVGSVGElement>) => (
     strokeLinejoin="round"
     {...props}
   >
-    <defs>
-        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{stopColor: 'hsl(var(--primary))', stopOpacity: 1}} />
-            <stop offset="100%" style={{stopColor: 'hsl(var(--destructive))', stopOpacity: 1}} />
-        </linearGradient>
-    </defs>
-    <rect x="3" y="3" width="18" height="18" rx="4" stroke="url(#logo-gradient)"/>
-    <path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2" stroke="url(#logo-gradient)"/>
-    <path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2" stroke="url(#logo-gradient)"/>
-    <path d="M12 8h-1a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1" stroke="url(#logo-gradient)"/>
-    <path d="M15 8h1a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1" stroke="url(#logo-gradient)"/>
-    <path d="M8 12h2" stroke="url(#logo-gradient)"/>
-    <path d="M14 12h2" stroke="url(#logo-gradient)"/>
-    <path d="M8 16h2" stroke="url(#logo-gradient)"/>
-    <path d="M14 16h2" stroke="url(#logo-gradient)"/>
+    <rect x="3" y="3" width="18" height="18" rx="4" />
+    <path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2" />
+    <path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2" />
+    <path d="M12 8h-1a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h1" />
+    <path d="M15 8h1a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1" />
+    <path d="M8 12h2" />
+    <path d="M14 12h2" />
+    <path d="M8 16h2" />
+    <path d="M14 16h2" />
 </svg>
 );
 
