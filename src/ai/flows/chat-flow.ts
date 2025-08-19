@@ -51,7 +51,7 @@ const chatFlow = ai.defineFlow(
       config: {
         temperature: 0.5,
       },
-      context: {
+      input: {
         question: input.question,
         fileDataUri: input.fileDataUri,
       }
