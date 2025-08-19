@@ -182,16 +182,16 @@ h1, h2, h3, h4, h5, h6 {
     }
     33% {
         transform: translate(0, 0) scale(1.1) rotate(0);
-        stroke: white;
-        fill: white;
+        stroke: hsl(var(--primary));
+        fill: hsl(var(--primary));
         filter: blur(4px) brightness(3);
-        text-shadow: 0 0 20px #fff, 0 0 30px #fff;
+        text-shadow: 0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary));
         opacity: 1;
     }
     100% {
         transform: translate(calc(var(--randX) * 250px), calc(var(--randY) * 250px)) scale(0) rotate(calc(var(--randR) * 360deg));
-        stroke: white;
-        fill: white;
+        stroke: hsl(var(--primary));
+        fill: hsl(var(--primary));
         filter: blur(20px) brightness(0);
         opacity: 0;
     }
