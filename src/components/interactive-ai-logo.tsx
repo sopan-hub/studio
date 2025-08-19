@@ -34,7 +34,7 @@ export const InteractiveAiLogo = () => {
       <svg viewBox="0 0 400 400" className="interactive-logo">
         <g className="logo-geometry">
            {/* Inner square */}
-          <rect x="120" y="120" width="160" height="160" rx="10" fill="hsl(var(--background))" stroke="hsl(var(--primary))" strokeWidth="4" className={'circuit-path logo-inner-chip'} />
+          <rect x="120" y="120" width="160" height="160" rx="10" fill="hsl(var(--background))" stroke="hsl(var(--primary))" strokeWidth="4" className={'logo-inner-chip'} />
 
           {/* Render circuit pieces */}
           {circuitPieces.map((piece, i) => {
@@ -55,7 +55,7 @@ export const InteractiveAiLogo = () => {
               cx={node.cx}
               cy={node.cy}
               r="10"
-              className={cn('node', `node-${i % 3 + 1}`)}
+              className={'node'}
             />
           ))}
 
