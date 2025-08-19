@@ -28,9 +28,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const dataUri = e.target?.result as string;
-                // For quiz generation, we need the text content.
-                // This is a simplified approach. For real-world use, you'd want a more robust text extraction library.
-                if (selectedFile.type === 'text/plain') {
+                if (selectedFile.type.startsWith('text/')) {
                     const textContentReader = new FileReader();
                     textContentReader.onload = (e) => {
                          setFile({ name: selectedFile.name, dataUri, content: e.target?.result as string });
@@ -40,7 +38,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                      toast({
                         variant: 'destructive',
                         title: 'File Type Not Supported',
-                        description: 'For now, please upload a plain text (.txt) file.',
+                        description: 'For now, please upload a text-based file (e.g., .txt, .md).',
                     });
                 }
             };
@@ -146,12 +144,10 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                         </Button>
                         <CardTitle className="text-2xl font-bold text-primary neon-glow">Smart Quiz Maker</CardTitle>
                     </div>
-                    {quiz && (
-                        <Button variant="outline" onClick={handleDownloadPdf}>
-                            <Download className="mr-2" />
-                            Download PDF
-                        </Button>
-                    )}
+                     <Button variant="outline" onClick={handleDownloadPdf} disabled={!quiz || loading}>
+                        <Download className="mr-2" />
+                        Download PDF
+                    </Button>
                 </div>
             </CardHeader>
             <CardContent>
@@ -170,7 +166,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                         ) : (
                              <div className="flex flex-col items-center justify-center py-6">
                                 <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                                <p className="mb-2 text-sm text-muted-foreground">Upload your study material (.txt file)</p>
+                                <p className="mb-2 text-sm text-muted-foreground">Upload your study material (e.g., .txt file)</p>
                                 <Button variant="outline" onClick={handleUploadClick} disabled={loading}>
                                     Choose File
                                 </Button>
@@ -181,7 +177,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             className="hidden"
-                            accept=".txt"
+                            accept="text/*,.pdf"
                             disabled={loading}
                         />
                      </div>

@@ -141,11 +141,21 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
     return (
         <Card className="w-full bg-card border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.5)] animate-blast-in">
             <CardHeader>
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
-                        <ArrowLeft />
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
+                            <ArrowLeft />
+                        </Button>
+                        <CardTitle className="text-2xl font-bold text-primary neon-glow">Ask Any Question (AI Chat)</CardTitle>
+                    </div>
+                     <Button
+                        variant="outline"
+                        onClick={handleDownloadPdf}
+                        disabled={!answer || loading}
+                     >
+                        <Download className="mr-2" />
+                        Download PDF
                     </Button>
-                    <CardTitle className="text-2xl font-bold text-primary neon-glow">Ask Any Question (AI Chat)</CardTitle>
                 </div>
             </CardHeader>
             <CardContent>
@@ -202,18 +212,7 @@ export const AiChatTool = ({ onBack, initialQuestion = "", onSearchPerformed }: 
                                 Thinking...
                             </div>
                         ) : answer ? (
-                            <>
-                                <p className="whitespace-pre-wrap">{answer}</p>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    title="Download as PDF"
-                                    onClick={handleDownloadPdf}
-                                    className="absolute top-2 right-2"
-                                >
-                                    <Download className="h-4 w-4" />
-                                </Button>
-                            </>
+                            <p className="whitespace-pre-wrap">{answer}</p>
                         ) : (
                            <p className="text-muted-foreground">AI output will appear here...</p>
                         )}
