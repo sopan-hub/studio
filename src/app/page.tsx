@@ -10,9 +10,9 @@ import { Logo } from "@/components/logo";
 import { useAuth } from '@/hooks/use-auth';
 import { LoginDialog } from '@/components/login-dialog';
 import { InteractiveAiLogo } from '@/components/interactive-ai-logo';
+import { AiChatTool } from '@/components/ai-chat-tool';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'tracker' | 'organizer' | 'explainer' | 'outliner' | null;
 
@@ -90,7 +90,7 @@ export default function Home() {
   const renderActiveFeature = () => {
     switch (activeFeature) {
         case 'chat':
-            return <AiToolPlaceholder title="Ask Any Question (AI Chat)" onBack={() => setActiveFeature(null)} />;
+            return <AiChatTool onBack={() => setActiveFeature(null)} />;
         case 'summarizer':
             return <AiToolPlaceholder title="Generate Notes & Summaries" onBack={() => setActiveFeature(null)} />;
         case 'quiz':
@@ -235,5 +235,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
