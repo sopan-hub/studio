@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-const TILE_SIZE = 20; // px
+const TILE_SIZE = 25; // px
 
 export const InteractiveGridFooter = () => {
   const [numCols, setNumCols] = useState(0);
@@ -55,17 +55,8 @@ export const InteractiveGridFooter = () => {
       }
     };
     
-    // Create a "brush" or "spotlight" effect
-    for(let i = -1; i <= 1; i++) {
-        for(let j = -1; j <= 1; j++) {
-            // Main spotlight
-            applyGlow(row + i, col + j);
-            // Softer, further spotlight
-            if(Math.abs(i) <= 1 && Math.abs(j) <= 1) {
-                 setTimeout(() => applyGlow(row + i*2, col+j*2), 100);
-            }
-        }
-    }
+    // Activate only the tile directly under the cursor
+    applyGlow(row, col);
   };
 
   if (numCols === 0 || numRows === 0) {
