@@ -15,6 +15,7 @@ import { AiQuizTool } from '@/components/ai-quiz-tool';
 import { AiToolPlaceholder } from '@/components/ai-tool-placeholder';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
 
 type FeatureKey = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator' | null;
 
@@ -103,7 +104,7 @@ export default function Home() {
                         onSearchPerformed={() => setGlobalSearchQuery("")}
                     />;
         case 'summarizer':
-            return <AiToolPlaceholder title="Generate Notes & Summaries" onBack={() => setActiveFeature(null)} inputType="text-file" />;
+            return <AiSummarizerTool onBack={() => setActiveFeature(null)} />;
         case 'quiz':
             return <AiQuizTool onBack={() => setActiveFeature(null)} />;
         case 'planner':
@@ -158,8 +159,10 @@ export default function Home() {
         <section className="container mx-auto py-16 md:py-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 text-center md:text-left">
-              <h1 className="text-5xl md:text-6xl font-extrabold text-primary leading-tight neon-glow">
-                Your Personal AI Study Buddy
+              <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
+                <span className="text-primary neon-glow">Your Personal</span>
+                <br/>
+                <span className="text-destructive neon-glow">AI Study Buddy</span>
               </h1>
               <p className="text-xl text-muted-foreground">
                 Ask questions, generate summaries, create quizzes, and organize your study like never before.
@@ -260,5 +263,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
