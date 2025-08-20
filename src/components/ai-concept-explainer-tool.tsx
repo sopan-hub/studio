@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 interface AiConceptExplainerToolProps {
     onBack: () => void;
@@ -75,7 +76,7 @@ export const AiConceptExplainerTool = ({ onBack }: AiConceptExplainerToolProps) 
         y += titleLines.length * 8 + 10;
         
         const addFormattedText = (text: string) => {
-            const lines = text.split('\n');
+            const lines = text.split('\\n');
 
             lines.forEach(line => {
                 if (y > 280) {
@@ -169,12 +170,9 @@ export const AiConceptExplainerTool = ({ onBack }: AiConceptExplainerToolProps) 
 
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
-                        {loading && (
-                             <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-8 w-8 text-primary" /><p>Simplifying the concept...</p>
-                            </div>
-                        )}
-                        {explanation && (
+                        {loading ? (
+                            <AiLoadingAnimation text="Simplifying the concept..." />
+                        ) : explanation ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-xl font-bold text-primary mb-4">{explanation.title}</h3>
                                 <ReactMarkdown>{explanation.explanation}</ReactMarkdown>
@@ -185,8 +183,7 @@ export const AiConceptExplainerTool = ({ onBack }: AiConceptExplainerToolProps) 
                                     </blockquote>
                                 )}
                             </div>
-                        )}
-                        {!loading && !explanation && (
+                        ) : (
                              <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">The explanation will appear here.</p>
                             </div>

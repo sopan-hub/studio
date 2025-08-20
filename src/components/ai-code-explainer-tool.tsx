@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 interface AiCodeExplainerToolProps {
     onBack: () => void;
@@ -85,7 +86,7 @@ export const AiCodeExplainerTool = ({ onBack }: AiCodeExplainerToolProps) => {
         y += 8;
         
         const addFormattedText = (text: string) => {
-            const lines = text.split('\n');
+            const lines = text.split('\\n');
             lines.forEach(line => {
                 if (y > 280) { doc.addPage(); y = margin; }
                 const isCode = line.startsWith('`') && line.endsWith('`');
@@ -146,12 +147,9 @@ export const AiCodeExplainerTool = ({ onBack }: AiCodeExplainerToolProps) => {
 
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
-                        {loading && (
-                             <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-8 w-8 text-primary" /><p>Analyzing the code...</p>
-                            </div>
-                        )}
-                        {explanation && (
+                        {loading ? (
+                            <AiLoadingAnimation text="Analyzing the code..." />
+                        ) : explanation ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-lg font-bold text-primary mb-2">Summary</h3>
                                 <p className="mb-4">{explanation.summary}</p>
@@ -159,8 +157,7 @@ export const AiCodeExplainerTool = ({ onBack }: AiCodeExplainerToolProps) => {
                                 <h3 className="text-lg font-bold text-primary mb-2">Detailed Explanation ({explanation.language})</h3>
                                 <ReactMarkdown>{explanation.lineByLineExplanation}</ReactMarkdown>
                             </div>
-                        )}
-                        {!loading && !explanation && (
+                        ) : (
                              <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">The code explanation will appear here.</p>
                             </div>

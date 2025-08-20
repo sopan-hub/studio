@@ -11,6 +11,7 @@ import { Textarea } from './ui/textarea';
 import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import { Label } from './ui/label';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 interface AiMathSolverToolProps {
     onBack: () => void;
@@ -92,7 +93,7 @@ export const AiMathSolverTool = ({ onBack }: AiMathSolverToolProps) => {
         y += 8;
 
         const addFormattedText = (text: string) => {
-            const lines = text.split('\n');
+            const lines = text.split('\\n');
             lines.forEach(line => {
                 if (y > 280) { doc.addPage(); y = margin; }
                 doc.setFontSize(11);
@@ -144,12 +145,9 @@ export const AiMathSolverTool = ({ onBack }: AiMathSolverToolProps) => {
 
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
-                        {loading && (
-                             <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-8 w-8 text-primary" /><p>Calculating the solution...</p>
-                            </div>
-                        )}
-                        {solution && (
+                        {loading ? (
+                            <AiLoadingAnimation text="Calculating the solution..." />
+                        ) : solution ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-lg font-bold text-primary mb-2">Final Answer</h3>
                                 <div className="p-3 rounded-md bg-muted text-lg font-bold font-mono mb-6">{solution.finalAnswer}</div>
@@ -157,8 +155,7 @@ export const AiMathSolverTool = ({ onBack }: AiMathSolverToolProps) => {
                                 <h3 className="text-lg font-bold text-primary mb-2">Step-by-Step Solution</h3>
                                 <ReactMarkdown>{solution.stepByStepSolution}</ReactMarkdown>
                             </div>
-                        )}
-                        {!loading && !solution && (
+                        ) : (
                              <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">The solution will appear here.</p>
                             </div>

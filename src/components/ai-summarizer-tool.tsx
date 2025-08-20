@@ -11,6 +11,7 @@ import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow';
 import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 
 interface AiSummarizerToolProps {
@@ -126,7 +127,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         let currentY = 20;
 
         const addFormattedText = (text: string) => {
-            const lines = text.split('\n');
+            const lines = text.split('\\n');
 
             lines.forEach(line => {
                 if (currentY > pageHeight - margin) {
@@ -246,19 +247,14 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
 
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
-                        {loading && (
-                             <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-8 w-8 text-primary" />
-                                <p>Summarizing your material...</p>
-                            </div>
-                        )}
-                        {summary && (
+                        {loading ? (
+                            <AiLoadingAnimation text="Summarizing your material..." />
+                        ) : summary ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-xl font-bold text-secondary mb-4">{summary.title}</h3>
                                 <ReactMarkdown>{summary.summary}</ReactMarkdown>
                             </div>
-                        )}
-                        {!loading && !summary && (
+                        ) : (
                              <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">Your generated summary will appear here.</p>
                             </div>

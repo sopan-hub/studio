@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow'; // We need a way to extract text
 import { jsPDF } from 'jspdf';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 
 interface AiQuizToolProps {
@@ -247,13 +248,9 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                     </div>
                     
                     <div className="mt-4 min-h-[150px]">
-                        {loading && (
-                             <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-5 w-5" />
-                                <p>Brewing your quiz...</p>
-                            </div>
-                        )}
-                        {quiz && (
+                        {loading ? (
+                            <AiLoadingAnimation text="Brewing your quiz..." />
+                        ) : quiz ? (
                             <Accordion type="single" collapsible className="w-full">
                                 <h3 className="text-xl font-bold text-secondary mb-4">{quiz.title}</h3>
                                 {quiz.questions.map((q, index) => (
@@ -271,8 +268,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                                     </AccordionItem>
                                 ))}
                             </Accordion>
-                        )}
-                        {!loading && !quiz && (
+                        ) : (
                              <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">Your generated quiz will appear here.</p>
                             </div>

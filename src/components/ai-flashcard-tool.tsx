@@ -12,6 +12,7 @@ import { chat } from '@/ai/flows/chat-flow';
 import { jsPDF } from 'jspdf';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './ui/carousel';
 import { cn } from '@/lib/utils';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 
 interface AiFlashcardToolProps {
@@ -208,12 +209,9 @@ export const AiFlashcardTool = ({ onBack }: AiFlashcardToolProps) => {
 
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
-                        {loading && (
-                             <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-8 w-8 text-primary" /><p>Creating your flashcards...</p>
-                            </div>
-                        )}
-                        {deck && (
+                        {loading ? (
+                            <AiLoadingAnimation text="Creating your flashcards..." />
+                        ) : deck ? (
                            <div className="flex flex-col gap-4">
                              <h3 className="text-xl font-bold text-primary text-center">{deck.title}</h3>
                              <Carousel className="w-full max-w-xs mx-auto">
@@ -241,8 +239,7 @@ export const AiFlashcardTool = ({ onBack }: AiFlashcardToolProps) => {
                                <CarouselNext />
                              </Carousel>
                            </div>
-                        )}
-                        {!loading && !deck && (
+                        ) : (
                              <div className="flex items-center justify-center h-full p-8 border border-dashed rounded-lg bg-background/50">
                                 <p className="text-muted-foreground">Your generated flashcards will appear here.</p>
                             </div>

@@ -10,6 +10,7 @@ import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
+import { AiLoadingAnimation } from './ui/ai-loading-animation';
 
 
 interface AiChatToolProps {
@@ -129,7 +130,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
 
         const addFormattedText = (text: string, isAnswer: boolean) => {
             // A simple regex to split markdown elements but keep delimiters
-            const parts = text.split(/(\n|# |\*\*|### |\* |- |## )/g);
+            const parts = text.split(/(\\n|# |\\*\\*|### |\\* |- |## )/g);
             let isBold = false;
             let listType: 'ul' | 'ol' | null = null;
             let listCounter = 1;
@@ -166,7 +167,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             }
 
             const cleanText = answer.replace(/\*\*(.*?)\*\*/g, '$1'); // Basic bold removal for now
-            const lines = cleanText.split('\n');
+            const lines = cleanText.split('\\n');
 
             lines.forEach(line => {
                  if (line.trim() === "") {
@@ -282,10 +283,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
 
                         <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[250px] bg-background/50 relative overflow-y-auto">
                             {loading ? (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Loader2 className="animate-spin h-5 w-5" />
-                                    Thinking...
-                                </div>
+                                <AiLoadingAnimation text="Thinking..." />
                             ) : answer ? (
                                 <div className="markdown-content">
                                     <ReactMarkdown>{answer}</ReactMarkdown>
@@ -300,5 +298,3 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         </div>
     );
 };
-
-    
