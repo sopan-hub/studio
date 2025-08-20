@@ -10,7 +10,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
        <DialogContent className="sm:max-w-none w-auto h-auto bg-transparent border-none shadow-none">
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', width: '80vw' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '90vw' }}>
             <div 
               className="visme_d"
               style={{ width: '100%', height: '100%' }}
