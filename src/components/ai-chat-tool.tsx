@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -9,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import ReactMarkdown from 'react-markdown';
+import { jsPDF } from 'jspdf';
+
 
 interface AiChatToolProps {
     onBack: () => void;
@@ -25,6 +26,11 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     
+    useEffect(() => {
+        // This effect ensures the jspdf polyfill is loaded only on the client-side
+        import("jspdf/dist/polyfills.es.js");
+    }, []);
+
     const handleGenerate = async () => {
         if (!question.trim() && !file) {
             toast({
@@ -97,7 +103,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         }
     }
 
-    const handleDownloadPdf = async () => {
+    const handleDownloadPdf = () => {
         if (!answer) {
             toast({
                 variant: "destructive",
@@ -106,9 +112,6 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             });
             return;
         }
-
-        const { jsPDF } = await import('jspdf');
-        await import("jspdf/dist/polyfills.es.js");
 
         const doc = new jsPDF({
             orientation: 'p',

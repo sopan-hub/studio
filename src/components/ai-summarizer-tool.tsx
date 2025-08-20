@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -10,6 +9,8 @@ import { generateSummary, SummaryInput, SummaryOutput } from '@/ai/flows/summari
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow';
 import ReactMarkdown from 'react-markdown';
+import { jsPDF } from 'jspdf';
+
 
 interface AiSummarizerToolProps {
     onBack: () => void;
@@ -23,6 +24,11 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     
+    useEffect(() => {
+        // This effect ensures the jspdf polyfill is loaded only on the client-side
+        import("jspdf/dist/polyfills.es.js");
+    }, []);
+
     useEffect(() => {
         if (file) {
             setMaterial(file.content);
@@ -100,7 +106,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         }
     };
     
-    const handleDownloadPdf = async () => {
+    const handleDownloadPdf = () => {
         if (!summary) {
             toast({
                 variant: "destructive",
@@ -109,9 +115,6 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
             });
             return;
         }
-
-        const { jsPDF } = await import('jspdf');
-        await import("jspdf/dist/polyfills.es.js");
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         doc.setFont('Helvetica', 'normal');

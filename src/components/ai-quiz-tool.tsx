@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -10,6 +9,8 @@ import { generateQuiz, QuizInput, QuizOutput } from '@/ai/flows/quiz-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow'; // We need a way to extract text
+import { jsPDF } from 'jspdf';
+
 
 interface AiQuizToolProps {
     onBack: () => void;
@@ -23,6 +24,11 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     
+    useEffect(() => {
+        // This effect ensures the jspdf polyfill is loaded only on the client-side
+        import("jspdf/dist/polyfills.es.js");
+    }, []);
+
     useEffect(() => {
         if (file) {
             setMaterial(file.content);
@@ -101,7 +107,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         }
     };
     
-    const handleDownloadPdf = async () => {
+    const handleDownloadPdf = () => {
         if (!quiz) {
             toast({
                 variant: "destructive",
@@ -110,9 +116,6 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
             });
             return;
         }
-
-        const { jsPDF } = await import('jspdf');
-        await import("jspdf/dist/polyfills.es.js");
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         doc.setFont('Helvetica', 'normal');
