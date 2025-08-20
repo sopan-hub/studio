@@ -6,6 +6,12 @@ import { neonCursor } from 'threejs-toys';
 
 const NeonCursor = () => {
   useEffect(() => {
+    // Check if the animation has already been initialized to avoid duplicates
+    const canvas = document.querySelector('#app-container > canvas');
+    if (canvas) {
+      return;
+    }
+
     const appContainer = document.getElementById('app-container');
     if (appContainer) {
         neonCursor({
