@@ -232,13 +232,13 @@ export default function Dashboard() {
 
           <footer className="w-full p-6 border-t border-primary/20 text-center text-muted-foreground">
                 <div className="flex justify-center gap-6 mb-4">
-                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                    <a href="https://github.com/sopan-hub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                         <Github className="h-6 w-6" />
                     </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                    <a href="https://www.instagram.com/sopan.147/profilecard/?igsh=MXJ3NTF6c3BnM2Fucg==" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                         <Instagram className="h-6 w-6" />
                     </a>
-                    <a href="mailto:contact@studybuddy.ai" className="hover:text-primary transition-colors">
+                    <a href="mailto:patilsopan4148@gmail.com" className="hover:text-primary transition-colors">
                         <Mail className="h-6 w-6" />
                     </a>
                 </div>
