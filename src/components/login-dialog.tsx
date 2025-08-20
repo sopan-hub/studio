@@ -1,164 +1,39 @@
 
 "use client";
 
-import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "./ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { KeyRound, Mail, Loader2 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { useToast } from "@/hooks/use-toast";
+import Script from 'next/script';
 
-const signUpSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-});
 
-const signInSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(1, { message: "Password is required." }),
-});
-
-export function LoginDialog({ open, onOpenChange, onLoginSuccess }: { open: boolean, onOpenChange: (open: boolean) => void, onLoginSuccess?: () => void }) {
-  const { signInWithEmail, signUpWithEmail } = useAuth();
-  const [activeTab, setActiveTab] = useState("signin");
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
-  const signUpForm = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: { email: "", password: "" },
-  });
-
-  const signInForm = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: { email: "", password: "" },
-  });
-
-  const handleSuccess = () => {
-    onOpenChange(false);
-    if(onLoginSuccess) {
-      onLoginSuccess();
-    }
-  }
-
-  const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
-    setLoading(true);
-    try {
-      await signUpWithEmail(values.email, values.password);
-      toast({ title: "Welcome!", description: "Your account has been created successfully." });
-      handleSuccess();
-    } catch (error: any) {
-      console.error("Sign-up Error:", error);
-      const message = error.code === 'auth/email-already-in-use' ? "This email might already be in use." : "An unknown error occurred.";
-      toast({ variant: "destructive", title: "Sign-up Error", description: message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignIn = async (values: z.infer<typeof signInSchema>) => {
-    setLoading(true);
-    try {
-      await signInWithEmail(values.email, values.password);
-      handleSuccess();
-    } catch (error) {
-      console.error("Sign-in Error:", error);
-      toast({ variant: "destructive", title: "Sign-in Error", description: "Invalid email or password." });
-    } finally {
-      setLoading(false);
-    }
-  };
+export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-foreground">
-            {activeTab === 'signin' ? 'Sign In' : 'Create Account'}
+            Register for Webinar
           </DialogTitle>
           <DialogDescription className="text-center">
-            {activeTab === 'signin' ? 'Sign in to access your dashboard.' : 'Create an account to get started.'}
+            Please fill out the form below to register.
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="signin" className="w-full" onValueChange={setActiveTab} value={activeTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
-          <TabsContent value="signin">
-            <Form {...signInForm}>
-              <form onSubmit={signInForm.handleSubmit(handleSignIn)} className="space-y-4 pt-4">
-                <FormField control={signInForm.control} name="email" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input placeholder="you@example.com" {...field} className="pl-10"/>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={signInForm.control} name="password" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                       <div className="relative">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input type="password" placeholder="••••••••" {...field} className="pl-10"/>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <Button type="submit" disabled={loading} className="w-full neon-glow-button">
-                  {loading ? <Loader2 className="animate-spin" /> : 'Sign In'}
-                </Button>
-              </form>
-            </Form>
-          </TabsContent>
-          <TabsContent value="signup">
-            <Form {...signUpForm}>
-              <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="space-y-4 pt-4">
-                <FormField control={signUpForm.control} name="email" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input placeholder="you@example.com" {...field} className="pl-10" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={signUpForm.control} name="password" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input type="password" placeholder="••••••••" {...field} className="pl-10" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <Button type="submit" disabled={loading} className="w-full neon-glow-button">
-                  {loading ? <Loader2 className="animate-spin" /> : 'Sign Up'}
-                </Button>
-              </form>
-            </Form>
-          </TabsContent>
-        </Tabs>
+        <div 
+          className="visme_d"
+          data-title="Webinar Registration Form"
+          data-url="g7ddqxx0-untitled-project?fullPage=true"
+          data-domain="forms"
+          data-full-page="false"
+          data-min-height="500px"
+          data-form-id="133190">
+        </div>
+        
+        <Script 
+          src="https://static-bundles.visme.co/forms/vismeforms-embed.js" 
+          strategy="lazyOnload"
+        />
+        
       </DialogContent>
     </Dialog>
   );
