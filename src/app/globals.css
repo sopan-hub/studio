@@ -159,6 +159,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+#app-container canvas {
+  display: block;
+  position: fixed;
+  z-index: -1;
+  top: 0;
+}
 
 .interactive-logo-container {
     display: flex;

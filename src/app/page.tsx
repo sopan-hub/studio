@@ -25,6 +25,7 @@ import { AiConceptExplainerTool } from '@/components/ai-concept-explainer-tool';
 import { AiMathSolverTool } from '@/components/ai-math-solver-tool';
 import { AiCodeExplainerTool } from '@/components/ai-code-explainer-tool';
 import { AiTranslatorTool } from '@/components/ai-translator-tool';
+import NeonCursor from '@/components/neon-cursor';
 
 
 type Tool = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator';
@@ -179,7 +180,8 @@ export default function Dashboard() {
   return (
     <>
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setLoginDialogOpen} />
-      <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
+      <div id="app-container" className="flex flex-col min-h-screen bg-background text-foreground font-body">
+          <NeonCursor />
           <header className="p-4 border-b border-primary/20 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-50">
               <div className="flex items-center gap-2">
                   <BrainCircuit className="h-8 w-8 text-primary" />
