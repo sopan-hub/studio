@@ -24,7 +24,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
           data-title="Webinar Registration Form"
           data-url="g7ddqxx0-untitled-project?fullPage=true"
           data-domain="forms"
-          data-full-page="false"
+          data-full-page="true" 
           data-min-height="500px"
           data-form-id="133190">
         </div>
