@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
-import { Search, BrainCircuit, Bot, FileText, ListChecks, UserCircle, LogOut, BookOpen, MessageSquare, Microscope, FlaskConical, Target, Github, Instagram, Mail } from 'lucide-react';
+import { Search, BrainCircuit, Bot, FileText, ListChecks, UserCircle, LogOut, BookOpen, MessageSquare, Microscope, FlaskConical, Target, Github, Instagram, Mail, HelpCircle, Columns, Sigma, Code, Languages } from 'lucide-react';
 import { AiChatTool } from '@/components/ai-chat-tool';
 import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
 import { AiQuizTool } from '@/components/ai-quiz-tool';
@@ -20,70 +20,74 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { AiFlashcardTool } from '@/components/ai-flashcard-tool';
+import { AiConceptExplainerTool } from '@/components/ai-concept-explainer-tool';
+import { AiMathSolverTool } from '@/components/ai-math-solver-tool';
+import { AiCodeExplainerTool } from '@/components/ai-code-explainer-tool';
+import { AiTranslatorTool } from '@/components/ai-translator-tool';
 
 
-type Tool = 'chat' | 'summarizer' | 'quiz' | 'planner' | 'research' | 'tutor' | 'lab' | 'goals';
+type Tool = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator';
 
 const toolComponents: Record<Tool, React.ComponentType<{ onBack: () => void }>> = {
-  chat: (props) => <AiChatTool {...props} title="Ask Any Question (AI Chat)" />,
+  chat: (props) => <AiChatTool {...props} title="Ask Any Question" />,
   summarizer: AiSummarizerTool,
   quiz: AiQuizTool,
-  // Placeholders for new tools
-  planner: (props) => <AiChatTool {...props} title="AI Study Planner" />,
-  research: (props) => <AiChatTool {...props} title="AI Research Assistant" />,
-  tutor: (props) => <AiChatTool {...props} title="Personal AI Tutor" />,
-  lab: (props) => <AiChatTool {...props} title="Virtual Lab Assistant" />,
-  goals: (props) => <AiChatTool {...props} title="Learning Goal Setter" />,
+  explainer: AiConceptExplainerTool,
+  flashcards: AiFlashcardTool,
+  math: AiMathSolverTool,
+  code: AiCodeExplainerTool,
+  translator: AiTranslatorTool,
 };
 
 const featureCards = [
   {
     tool: 'chat' as Tool,
-    icon: <MessageSquare />,
-    title: 'AI Chat',
-    description: 'Ask any question and get detailed, AI-powered answers. Works with text and files.',
+    icon: <HelpCircle />,
+    title: 'Ask Any Question',
+    description: 'Get instant, detailed answers to your questions from an expert AI tutor.',
   },
   {
     tool: 'summarizer' as Tool,
     icon: <FileText />,
-    title: 'Generate Notes',
-    description: 'Turn long documents or pasted text into concise summaries and organized notes.',
+    title: 'Generate Summaries',
+    description: 'Automatically create concise summaries and organized notes from any text.',
   },
   {
     tool: 'quiz' as Tool,
     icon: <ListChecks />,
-    title: 'Make a Quiz',
-    description: 'Automatically generate practice quizzes from your study materials to test your knowledge.',
+    title: 'Smart Quiz Maker',
+    description: 'Test your knowledge with custom quizzes generated from your study materials.',
   },
     {
-    tool: 'planner' as Tool,
-    icon: <BookOpen />,
-    title: 'Study Planner',
-    description: 'Let our AI create a customized study schedule to keep you on track.',
+    tool: 'explainer' as Tool,
+    icon: <BrainCircuit />,
+    title: 'Concept Explainer',
+    description: 'Break down complex topics and concepts into easy-to-understand explanations.',
   },
   {
-    tool: 'research' as Tool,
-    icon: <Microscope />,
-    title: 'Research Helper',
-    description: 'Get help finding and understanding sources for your research papers and projects.',
+    tool: 'flashcards' as Tool,
+    icon: <Columns />,
+    title: 'AI Flashcard Maker',
+    description: 'Turn your study notes into interactive flashcards for effective revision.',
   },
   {
-    tool: 'tutor' as Tool,
-    icon: <Bot />,
-    title: 'Personal Tutor',
-    description: 'Receive one-on-one guidance and explanations on complex topics from your AI tutor.',
+    tool: 'math' as Tool,
+    icon: <Sigma />,
+    title: 'Math Problem Solver',
+    description: 'Get step-by-step solutions for complex math problems, from algebra to calculus.',
   },
     {
-    tool: 'lab' as Tool,
-    icon: <FlaskConical />,
-    title: 'Virtual Lab',
-    description: 'Simulate experiments and get help with your lab reports and data analysis.',
+    tool: 'code' as Tool,
+    icon: <Code />,
+    title: 'Code Explainer',
+    description: 'Understand code snippets in any programming language with detailed explanations.',
   },
   {
-    tool: 'goals' as Tool,
-    icon: <Target />,
-    title: 'Goal Setter',
-    description: 'Define your learning objectives and track your progress with AI-driven insights.',
+    tool: 'translator' as Tool,
+    icon: <Languages />,
+    title: 'Document Translator',
+    description: 'Translate your study documents into multiple languages instantly.',
   },
 ];
 
@@ -109,7 +113,7 @@ export default function Dashboard() {
   const renderContent = () => {
     if (activeTool) {
         if (activeTool === 'chat' && globalSearch) {
-            return <AiChatTool onBack={() => { setActiveTool(null); setGlobalSearch(""); }} title="Ask Any Question (AI Chat)" initialQuestion={globalSearch} onSearchPerformed={() => setGlobalSearch("")}/>
+            return <AiChatTool onBack={() => { setActiveTool(null); setGlobalSearch(""); }} title="Ask Any Question" initialQuestion={globalSearch} onSearchPerformed={() => setGlobalSearch("")}/>
         }
       const ToolComponent = toolComponents[activeTool];
       return <ToolComponent onBack={() => setActiveTool(null)} />;
@@ -244,5 +248,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-    
