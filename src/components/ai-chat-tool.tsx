@@ -27,8 +27,8 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     
+    // This effect ensures the jspdf polyfill is loaded only on the client-side
     useEffect(() => {
-        // This effect ensures the jspdf polyfill is loaded only on the client-side
         import("jspdf/dist/polyfills.es.js");
     }, []);
 
@@ -72,13 +72,10 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
     useEffect(() => {
         if (initialQuestion && !loading) {
             setQuestion(initialQuestion);
-             // Only auto-submit for the main global search
-            if (title === "Ask Any Question (AI Chat)") {
-                 handleGenerate();
-            }
+            handleGenerate();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialQuestion, title]);
+    }, [initialQuestion]);
 
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,65 +117,73 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             format: 'a4'
         });
 
-        doc.setFont('Helvetica', 'normal');
+        // Add a more robust font that supports more characters
+        doc.addFont('Helvetica', 'normal', 'normal');
+        doc.setFont('Helvetica');
+
 
         const margin = 15;
         const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = doc.internal.pageSize.getWidth() - (margin * 2);
         let currentY = 20;
 
-        const addFormattedText = (text: string) => {
-            const lines = text.split('\n');
+        const addFormattedText = (text: string, isAnswer: boolean) => {
+            // A simple regex to split markdown elements but keep delimiters
+            const parts = text.split(/(\n|# |\*\*|### |\* |- |## )/g);
+            let isBold = false;
+            let listType: 'ul' | 'ol' | null = null;
+            let listCounter = 1;
 
-            lines.forEach(line => {
-                if (currentY > pageHeight - margin) {
+            const processLine = (line: string) => {
+                 if (currentY > pageHeight - margin - 10) { // Add new page if not enough space
                     doc.addPage();
                     currentY = margin;
-                }
+                 }
+                let fontSize = 11;
+                let fontStyle = isBold ? 'bold' : 'normal';
 
-                let currentX = margin;
-                
                 if (line.startsWith('# ')) {
-                    doc.setFont('Helvetica', 'bold');
-                    doc.setFontSize(18);
-                    const textLines = doc.splitTextToSize(line.substring(2), usableWidth);
-                    doc.text(textLines, currentX, currentY);
-                    currentY += (textLines.length * 7) + 2;
+                    fontSize = 18;
+                    fontStyle = 'bold';
+                    line = line.substring(2);
                 } else if (line.startsWith('## ')) {
-                    doc.setFont('Helvetica', 'bold');
-                    doc.setFontSize(16);
-                    const textLines = doc.splitTextToSize(line.substring(3), usableWidth);
-                    doc.text(textLines, currentX, currentY);
-                    currentY += (textLines.length * 6) + 2;
+                    fontSize = 16;
+                    fontStyle = 'bold';
+                    line = line.substring(3);
                 } else if (line.startsWith('### ')) {
-                    doc.setFont('Helvetica', 'bold');
-                    doc.setFontSize(14);
-                     const textLines = doc.splitTextToSize(line.substring(4), usableWidth);
-                    doc.text(textLines, currentX, currentY);
-                    currentY += (textLines.length * 5) + 2;
+                    fontSize = 14;
+                    fontStyle = 'bold';
+                    line = line.substring(4);
                 } else if (line.startsWith('* ') || line.startsWith('- ')) {
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setFontSize(11);
-                    const bulletPoint = `• ${line.substring(2)}`;
-                    const textLines = doc.splitTextToSize(bulletPoint, usableWidth - 5);
-                    doc.text(textLines, currentX + 5, currentY); // Indent bullets
-                    currentY += (textLines.length * 5);
-                } else {
-                    doc.setFont('Helvetica', 'normal');
-                    doc.setFontSize(11);
-                    const textLines = doc.splitTextToSize(line, usableWidth);
-                    doc.text(textLines, currentX, currentY);
-                    currentY += (textLines.length * 5);
+                    line = `• ${line.substring(2)}`;
                 }
-                currentY += 4; 
+                
+                doc.setFontSize(fontSize);
+                doc.setFont('Helvetica', fontStyle);
+                const textLines = doc.splitTextToSize(line, usableWidth - ( (line.startsWith('•')) ? 5 : 0) );
+                doc.text(textLines, margin + ( (line.startsWith('•')) ? 5 : 0), currentY);
+                currentY += (textLines.length * (fontSize / 2)) + 2;
+            }
+
+            const cleanText = answer.replace(/\*\*(.*?)\*\*/g, '$1'); // Basic bold removal for now
+            const lines = cleanText.split('\n');
+
+            lines.forEach(line => {
+                 if (line.trim() === "") {
+                    currentY += 5; // Add space for empty lines
+                } else {
+                    processLine(line);
+                }
             });
         };
 
         // Title
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(22);
-        doc.text(`Study Buddy AI - ${title}`, margin, currentY);
-        currentY += 15;
+        const titleLines = doc.splitTextToSize(`Study Buddy AI - ${title}`, usableWidth);
+        doc.text(titleLines, margin, currentY);
+        currentY += (titleLines.length * 10) + 10;
+        
 
         // Question
         doc.setFont('Helvetica', 'bold');
@@ -201,95 +206,99 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         doc.text("AI Answer:", margin, currentY);
         currentY += 8;
         
-        addFormattedText(answer);
+        addFormattedText(answer, true);
 
         doc.save(`study-buddy-${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
     };
 
 
     return (
-        <Card className="w-full bg-card shadow-lg animate-blast-in">
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
-                            <ArrowLeft />
-                        </Button>
-                        <CardTitle className="text-2xl font-bold text-foreground">{title}</CardTitle>
-                    </div>
-                     <Button
-                        variant="outline"
-                        onClick={handleDownloadPdf}
-                        disabled={!answer || loading}
-                     >
-                        <Download className="mr-2" />
-                        Download PDF
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <div className="flex flex-col gap-4">
-                    <Textarea
-                        placeholder="Ask your AI tutor anything... (Optionally, upload a file for context)"
-                        className="min-h-[150px]"
-                        value={question}
-                        onChange={(e) => setQuestion(e.target.value)}
-                        disabled={loading}
-                    />
-
-                    {file && (
-                        <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
-                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Paperclip className="h-4 w-4" />
-                                <span>{file.name}</span>
-                           </div>
-                           <Button variant="ghost" size="icon" onClick={handleRemoveFile} disabled={loading}>
-                                <XCircle className="h-4 w-4" />
-                           </Button>
+        <div className="p-4 md:p-8">
+            <Card className="w-full bg-card shadow-lg animate-blast-in">
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
+                                <ArrowLeft />
+                            </Button>
+                            <CardTitle className="text-2xl font-bold text-foreground">{title}</CardTitle>
                         </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2">
-                         <Button onClick={handleGenerate} disabled={loading} className="self-start neon-glow-button">
-                            {loading ? (
-                                <>
-                                    <Loader2 className="animate-spin" /> Generating...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles /> Generate
-                                </>
-                            )}
+                        <Button
+                            variant="outline"
+                            onClick={handleDownloadPdf}
+                            disabled={!answer || loading}
+                        >
+                            <Download className="mr-2" />
+                            Download PDF
                         </Button>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            className="hidden"
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col gap-4">
+                        <Textarea
+                            placeholder="Ask your AI tutor anything... (Optionally, upload a file for context)"
+                            className="min-h-[150px]"
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
                             disabled={loading}
                         />
-                        <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
-                            <Upload />
-                            {file ? "Change File" : "Upload File"}
-                        </Button>
-                    </div>
 
-                    <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[150px] bg-background/50 relative overflow-y-auto">
-                        {loading ? (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <Loader2 className="animate-spin h-5 w-5" />
-                                Thinking...
+                        {file && (
+                            <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Paperclip className="h-4 w-4" />
+                                    <span>{file.name}</span>
                             </div>
-                        ) : answer ? (
-                             <div className="markdown-content">
-                                <ReactMarkdown>{answer}</ReactMarkdown>
+                            <Button variant="ghost" size="icon" onClick={handleRemoveFile} disabled={loading}>
+                                    <XCircle className="h-4 w-4" />
+                            </Button>
                             </div>
-                        ) : (
-                           <p className="text-muted-foreground">AI output will appear here...</p>
                         )}
+                        
+                        <div className="flex items-center gap-2">
+                            <Button onClick={handleGenerate} disabled={loading} className="self-start neon-glow-button">
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="animate-spin" /> Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles /> Generate
+                                    </>
+                                )}
+                            </Button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                                disabled={loading}
+                            />
+                            <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
+                                <Upload />
+                                {file ? "Change File" : "Upload File"}
+                            </Button>
+                        </div>
+
+                        <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[250px] bg-background/50 relative overflow-y-auto">
+                            {loading ? (
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Loader2 className="animate-spin h-5 w-5" />
+                                    Thinking...
+                                </div>
+                            ) : answer ? (
+                                <div className="markdown-content">
+                                    <ReactMarkdown>{answer}</ReactMarkdown>
+                                </div>
+                            ) : (
+                            <p className="text-muted-foreground">AI output will appear here...</p>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        </div>
     );
 };
+
+    
