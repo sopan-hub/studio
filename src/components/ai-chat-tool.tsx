@@ -8,8 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
-import { jsPDF } from 'jspdf';
-import "jspdf/dist/polyfills.es.js"; // Required for jsPDF in some environments
 import ReactMarkdown from 'react-markdown';
 
 interface AiChatToolProps {
@@ -99,7 +97,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         }
     }
 
-    const handleDownloadPdf = () => {
+    const handleDownloadPdf = async () => {
         if (!answer) {
             toast({
                 variant: "destructive",
@@ -109,13 +107,15 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             return;
         }
 
+        const { jsPDF } = await import('jspdf');
+        await import("jspdf/dist/polyfills.es.js");
+
         const doc = new jsPDF({
             orientation: 'p',
             unit: 'mm',
             format: 'a4'
         });
 
-        // Add custom fonts if necessary for better character support, though default is often sufficient.
         doc.setFont('Helvetica', 'normal');
 
         const margin = 15;
@@ -127,13 +127,13 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
             const lines = text.split('\n');
 
             lines.forEach(line => {
-                let currentX = margin;
-                 if (currentY > pageHeight - margin) {
+                if (currentY > pageHeight - margin) {
                     doc.addPage();
                     currentY = margin;
                 }
 
-                // Basic Markdown Parsing
+                let currentX = margin;
+                
                 if (line.startsWith('# ')) {
                     doc.setFont('Helvetica', 'bold');
                     doc.setFontSize(18);
@@ -157,7 +157,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                     doc.setFontSize(11);
                     const bulletPoint = `• ${line.substring(2)}`;
                     const textLines = doc.splitTextToSize(bulletPoint, usableWidth);
-                    doc.text(textLines, currentX, currentY);
+                    doc.text(textLines, currentX + 4, currentY); // Indent bullets
                     currentY += (textLines.length * 5);
                 } else {
                     doc.setFont('Helvetica', 'normal');
@@ -166,23 +166,19 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                     doc.text(textLines, currentX, currentY);
                     currentY += (textLines.length * 5);
                 }
-                currentY += 4; // Extra space between paragraphs/lines
+                currentY += 4; 
             });
         };
-
-        // --- PDF Content ---
 
         // Title
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(22);
-        doc.setTextColor(40, 40, 40); // Dark grey color
         doc.text(`Study Buddy AI - ${title}`, margin, currentY);
         currentY += 15;
 
         // Question
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.setTextColor(60, 60, 60);
         doc.text("Your Question:", margin, currentY);
         currentY += 8;
 
@@ -193,15 +189,14 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         const questionLines = doc.splitTextToSize(questionToDisplay, usableWidth);
         doc.text(questionLines, margin, currentY);
         currentY += (questionLines.length * 5) + 10;
+        doc.setTextColor(0, 0, 0);
 
         // Answer
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.setTextColor(60, 60, 60);
         doc.text("AI Answer:", margin, currentY);
         currentY += 8;
         
-        doc.setTextColor(0, 0, 0);
         addFormattedText(answer);
 
         doc.save(`study-buddy-${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
@@ -294,5 +289,3 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
         </Card>
     );
 };
-
-    

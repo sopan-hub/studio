@@ -7,8 +7,6 @@ import { ArrowLeft, Sparkles, Loader2, Upload, XCircle, Paperclip, Download } fr
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { generateSummary, SummaryInput, SummaryOutput } from '@/ai/flows/summarizer-flow';
-import { jsPDF } from 'jspdf';
-import "jspdf/dist/polyfills.es.js";
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow';
 import ReactMarkdown from 'react-markdown';
@@ -102,7 +100,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         }
     };
     
-    const handleDownloadPdf = () => {
+    const handleDownloadPdf = async () => {
         if (!summary) {
             toast({
                 variant: "destructive",
@@ -111,6 +109,9 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
             });
             return;
         }
+
+        const { jsPDF } = await import('jspdf');
+        await import("jspdf/dist/polyfills.es.js");
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         doc.setFont('Helvetica', 'normal');
@@ -124,11 +125,12 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
             const lines = text.split('\n');
 
             lines.forEach(line => {
-                let currentX = margin;
                 if (currentY > pageHeight - margin) {
                     doc.addPage();
                     currentY = margin;
                 }
+                
+                let currentX = margin;
 
                 if (line.startsWith('# ')) {
                     doc.setFont('Helvetica', 'bold');
@@ -153,7 +155,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                     doc.setFontSize(11);
                     const bulletPoint = `• ${line.substring(2)}`;
                     const textLines = doc.splitTextToSize(bulletPoint, usableWidth);
-                    doc.text(textLines, currentX, currentY);
+                    doc.text(textLines, currentX + 4, currentY);
                     currentY += textLines.length * 5;
                 } else {
                     doc.setFont('Helvetica', 'normal');
@@ -170,12 +172,10 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(22);
-        doc.setTextColor(40, 40, 40);
         const titleLines = doc.splitTextToSize(summary.title, usableWidth);
         doc.text(titleLines, margin, currentY);
         currentY += titleLines.length * 10 + 5;
         
-        doc.setTextColor(0, 0, 0);
         addFormattedText(summary.summary);
         
         doc.save(`${summary.title.replace(/\s+/g, '_').toLowerCase()}_summary.pdf`);
@@ -265,5 +265,3 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
         </Card>
     );
 };
-
-    

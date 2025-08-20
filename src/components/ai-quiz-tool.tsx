@@ -8,8 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { generateQuiz, QuizInput, QuizOutput } from '@/ai/flows/quiz-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { jsPDF } from 'jspdf';
-import "jspdf/dist/polyfills.es.js";
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow'; // We need a way to extract text
 
@@ -103,7 +101,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         }
     };
     
-    const handleDownloadPdf = () => {
+    const handleDownloadPdf = async () => {
         if (!quiz) {
             toast({
                 variant: "destructive",
@@ -112,6 +110,9 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
             });
             return;
         }
+
+        const { jsPDF } = await import('jspdf');
+        await import("jspdf/dist/polyfills.es.js");
 
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         doc.setFont('Helvetica', 'normal');
@@ -141,7 +142,6 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         // Set Title
         doc.setFont("Helvetica", "bold");
         doc.setFontSize(18);
-        doc.setTextColor(40, 40, 40);
         currentY = addWrappedText(quiz.title, margin, currentY, { fontSize: 18, fontStyle: 'bold' });
         currentY += 10;
 
@@ -279,5 +279,3 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
         </Card>
     );
 };
-
-    
