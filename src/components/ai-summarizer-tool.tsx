@@ -157,8 +157,8 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                     doc.setFont('Helvetica', 'normal');
                     doc.setFontSize(11);
                     const bulletPoint = `• ${line.substring(2)}`;
-                    const textLines = doc.splitTextToSize(bulletPoint, usableWidth);
-                    doc.text(textLines, currentX + 4, currentY);
+                    const textLines = doc.splitTextToSize(bulletPoint, usableWidth - 5);
+                    doc.text(textLines, currentX + 5, currentY);
                     currentY += textLines.length * 5;
                 } else {
                     doc.setFont('Helvetica', 'normal');
