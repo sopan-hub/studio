@@ -12,7 +12,7 @@ import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { AiLoadingAnimation } from './ui/ai-loading-animation';
+import { AiTruckLoadingAnimation } from '@/components/ui/ai-truck-loading-animation';
 
 interface AiCodeExplainerToolProps {
     onBack: () => void;
@@ -148,7 +148,7 @@ export const AiCodeExplainerTool = ({ onBack }: AiCodeExplainerToolProps) => {
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
                         {loading ? (
-                            <AiLoadingAnimation text="Analyzing the code..." />
+                            <AiTruckLoadingAnimation />
                         ) : explanation ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-lg font-bold text-primary mb-2">Summary</h3>

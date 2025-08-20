@@ -10,7 +10,7 @@ import { chat, ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
-import { AiLoadingAnimation } from './ui/ai-loading-animation';
+import { AiTruckLoadingAnimation } from '@/components/ui/ai-truck-loading-animation';
 
 
 interface AiChatToolProps {
@@ -283,7 +283,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
 
                         <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[250px] bg-background/50 relative overflow-y-auto">
                             {loading ? (
-                                <AiLoadingAnimation text="Thinking..." />
+                                <AiTruckLoadingAnimation />
                             ) : answer ? (
                                 <div className="markdown-content">
                                     <ReactMarkdown>{answer}</ReactMarkdown>

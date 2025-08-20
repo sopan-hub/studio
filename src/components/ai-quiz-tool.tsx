@@ -11,7 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow'; // We need a way to extract text
 import { jsPDF } from 'jspdf';
-import { AiLoadingAnimation } from './ui/ai-loading-animation';
+import { AiTruckLoadingAnimation } from '@/components/ui/ai-truck-loading-animation';
 
 
 interface AiQuizToolProps {
@@ -249,7 +249,7 @@ export const AiQuizTool = ({ onBack }: AiQuizToolProps) => {
                     
                     <div className="mt-4 min-h-[150px]">
                         {loading ? (
-                            <AiLoadingAnimation text="Brewing your quiz..." />
+                            <AiTruckLoadingAnimation />
                         ) : quiz ? (
                             <Accordion type="single" collapsible className="w-full">
                                 <h3 className="text-xl font-bold text-secondary mb-4">{quiz.title}</h3>

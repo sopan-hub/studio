@@ -11,7 +11,7 @@ import { Textarea } from './ui/textarea';
 import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import { Label } from './ui/label';
-import { AiLoadingAnimation } from './ui/ai-loading-animation';
+import { AiTruckLoadingAnimation } from '@/components/ui/ai-truck-loading-animation';
 
 interface AiMathSolverToolProps {
     onBack: () => void;
@@ -146,7 +146,7 @@ export const AiMathSolverTool = ({ onBack }: AiMathSolverToolProps) => {
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
                         {loading ? (
-                            <AiLoadingAnimation text="Calculating the solution..." />
+                            <AiTruckLoadingAnimation />
                         ) : solution ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-lg font-bold text-primary mb-2">Final Answer</h3>

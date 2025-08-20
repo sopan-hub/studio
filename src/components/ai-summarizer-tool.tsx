@@ -11,7 +11,7 @@ import { Textarea } from './ui/textarea';
 import { chat } from '@/ai/flows/chat-flow';
 import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
-import { AiLoadingAnimation } from './ui/ai-loading-animation';
+import { AiTruckLoadingAnimation } from '@/components/ui/ai-truck-loading-animation';
 
 
 interface AiSummarizerToolProps {
@@ -248,7 +248,7 @@ export const AiSummarizerTool = ({ onBack }: AiSummarizerToolProps) => {
                     {/* Output Side */}
                     <div className="mt-0 min-h-[400px]">
                         {loading ? (
-                            <AiLoadingAnimation text="Summarizing your material..." />
+                            <AiTruckLoadingAnimation />
                         ) : summary ? (
                             <div className="p-4 border rounded-lg bg-background/50 h-full overflow-y-auto markdown-content">
                                 <h3 className="text-xl font-bold text-secondary mb-4">{summary.title}</h3>

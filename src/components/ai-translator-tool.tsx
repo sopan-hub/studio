@@ -13,7 +13,7 @@ import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { AiLoadingAnimation } from './ui/ai-loading-animation';
+import { AiTruckLoadingAnimation } from '@/components/ui/ai-truck-loading-animation';
 
 interface AiTranslatorToolProps {
     onBack: () => void;
@@ -158,7 +158,7 @@ export const AiTranslatorTool = ({ onBack }: AiTranslatorToolProps) => {
                             <Label>Translated Text</Label>
                             <div className="p-4 border rounded-lg bg-background/50 h-[300px] overflow-y-auto markdown-content">
                                {loading ? (
-                                    <AiLoadingAnimation text="Translating..." />
+                                    <AiTruckLoadingAnimation />
                                 ) : translation ? (
                                     <ReactMarkdown>{translation.translatedText}</ReactMarkdown>
                                 ) : (
