@@ -9,7 +9,7 @@ export function LoginDialog({ open, onOpenChange }: { open: boolean, onOpenChang
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-5xl">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-foreground">
             Register for Webinar
