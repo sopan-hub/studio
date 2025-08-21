@@ -94,6 +94,8 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
   const smoothedCursorPos = useRef({ x: 0, y: 0 });
   const [sensitivity, setSensitivity] = useState(1.5); // 0.5 to 2.5
   const scrollVelocity = useRef(0);
+  const targetScroll = useRef(0);
+  const currentScroll = useRef(window.scrollY);
 
   // --- INITIALIZATION ---
   useEffect(() => {
@@ -144,12 +146,11 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
   };
 
   const smoothScroll = () => {
-    if (Math.abs(scrollVelocity.current) > 0.1) {
-      window.scrollBy(0, scrollVelocity.current);
-      scrollVelocity.current *= 0.95; // Apply friction
-      requestAnimationFrame(smoothScroll);
-    } else {
-      scrollVelocity.current = 0;
+    currentScroll.current += (targetScroll.current - currentScroll.current) * 0.1; // Easing factor
+    window.scrollTo(0, currentScroll.current);
+
+    if (Math.abs(targetScroll.current - currentScroll.current) > 0.5) {
+        requestAnimationFrame(smoothScroll);
     }
   }
 
@@ -213,12 +214,9 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
       
       const deltaY = (currentY - lastScrollY.current) * 40; // Multiplier for scroll speed
       
-      // Add to velocity instead of directly scrolling
-      scrollVelocity.current += deltaY;
-      
-      if(Math.abs(scrollVelocity.current) > 1) {
-        requestAnimationFrame(smoothScroll);
-      }
+      // Update target scroll instead of directly scrolling
+      targetScroll.current = window.scrollY + deltaY;
+      requestAnimationFrame(smoothScroll);
       
       lastScrollY.current = currentY;
       isClickGestureRef.current = false;
@@ -282,5 +280,3 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
     </>
   );
 };
-
-    
