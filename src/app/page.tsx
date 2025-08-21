@@ -183,8 +183,6 @@ export default function Dashboard() {
                 ))}
             </div>
         </section>
-        {/* Extra content to make page scrollable */}
-        <div className="h-[500px]"></div>
       </div>
     );
   };
@@ -278,5 +276,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-    
