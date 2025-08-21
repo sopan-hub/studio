@@ -25,7 +25,6 @@ import { AiConceptExplainerTool } from '@/components/ai-concept-explainer-tool';
 import { AiMathSolverTool } from '@/components/ai-math-solver-tool';
 import { AiCodeExplainerTool } from '@/components/ai-code-explainer-tool';
 import { AiTranslatorTool } from '@/components/ai-translator-tool';
-import { NeonCursor } from '@/components/neon-cursor';
 
 
 type Tool = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator';
@@ -131,7 +130,7 @@ export default function Dashboard() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input 
                         placeholder="Ask me anything to get started..." 
-                        className="pl-12 h-14 text-lg rounded-full neon-glow-button"
+                        className="pl-12 h-14 text-lg rounded-full"
                         value={globalSearch}
                         onChange={(e) => setGlobalSearch(e.target.value)}
                     />
@@ -142,7 +141,7 @@ export default function Dashboard() {
 
         {/* Features Title Section */}
         <section className="text-center my-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary neon-glow">Powerful Features to Boost Your Learning</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary">Powerful Features to Boost Your Learning</h2>
             <p className="text-muted-foreground mt-4 max-w-3xl mx-auto">
                 Everything you need to succeed in your studies, powered by AI.
             </p>
@@ -181,7 +180,7 @@ export default function Dashboard() {
     <>
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setLoginDialogOpen} />
       <div id="app-container" className="flex flex-col min-h-screen bg-background text-foreground font-body">
-          <NeonCursor />
+          
           <header className="p-4 border-b border-primary/20 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-50">
               <div className="flex items-center gap-2">
                   <BrainCircuit className="h-8 w-8 text-primary" />
@@ -206,7 +205,7 @@ export default function Dashboard() {
                     </DropdownMenuContent>
                     </DropdownMenu>
                 ) : (
-                    <Button variant="outline" className="neon-glow-button" onClick={() => setLoginDialogOpen(true)}>Sign In / Sign Up</Button>
+                    <Button variant="outline" onClick={() => setLoginDialogOpen(true)}>Sign In / Sign Up</Button>
                 )}
               </div>
           </header>
@@ -217,7 +216,7 @@ export default function Dashboard() {
                 <section className="flex items-center justify-center p-8 md:p-16 border-b border-primary/20">
                     <div className="grid md:grid-cols-2 items-center gap-8 w-full max-w-6xl">
                         <div className="text-left animate-blast-in">
-                            <h1 className="text-4xl md:text-6xl font-bold text-primary neon-glow">Welcome to Study Buddy AI</h1>
+                            <h1 className="text-4xl md:text-6xl font-bold text-primary">Welcome to Study Buddy AI</h1>
                             <p className="text-muted-foreground mt-4 text-lg">
                                 Your personal AI-powered study partner. Generate notes, create quizzes, and get answers to your toughest questions.
                             </p>
@@ -244,7 +243,7 @@ export default function Dashboard() {
                         <Mail className="h-6 w-6" />
                     </a>
                 </div>
-                <span className="neon-glow">© {new Date().getFullYear()} Study Buddy AI. All Rights Reserved.</span>
+                <span>© {new Date().getFullYear()} Study Buddy AI. All Rights Reserved.</span>
             </footer>
       </div>
     </>
