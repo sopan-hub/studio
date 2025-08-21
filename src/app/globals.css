@@ -159,6 +159,17 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Neon Cursor Canvas */
+.neon-cursor-canvas {
+    display: block;
+    position: fixed;
+    z-index: 9999; /* Ensure it's on top */
+    top: 0;
+    left: 0;
+    pointer-events: none; /* Make sure it doesn't block interactions */
+}
+
+
 .interactive-logo-container {
     display: flex;
     justify-content: center;
