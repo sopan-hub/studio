@@ -295,7 +295,7 @@ export const GestureController = () => {
         boxShadow: '0 0 10px #00FFFF',
         zIndex: 10000,
         transform: 'scaleX(-1)', // Mirror the video feed
-        display: 'none' // Set to 'block' for debugging
+        display: 'block' // Set to 'none' to hide it
     }} />;
 };
 
