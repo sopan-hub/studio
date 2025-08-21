@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import { HandLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Fingerprint, Move, MousePointerClick, ArrowDownUp } from 'lucide-react';
+import { Fingerprint, Move, MousePointerClick, ArrowDownUp, X } from 'lucide-react';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
+import { Button } from './ui/button';
 
 // Enum for hand landmarks to make code more readable
 enum HandLandmark {
@@ -34,32 +35,49 @@ enum HandLandmark {
   PINKY_FINGER_TIP = 20,
 }
 
-const GestureInstructions = () => (
-    <Card className="fixed bottom-4 left-4 z-[9999] w-80 bg-background/80 backdrop-blur-sm">
-        <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-                <Fingerprint />
-                Gesture Control Instructions
-            </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-            <div className="flex items-center gap-3">
-                <Move className="h-6 w-6 text-muted-foreground" />
-                <span><span className="font-bold">Move Cursor:</span> Use your index finger.</span>
-            </div>
-            <div className="flex items-center gap-3">
-                <MousePointerClick className="h-6 w-6 text-muted-foreground" />
-                <span><span className="font-bold">Click:</span> Pinch thumb and index finger.</span>
-            </div>
-             <div className="flex items-center gap-3">
-                <ArrowDownUp className="h-6 w-6 text-muted-foreground" />
-                <span><span className="font-bold">Scroll:</span> Move index and middle finger up or down.</span>
-            </div>
-        </CardContent>
-    </Card>
+const GestureInstructionPanel = ({ sensitivity, setSensitivity, onClose }: { sensitivity: number, setSensitivity: (v: number) => void, onClose: () => void }) => (
+    <div className="fixed bottom-4 left-4 z-[9999] space-y-4">
+        <Card className="w-80 bg-background/80 backdrop-blur-sm relative">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary">
+                    <Fingerprint />
+                    Gesture Control Instructions
+                </CardTitle>
+                <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-6 w-6" onClick={onClose}>
+                    <X className="h-4 w-4"/>
+                </Button>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+                <div className="flex items-center gap-3">
+                    <Move className="h-6 w-6 text-muted-foreground" />
+                    <span><span className="font-bold">Move Cursor:</span> Use your index finger.</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <MousePointerClick className="h-6 w-6 text-muted-foreground" />
+                    <span><span className="font-bold">Click:</span> Pinch thumb and index finger.</span>
+                </div>
+                 <div className="flex items-center gap-3">
+                    <ArrowDownUp className="h-6 w-6 text-muted-foreground" />
+                    <span><span className="font-bold">Scroll:</span> Move index and middle finger up or down.</span>
+                </div>
+            </CardContent>
+        </Card>
+        <Card className="w-80 bg-background/80 backdrop-blur-sm p-4">
+            <Label htmlFor="sensitivity-slider" className="mb-2 block text-sm font-medium">Cursor Sensitivity</Label>
+            <Slider
+                id="sensitivity-slider"
+                min={0.5}
+                max={1.5}
+                step={0.1}
+                value={[sensitivity]}
+                onValueChange={(value) => setSensitivity(value[0])}
+            />
+        </Card>
+    </div>
 );
 
-export const GestureController = () => {
+
+export const GestureController = ({ showInstructions, setShowInstructions }: { showInstructions: boolean, setShowInstructions: (v: boolean) => void }) => {
   // --- STATE AND REFS ---
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -160,8 +178,8 @@ export const GestureController = () => {
     // --- 2. Gesture Detection ---
     const thumbTip = landmarks[HandLandmark.THUMB_TIP];
     const middleFingertip = landmarks[HandLandmark.MIDDLE_FINGER_TIP];
-    const indexFingerPip = landmarks[HandLandmark.INDEX_FINGER_PIP];
-
+    
+    // Calculate distances between fingertips
     const clickDistance = Math.hypot(indexFingertip.x - thumbTip.x, indexFingertip.y - thumbTip.y);
     const scrollGestureActive = Math.hypot(indexFingertip.x - middleFingertip.x, indexFingertip.y - middleFingertip.y) < 0.07;
     
@@ -170,21 +188,26 @@ export const GestureController = () => {
     // --- 3. Scroll Gesture Logic ---
     if (scrollGestureActive) {
       cursorRef.current.style.backgroundColor = 'hsl(var(--ring))';
+      // Use the average Y of the two fingers for scrolling
       const currentY = (indexFingertip.y + middleFingertip.y) / 2;
       
       if (lastScrollYRef.current !== null) {
+        // Calculate the change in Y position
         const deltaY = currentY - lastScrollYRef.current;
-        window.scrollBy(0, deltaY * 1500 * sensitivity); // Scroll speed affected by sensitivity
+        // Scroll the window based on the delta, multiplied by a sensitivity factor
+        window.scrollBy(0, deltaY * 1500 * sensitivity); 
       }
+      // Store the current Y position for the next frame
       lastScrollYRef.current = currentY;
     } 
     // --- 4. Click Gesture Logic ---
     else if (clickDistance < clickThreshold) {
       cursorRef.current.style.backgroundColor = 'hsl(var(--destructive))';
       if (!isClickGestureRef.current) {
-        isClickGestureRef.current = true;
+        isClickGestureRef.current = true; // Prevents multiple clicks
         performClick(smoothedCursorPos.current.x, smoothedCursorPos.current.y);
         
+        // Visual feedback for the click
         if(cursorRef.current) {
             cursorRef.current.style.transform += ' scale(0.7)';
             setTimeout(() => {
@@ -203,9 +226,9 @@ export const GestureController = () => {
   // --- ACTION SIMULATION ---
   const performClick = (x: number, y: number) => {
     if (cursorRef.current) {
-      cursorRef.current.style.display = 'none';
+      cursorRef.current.style.display = 'none'; // Hide cursor to click element underneath
       const element = document.elementFromPoint(x, y);
-      cursorRef.current.style.display = '';
+      cursorRef.current.style.display = ''; // Show it again
 
       if (element instanceof HTMLElement) {
         element.click();
@@ -224,19 +247,15 @@ export const GestureController = () => {
       
       <video ref={videoRef} className="fixed -z-10 w-px h-px left-0 top-0 opacity-0" playsInline />
       
-      <GestureInstructions />
-
-      <Card className="fixed bottom-4 right-4 z-[9999] w-72 bg-background/80 backdrop-blur-sm p-4">
-        <Label htmlFor="sensitivity-slider" className="mb-2 block text-sm font-medium">Cursor Sensitivity</Label>
-        <Slider
-            id="sensitivity-slider"
-            min={0.5}
-            max={1.5}
-            step={0.1}
-            value={[sensitivity]}
-            onValueChange={(value) => setSensitivity(value[0])}
+      {showInstructions && (
+        <GestureInstructionPanel 
+            sensitivity={sensitivity} 
+            setSensitivity={setSensitivity} 
+            onClose={() => setShowInstructions(false)}
         />
-      </Card>
+      )}
     </>
   );
 };
+
+    

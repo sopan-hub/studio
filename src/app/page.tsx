@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
-import { Search, BrainCircuit, Bot, FileText, ListChecks, UserCircle, LogOut, BookOpen, MessageSquare, Microscope, FlaskConical, Target, Github, Instagram, Mail, HelpCircle, Columns, Sigma, Code, Languages, Hand } from 'lucide-react';
+import { Search, BrainCircuit, Bot, FileText, ListChecks, UserCircle, LogOut, BookOpen, MessageSquare, Microscope, FlaskConical, Target, Github, Instagram, Mail, HelpCircle, Columns, Sigma, Code, Languages, Hand, Info } from 'lucide-react';
 import { AiChatTool } from '@/components/ai-chat-tool';
 import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
 import { AiQuizTool } from '@/components/ai-quiz-tool';
@@ -101,6 +101,7 @@ export default function Dashboard() {
   const { user, signOut } = useAuth();
   const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
   const [isGestureControlOn, setGestureControlOn] = useState(false);
+  const [showGestureInstructions, setShowGestureInstructions] = useState(false);
 
 
   const handleToolSelect = (tool: Tool) => {
@@ -191,7 +192,7 @@ export default function Dashboard() {
   return (
     <>
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setLoginDialogOpen} />
-      {isGestureControlOn && <GestureController />}
+      {isGestureControlOn && <GestureController showInstructions={showGestureInstructions} setShowInstructions={setShowGestureInstructions} />}
       <div id="app-container" className="flex flex-col min-h-screen bg-background text-foreground font-body">
           
           <header className="p-4 border-b border-primary/20 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-50">
@@ -207,6 +208,12 @@ export default function Dashboard() {
                     Gesture Control
                   </Label>
                 </div>
+                 {isGestureControlOn && (
+                    <Button variant="outline" size="sm" onClick={() => setShowGestureInstructions(prev => !prev)}>
+                        <Info className="mr-2 h-4 w-4" />
+                        Instructions
+                    </Button>
+                )}
                 <nav aria-label="User account">
                     {user ? (
                         <DropdownMenu>
@@ -271,3 +278,5 @@ export default function Dashboard() {
     </>
   );
 }
+
+    
