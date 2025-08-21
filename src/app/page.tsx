@@ -123,16 +123,18 @@ export default function Dashboard() {
        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8">
 
         {/* Search Section */}
-        <section className="text-center mt-4">
-             <div className="max-w-2xl mx-auto">
-                <form onSubmit={handleGlobalSearch}>
+        <section aria-labelledby="global-search-heading">
+            <div className="max-w-2xl mx-auto mt-4 text-center">
+                <h2 id="global-search-heading" className="sr-only">Global Search</h2>
+                <form onSubmit={handleGlobalSearch} role="search">
                     <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                     <Input 
                         placeholder="Ask me anything to get started..." 
                         className="pl-12 h-14 text-lg rounded-full"
                         value={globalSearch}
                         onChange={(e) => setGlobalSearch(e.target.value)}
+                        aria-label="Search across all tools"
                     />
                     </div>
                 </form>
@@ -140,8 +142,8 @@ export default function Dashboard() {
         </section>
 
         {/* Features Title Section */}
-        <section className="text-center my-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary">Powerful Features to Boost Your Learning</h2>
+        <section className="text-center my-12" aria-labelledby="features-heading">
+            <h2 id="features-heading" className="text-3xl md:text-4xl font-bold text-primary">Powerful Features to Boost Your Learning</h2>
             <p className="text-muted-foreground mt-4 max-w-3xl mx-auto">
                 Everything you need to succeed in your studies, powered by AI.
             </p>
@@ -149,17 +151,21 @@ export default function Dashboard() {
 
 
         {/* Features Section */}
-        <section>
+        <section aria-labelledby="feature-cards-heading">
+             <h2 id="feature-cards-heading" className="sr-only">Feature Cards</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {featureCards.map(({ tool, icon, title, description }) => (
                 <Card 
                     key={tool} 
                     className="cursor-pointer hover:border-primary/80 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)] transition-all duration-300 bg-card/50 backdrop-blur-sm"
                     onClick={() => handleToolSelect(tool)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleToolSelect(tool)}
                 >
                     <CardHeader>
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                        <div className="p-3 bg-primary/10 rounded-lg text-primary" aria-hidden="true">
                         {icon}
                         </div>
                         <CardTitle className="text-xl">{title}</CardTitle>
@@ -183,15 +189,15 @@ export default function Dashboard() {
           
           <header className="p-4 border-b border-primary/20 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-50">
               <div className="flex items-center gap-2">
-                  <BrainCircuit className="h-8 w-8 text-primary" />
+                  <BrainCircuit className="h-8 w-8 text-primary" aria-hidden="true"/>
                   <h1 className="text-xl font-bold text-foreground">Study Buddy AI</h1>
               </div>
-              <div>
+              <nav aria-label="User account">
                 {user ? (
                     <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="gap-2">
-                            <UserCircle />
+                            <UserCircle aria-hidden="true" />
                             {user.email}
                         </Button>
                     </DropdownMenuTrigger>
@@ -199,7 +205,7 @@ export default function Dashboard() {
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={signOut} className="text-red-500 hover:text-red-500">
-                            <LogOut className="mr-2 h-4 w-4" />
+                            <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
                         Sign Out
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -207,21 +213,21 @@ export default function Dashboard() {
                 ) : (
                     <Button variant="outline" onClick={() => setLoginDialogOpen(true)}>Sign In / Sign Up</Button>
                 )}
-              </div>
+              </nav>
           </header>
           
-          <div className="flex-1 flex flex-col">
+          <main className="flex-1 flex flex-col">
             {/* Hero Section */}
             {!activeTool && (
-                <section className="flex items-center justify-center p-8 md:p-16 border-b border-primary/20">
+                <section className="flex items-center justify-center p-8 md:p-16 border-b border-primary/20" aria-labelledby="hero-heading">
                     <div className="grid md:grid-cols-2 items-center gap-8 w-full max-w-6xl">
                         <div className="text-left animate-blast-in">
-                            <h1 className="text-4xl md:text-6xl font-bold text-primary">Welcome to Study Buddy AI</h1>
+                            <h1 id="hero-heading" className="text-4xl md:text-6xl font-bold text-primary">Welcome to Study Buddy AI</h1>
                             <p className="text-muted-foreground mt-4 text-lg">
                                 Your personal AI-powered study partner. Generate notes, create quizzes, and get answers to your toughest questions.
                             </p>
                         </div>
-                        <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-center" aria-hidden="true">
                             <InteractiveAiLogo />
                         </div>
                     </div>
@@ -229,17 +235,17 @@ export default function Dashboard() {
             )}
 
             {renderContent()}
-          </div>
+          </main>
 
           <footer className="w-full p-6 border-t border-primary/20 text-center text-muted-foreground">
                 <div className="flex justify-center gap-6 mb-4">
-                    <a href="https://github.com/sopan-hub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                    <a href="https://github.com/sopan-hub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="View source code on Github">
                         <Github className="h-6 w-6" />
                     </a>
-                    <a href="https://www.instagram.com/sopan.147/profilecard/?igsh=MXJ3NTF6c3BnM2Fucg==" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                    <a href="https://www.instagram.com/sopan.147/profilecard/?igsh=MXJ3NTF6c3BnM2Fucg==" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="Follow us on Instagram">
                         <Instagram className="h-6 w-6" />
                     </a>
-                    <a href="mailto:patilsopan4148@gmail.com" className="hover:text-primary transition-colors">
+                    <a href="mailto:patilsopan4148@gmail.com" className="hover:text-primary transition-colors" aria-label="Send us an email">
                         <Mail className="h-6 w-6" />
                     </a>
                 </div>

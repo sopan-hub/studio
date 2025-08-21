@@ -219,7 +219,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary">
+                            <Button variant="ghost" size="icon" onClick={onBack} className="hover:text-primary" aria-label="Go back">
                                 <ArrowLeft />
                             </Button>
                             <CardTitle className="text-2xl font-bold text-foreground">{title}</CardTitle>
@@ -242,6 +242,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)}
                             disabled={loading}
+                            aria-label="Your question"
                         />
 
                         {file && (
@@ -250,7 +251,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                                     <Paperclip className="h-4 w-4" />
                                     <span>{file.name}</span>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={handleRemoveFile} disabled={loading}>
+                            <Button variant="ghost" size="icon" onClick={handleRemoveFile} disabled={loading} aria-label="Remove file">
                                     <XCircle className="h-4 w-4" />
                             </Button>
                             </div>
@@ -274,6 +275,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                                 onChange={handleFileChange}
                                 className="hidden"
                                 disabled={loading}
+                                aria-hidden="true"
                             />
                             <Button variant="outline" onClick={handleUploadClick} disabled={loading} className="self-start">
                                 <Upload />
@@ -281,7 +283,7 @@ export const AiChatTool = ({ onBack, title, initialQuestion = "", onSearchPerfor
                             </Button>
                         </div>
 
-                        <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[250px] bg-background/50 relative overflow-y-auto">
+                        <div className="mt-4 p-4 border border-dashed rounded-lg min-h-[250px] bg-background/50 relative overflow-y-auto" aria-live="polite">
                             {loading ? (
                                 <AiTruckLoadingAnimation />
                             ) : answer ? (
