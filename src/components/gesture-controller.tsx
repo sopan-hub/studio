@@ -70,7 +70,9 @@ export const GestureController = () => {
         return () => {
             if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
             videoRef.current?.srcObject && (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
-            cursorRef.current && document.body.removeChild(cursorRef.current);
+            if (cursorRef.current && document.body.contains(cursorRef.current)) {
+                document.body.removeChild(cursorRef.current);
+            }
         };
     }, [toast]);
 
@@ -93,6 +95,9 @@ export const GestureController = () => {
     
     // --- Create Custom Cursor ---
     useEffect(() => {
+        // Ensure this runs only once
+        if (cursorRef.current) return;
+
         const customCursor = document.createElement('div');
         customCursor.style.position = 'fixed';
         customCursor.style.width = '24px';
@@ -100,11 +105,12 @@ export const GestureController = () => {
         customCursor.style.border = '3px solid #00FFFF';
         customCursor.style.borderRadius = '50%';
         customCursor.style.pointerEvents = 'none';
-        customCursor.style.zIndex = '9999';
+        customCursor.style.zIndex = '99999';
         customCursor.style.transform = 'translate(-50%, -50%)';
-        customCursor.style.transition = 'transform 0.1s ease-out, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease';
+        customCursor.style.transition = 'transform 0.1s ease-out, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease';
         customCursor.style.boxShadow = '0 0 12px #00FFFF, 0 0 20px #00FFFF';
         customCursor.style.backdropFilter = 'blur(2px)';
+        customCursor.style.opacity = '0'; // Start hidden
         document.body.appendChild(customCursor);
         cursorRef.current = customCursor;
     }, []);
@@ -121,9 +127,11 @@ export const GestureController = () => {
                     const results = await handLandmarkerRef.current.detectForVideo(video, Date.now());
                     
                     if (results.landmarks && results.landmarks.length > 0) {
+                        if (cursorRef.current) cursorRef.current.style.opacity = '1';
                         processLandmarks(results.landmarks[0]);
                     } else {
-                        // If no hand is detected, reset gesture state
+                        // If no hand is detected, reset gesture state and hide cursor
+                         if (cursorRef.current) cursorRef.current.style.opacity = '0';
                          activeGestureRef.current = 'none';
                          updateCursorAppearance('none');
                     }
@@ -136,13 +144,17 @@ export const GestureController = () => {
 
     // --- Landmark & Gesture Processing ---
     const processLandmarks = (landmarks: handPoseDetection.Keypoint[]) => {
+        if (!landmarks || landmarks.length === 0) return;
+
         const indexTip = landmarks[INDEX_FINGER_TIP];
         const middleTip = landmarks[MIDDLE_FINGER_TIP];
         const ringTip = landmarks[RING_FINGER_TIP];
         const thumbTip = landmarks[THUMB_TIP];
+
+        if (!indexTip || !middleTip || !ringTip || !thumbTip) return;
         
         // --- 1. Cursor Movement (Always active) ---
-        if (indexTip && cursorRef.current) {
+        if (cursorRef.current) {
             const cursorX = window.innerWidth - (indexTip.x * window.innerWidth);
             const cursorY = indexTip.y * window.innerHeight;
             cursorRef.current.style.left = `${cursorX}px`;
@@ -157,38 +169,39 @@ export const GestureController = () => {
         if (activeGestureRef.current === 'scrolling') {
             if (isScrollGesture) {
                 performScroll(indexTip);
-                noGestureCounterRef.current = 0;
+                noGestureCounterRef.current = 0; // Reset no-gesture counter
             } else {
                 noGestureCounterRef.current++;
                 if (noGestureCounterRef.current > GESTURE_RESET_FRAMES) {
                     resetGestureState();
                 }
             }
-        } else {
-            // Not currently scrolling, check for new gestures
-            if (isClickGesture) {
-                clickCounterRef.current++;
-                scrollCounterRef.current = 0;
-                if (clickCounterRef.current === CLICK_THRESHOLD_FRAMES) {
-                    performClick(indexTip.x, indexTip.y);
-                    resetGestureState(); // Reset after a successful click
-                }
-            } else if (isScrollGesture) {
-                scrollCounterRef.current++;
-                clickCounterRef.current = 0;
-                if (scrollCounterRef.current > SCROLL_THRESHOLD_FRAMES) {
-                    activeGestureRef.current = 'scrolling';
-                    lastHandPosRef.current = { x: indexTip.x, y: indexTip.y };
-                    updateCursorAppearance('scrolling');
-                }
-            } else {
-                resetGestureState(); // No gesture detected, reset counters
-            }
+            return; // Don't check for other gestures while scrolling
         }
-        
-         // Update cursor visual based on potential gesture
-        if (activeGestureRef.current !== 'scrolling') {
-            updateCursorAppearance(isClickGesture ? 'clicking' : 'none');
+
+        // --- Check for new gestures if not currently scrolling ---
+        if (isClickGesture) {
+            clickCounterRef.current++;
+            scrollCounterRef.current = 0;
+            updateCursorAppearance('clicking');
+            if (clickCounterRef.current >= CLICK_THRESHOLD_FRAMES) {
+                performClick(indexTip.x, indexTip.y);
+                resetGestureState(); // Reset after a successful click
+            }
+        } else if (isScrollGesture) {
+            scrollCounterRef.current++;
+            clickCounterRef.current = 0;
+            updateCursorAppearance('scrolling');
+            if (scrollCounterRef.current >= SCROLL_THRESHOLD_FRAMES) {
+                activeGestureRef.current = 'scrolling';
+                lastHandPosRef.current = { x: indexTip.x, y: indexTip.y };
+            }
+        } else {
+            // No gesture detected, reset everything gradually
+            noGestureCounterRef.current++;
+            if (noGestureCounterRef.current > GESTURE_RESET_FRAMES) {
+                resetGestureState();
+            }
         }
     };
     
@@ -201,7 +214,9 @@ export const GestureController = () => {
     const resetGestureState = () => {
         clickCounterRef.current = 0;
         scrollCounterRef.current = 0;
+        noGestureCounterRef.current = 0;
         activeGestureRef.current = 'none';
+        lastHandPosRef.current = null;
         updateCursorAppearance('none');
     };
 
@@ -267,6 +282,8 @@ export const GestureController = () => {
     // The video element is only for processing, not for display
     return <video ref={videoRef} autoPlay playsInline muted style={{ 
         display: 'none',
-        // transform: 'scaleX(-1)' // Mirror the video feed
+        transform: 'scaleX(-1)' // Mirror the video feed
     }} />;
 };
+
+    
