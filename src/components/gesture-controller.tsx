@@ -8,11 +8,22 @@ import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-webgl';
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
-// --- Constants ---
-const CLICK_THRESHOLD_FRAMES = 5; // Number of consecutive frames to confirm a click
+// --- Constants for Gesture Recognition ---
+const CLICK_THRESHOLD_FRAMES = 4;    // Consecutive frames to confirm a click
+const SCROLL_THRESHOLD_FRAMES = 10;   // Consecutive frames to activate scroll mode
+const GESTURE_RESET_FRAMES = 15;     // Frames of no gesture to reset state
+
+// Landmark indices from MediaPipe
 const INDEX_FINGER_TIP = 8;
 const MIDDLE_FINGER_TIP = 12;
-const CLICK_DISTANCE_THRESHOLD = 0.05; // Normalized distance threshold for click gesture
+const RING_FINGER_TIP = 16;
+const THUMB_TIP = 4;
+
+// Distance thresholds for gestures (normalized)
+const CLICK_DISTANCE_THRESHOLD = 0.06;
+const SCROLL_DISTANCE_THRESHOLD = 0.05;
+
+type GestureState = 'none' | 'clicking' | 'scrolling';
 
 export const GestureController = () => {
     const { toast } = useToast();
@@ -20,41 +31,46 @@ export const GestureController = () => {
     const handLandmarkerRef = useRef<HandLandmarker | null>(null);
     const lastVideoTimeRef = useRef(-1);
     const cursorRef = useRef<HTMLDivElement | null>(null);
+    
+    // Refs for gesture detection state
     const clickCounterRef = useRef(0);
+    const scrollCounterRef = useRef(0);
+    const noGestureCounterRef = useRef(0);
+    const lastHandPosRef = useRef<{ x: number, y: number } | null>(null);
+    const activeGestureRef = useRef<GestureState>('none');
+    
     const animationFrameId = useRef<number>();
 
     // --- Initialization ---
     useEffect(() => {
         const initialize = async () => {
-            await tf.setBackend('webgl');
-            const vision = await FilesetResolver.forVisionTasks(
-                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
-            );
-            handLandmarkerRef.current = await HandLandmarker.createFromOptions(vision, {
-                baseOptions: {
-                    modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-                    delegate: "GPU"
-                },
-                runningMode: "VIDEO",
-                numHands: 1
-            });
-            toast({ title: "Gesture Control Ready", description: "The hand tracking model has loaded." });
-
-            setupCamera();
+            try {
+                await tf.setBackend('webgl');
+                const vision = await FilesetResolver.forVisionTasks(
+                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+                );
+                handLandmarkerRef.current = await HandLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numHands: 1
+                });
+                toast({ title: "Gesture Control Ready", description: "The hand tracking model has loaded." });
+                setupCamera();
+            } catch (error) {
+                console.error("Initialization failed:", error);
+                toast({ variant: 'destructive', title: "Gesture Control Failed", description: "Could not load the hand tracking model." });
+            }
         };
 
         initialize();
 
         return () => {
-            if (animationFrameId.current) {
-                cancelAnimationFrame(animationFrameId.current);
-            }
-            if (videoRef.current?.srcObject) {
-                (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
-            }
-            if (cursorRef.current) {
-                document.body.removeChild(cursorRef.current);
-            }
+            if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+            videoRef.current?.srcObject && (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+            cursorRef.current && document.body.removeChild(cursorRef.current);
         };
     }, [toast]);
 
@@ -75,25 +91,25 @@ export const GestureController = () => {
         }
     };
     
-    // --- Cursor Element ---
+    // --- Create Custom Cursor ---
     useEffect(() => {
-        // Create a custom cursor element and append it to the body
         const customCursor = document.createElement('div');
         customCursor.style.position = 'fixed';
-        customCursor.style.width = '20px';
-        customCursor.style.height = '20px';
-        customCursor.style.border = '2px solid #00FFFF';
+        customCursor.style.width = '24px';
+        customCursor.style.height = '24px';
+        customCursor.style.border = '3px solid #00FFFF';
         customCursor.style.borderRadius = '50%';
         customCursor.style.pointerEvents = 'none';
         customCursor.style.zIndex = '9999';
         customCursor.style.transform = 'translate(-50%, -50%)';
-        customCursor.style.transition = 'transform 0.1s ease-out';
-        customCursor.style.boxShadow = '0 0 10px #00FFFF, 0 0 20px #00FFFF';
+        customCursor.style.transition = 'transform 0.1s ease-out, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease';
+        customCursor.style.boxShadow = '0 0 12px #00FFFF, 0 0 20px #00FFFF';
+        customCursor.style.backdropFilter = 'blur(2px)';
         document.body.appendChild(customCursor);
         cursorRef.current = customCursor;
     }, []);
 
-    // --- Real-time Detection Loop ---
+    // --- Detection Loop ---
     const startDetection = () => {
         const detect = async () => {
             if (videoRef.current && handLandmarkerRef.current && videoRef.current.readyState >= 3) {
@@ -106,6 +122,10 @@ export const GestureController = () => {
                     
                     if (results.landmarks && results.landmarks.length > 0) {
                         processLandmarks(results.landmarks[0]);
+                    } else {
+                        // If no hand is detected, reset gesture state
+                         activeGestureRef.current = 'none';
+                         updateCursorAppearance('none');
                     }
                 }
             }
@@ -114,73 +134,139 @@ export const GestureController = () => {
         detect();
     };
 
-    // --- Landmark Processing & Actions ---
+    // --- Landmark & Gesture Processing ---
     const processLandmarks = (landmarks: handPoseDetection.Keypoint[]) => {
-        // --- Cursor Movement ---
-        const indexTip = landmarks[INDEX_FINGER_TIP]; // Landmark for the tip of the index finger
+        const indexTip = landmarks[INDEX_FINGER_TIP];
+        const middleTip = landmarks[MIDDLE_FINGER_TIP];
+        const ringTip = landmarks[RING_FINGER_TIP];
+        const thumbTip = landmarks[THUMB_TIP];
+        
+        // --- 1. Cursor Movement (Always active) ---
         if (indexTip && cursorRef.current) {
-            // Flip the x-coordinate to make it a mirror image
             const cursorX = window.innerWidth - (indexTip.x * window.innerWidth);
             const cursorY = indexTip.y * window.innerHeight;
-            
             cursorRef.current.style.left = `${cursorX}px`;
             cursorRef.current.style.top = `${cursorY}px`;
         }
 
-        // --- Click Gesture ---
-        const middleTip = landmarks[MIDDLE_FINGER_TIP];
-        if (indexTip && middleTip) {
-            const distance = Math.sqrt(
-                Math.pow(indexTip.x - middleTip.x, 2) +
-                Math.pow(indexTip.y - middleTip.y, 2) +
-                Math.pow((indexTip.z || 0) - (middleTip.z || 0), 2)
-            );
+        // --- 2. Gesture Detection ---
+        const isClickGesture = getDistance(thumbTip, indexTip) < CLICK_DISTANCE_THRESHOLD;
+        const isScrollGesture = getDistance(indexTip, middleTip) < SCROLL_DISTANCE_THRESHOLD && getDistance(middleTip, ringTip) < SCROLL_DISTANCE_THRESHOLD;
 
-            if (distance < CLICK_DISTANCE_THRESHOLD) {
-                clickCounterRef.current++;
+        // --- 3. State Machine for Gestures ---
+        if (activeGestureRef.current === 'scrolling') {
+            if (isScrollGesture) {
+                performScroll(indexTip);
+                noGestureCounterRef.current = 0;
             } else {
-                clickCounterRef.current = 0; // Reset if the gesture is broken
+                noGestureCounterRef.current++;
+                if (noGestureCounterRef.current > GESTURE_RESET_FRAMES) {
+                    resetGestureState();
+                }
             }
-
-            if (clickCounterRef.current === CLICK_THRESHOLD_FRAMES) {
-                performClick(indexTip.x, indexTip.y);
-                clickCounterRef.current = 0; // Reset after click
+        } else {
+            // Not currently scrolling, check for new gestures
+            if (isClickGesture) {
+                clickCounterRef.current++;
+                scrollCounterRef.current = 0;
+                if (clickCounterRef.current === CLICK_THRESHOLD_FRAMES) {
+                    performClick(indexTip.x, indexTip.y);
+                    resetGestureState(); // Reset after a successful click
+                }
+            } else if (isScrollGesture) {
+                scrollCounterRef.current++;
+                clickCounterRef.current = 0;
+                if (scrollCounterRef.current > SCROLL_THRESHOLD_FRAMES) {
+                    activeGestureRef.current = 'scrolling';
+                    lastHandPosRef.current = { x: indexTip.x, y: indexTip.y };
+                    updateCursorAppearance('scrolling');
+                }
+            } else {
+                resetGestureState(); // No gesture detected, reset counters
             }
         }
+        
+         // Update cursor visual based on potential gesture
+        if (activeGestureRef.current !== 'scrolling') {
+            updateCursorAppearance(isClickGesture ? 'clicking' : 'none');
+        }
     };
+    
+    // --- Helper Functions ---
+    
+    const getDistance = (p1: handPoseDetection.Keypoint, p2: handPoseDetection.Keypoint) => {
+       return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2) + Math.pow((p1.z || 0) - (p2.z || 0), 2));
+    };
+
+    const resetGestureState = () => {
+        clickCounterRef.current = 0;
+        scrollCounterRef.current = 0;
+        activeGestureRef.current = 'none';
+        updateCursorAppearance('none');
+    };
+
+    const updateCursorAppearance = (state: GestureState) => {
+        if (!cursorRef.current) return;
+        switch (state) {
+            case 'clicking':
+                cursorRef.current.style.borderColor = '#FF00FF'; // Magenta for click
+                cursorRef.current.style.boxShadow = '0 0 15px #FF00FF, 0 0 25px #FF00FF';
+                cursorRef.current.style.transform = 'translate(-50%, -50%) scale(1.4)';
+                break;
+            case 'scrolling':
+                cursorRef.current.style.borderColor = '#FFFF00'; // Yellow for scroll
+                cursorRef.current.style.boxShadow = '0 0 15px #FFFF00, 0 0 25px #FFFF00';
+                cursorRef.current.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                cursorRef.current.style.borderRadius = '20%';
+                break;
+            case 'none':
+            default:
+                cursorRef.current.style.borderColor = '#00FFFF'; // Cyan default
+                cursorRef.current.style.boxShadow = '0 0 12px #00FFFF, 0 0 20px #00FFFF';
+                cursorRef.current.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursorRef.current.style.borderRadius = '50%';
+                break;
+        }
+    }
+    
+    // --- Action Functions ---
 
     const performClick = (x: number, y: number) => {
         if (!cursorRef.current) return;
         
-        // Hide the custom cursor briefly to allow the native click to go through
         cursorRef.current.style.display = 'none';
-
         const clickX = window.innerWidth - (x * window.innerWidth);
         const clickY = y * window.innerHeight;
-        
-        // Find the element at the cursor's position
         const element = document.elementFromPoint(clickX, clickY);
-
-        // Re-show the custom cursor
         cursorRef.current.style.display = 'block';
 
         if (element instanceof HTMLElement) {
-             // Animate the click
-            cursorRef.current.style.transform = 'translate(-50%, -50%) scale(1.5)';
-            cursorRef.current.style.backgroundColor = 'rgba(0, 255, 255, 0.5)';
-            setTimeout(() => {
-                if (cursorRef.current) {
-                    cursorRef.current.style.transform = 'translate(-50%, -50%) scale(1)';
-                    cursorRef.current.style.backgroundColor = 'transparent';
-                }
-            }, 150);
-
-            // Dispatch a click event
             element.click();
-            toast({ title: "Gesture Click!", description: `Clicked on a ${element.tagName} element.` });
+            toast({ title: "Gesture Click!", description: `Clicked a ${element.tagName} element.` });
         }
     };
+    
+    const performScroll = (currentHandPos: handPoseDetection.Keypoint) => {
+        if (!lastHandPosRef.current) {
+            lastHandPosRef.current = { x: currentHandPos.x, y: currentHandPos.y };
+            return;
+        }
 
-    // The video element is only for processing, not for display to the user
-    return <video ref={videoRef} autoPlay playsInline style={{ display: 'none' }} />;
+        const dy = currentHandPos.y - lastHandPosRef.current.y;
+        
+        // Simple smoothing and scaling for scroll speed
+        const scrollAmount = dy * window.innerHeight * 1.5;
+
+        window.scrollBy(0, scrollAmount);
+
+        // Update last position for next frame's calculation
+        lastHandPosRef.current = { x: currentHandPos.x, y: currentHandPos.y };
+    };
+
+
+    // The video element is only for processing, not for display
+    return <video ref={videoRef} autoPlay playsInline muted style={{ 
+        display: 'none',
+        // transform: 'scaleX(-1)' // Mirror the video feed
+    }} />;
 };
