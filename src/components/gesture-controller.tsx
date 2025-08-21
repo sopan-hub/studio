@@ -41,12 +41,10 @@ export const GestureController = () => {
 
   // State to track gesture detection
   const isClickGestureRef = useRef(false);
-  const isScrollGestureRef = useRef(false);
-  const lastScrollYRef = useRef(0);
+  const lastScrollYRef = useRef<number | null>(null);
   
   // Smoothing state for cursor
   const smoothedCursorPos = useRef({ x: 0, y: 0 });
-
 
   // --- INITIALIZATION ---
   useEffect(() => {
@@ -66,7 +64,7 @@ export const GestureController = () => {
           numHands: 1, // Only track one hand
         });
         handLandmarkerRef.current = landmarker;
-        toast({ title: "Gesture Control Active", description: "Hand tracking model loaded successfully." });
+        toast({ title: "Gesture Control Active", description: "Hand tracking model loaded." });
 
         // --- 2. Get webcam access ---
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -101,14 +99,12 @@ export const GestureController = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   // --- DETECTION LOOP ---
   const startDetection = () => {
     // This function starts the real-time hand detection loop.
     if (!handLandmarkerRef.current || !videoRef.current || !videoRef.current.srcObject) {
       return;
     }
-    // Ensure the video is playing before we start
     videoRef.current.play().catch(e => console.error("Video play failed:", e));
     detectHands();
   };
@@ -127,9 +123,9 @@ export const GestureController = () => {
         processLandmarks(results.landmarks[0]);
       } else {
         // If no hand is detected, reset gesture states
-        if (isScrollGestureRef.current) {
-            isScrollGestureRef.current = false;
-            if (cursorRef.current) cursorRef.current.style.borderWidth = '2px';
+        lastScrollYRef.current = null;
+        if (cursorRef.current) {
+          cursorRef.current.style.backgroundColor = 'hsl(var(--primary) / 0.7)';
         }
       }
     }
@@ -137,13 +133,12 @@ export const GestureController = () => {
     animationFrameId.current = requestAnimationFrame(detectHands);
   };
 
-
   // --- GESTURE PROCESSING ---
   const processLandmarks = (landmarks: any[]) => {
     // This function takes the detected hand landmarks and translates them into actions.
     if (!cursorRef.current) return;
 
-    // --- 1. Cursor Movement ---
+    // --- 1. Cursor Movement (Single Finger) ---
     // Use the index fingertip to control the cursor.
     const indexFingertip = landmarks[HandLandmark.INDEX_FINGER_TIP];
     const targetX = window.innerWidth * (1 - indexFingertip.x);
@@ -156,55 +151,51 @@ export const GestureController = () => {
 
     cursorRef.current.style.transform = `translate(calc(${smoothedCursorPos.current.x}px - 50%), calc(${smoothedCursorPos.current.y}px - 50%))`;
 
-
     // --- 2. Gesture Detection ---
     const thumbTip = landmarks[HandLandmark.THUMB_TIP];
     const middleFingertip = landmarks[HandLandmark.MIDDLE_FINGER_TIP];
-    const ringFingertip = landmarks[HandLandmark.RING_FINGER_TIP];
-    
-    // Calculate distances between fingertips
-    const indexMiddleDistance = Math.hypot(indexFingertip.x - middleFingertip.x, indexFingertip.y - middleFingertip.y);
-    const middleRingDistance = Math.hypot(middleFingertip.x - ringFingertip.x, middleFingertip.y - ringFingertip.y);
 
-    // --- 3. Click Gesture Logic (Index + Middle finger together) ---
-    const clickThreshold = 0.04; 
-    if (indexMiddleDistance < clickThreshold) {
+    const clickDistance = Math.hypot(indexFingertip.x - thumbTip.x, indexFingertip.y - thumbTip.y);
+    const scrollDistance = Math.hypot(indexFingertip.x - middleFingertip.x, indexFingertip.y - middleFingertip.y);
+    
+    const clickThreshold = 0.05;
+    const scrollThreshold = 0.06;
+
+    // --- 3. Scroll Gesture Logic (Index + Middle finger up/down) ---
+    if (scrollDistance < scrollThreshold) {
+      cursorRef.current.style.backgroundColor = 'hsl(var(--ring))'; // Visual feedback for scroll
+      const currentY = indexFingertip.y;
+      
+      if (lastScrollYRef.current !== null) {
+        const deltaY = currentY - lastScrollYRef.current;
+        // The y-coordinate from MediaPipe is inverted (0 is top), so a positive delta means moving down
+        window.scrollBy(0, deltaY * 1000); // Multiplier for scroll speed
+      }
+      lastScrollYRef.current = currentY;
+
+    } else {
+       lastScrollYRef.current = null; // Reset scroll tracking when gesture stops
+       cursorRef.current.style.backgroundColor = 'hsl(var(--primary) / 0.7)';
+    }
+
+    // --- 4. Click Gesture Logic (Thumb + Index finger pinch) ---
+    if (clickDistance < clickThreshold) {
       if (!isClickGestureRef.current) {
-        isClickGestureRef.current = true;
+        isClickGestureRef.current = true; // Prevent multiple clicks for one pinch
         performClick(smoothedCursorPos.current.x, smoothedCursorPos.current.y);
+        
+        // Visual feedback for click
         if(cursorRef.current) {
-            cursorRef.current.style.transform += ' scale(0.8)';
+            cursorRef.current.style.transform += ' scale(0.7)';
             setTimeout(() => {
                 if(cursorRef.current) {
-                     cursorRef.current.style.transform = cursorRef.current.style.transform.replace(' scale(0.8)', '');
+                     cursorRef.current.style.transform = cursorRef.current.style.transform.replace(' scale(0.7)', '');
                 }
-            }, 100);
+            }, 150);
         }
       }
     } else {
-      isClickGestureRef.current = false;
-    }
-    
-    // --- 4. Scroll Gesture Logic (Index, Middle, and Ring fingers together) ---
-    const scrollThreshold = 0.05; 
-    if (indexMiddleDistance < scrollThreshold && middleRingDistance < scrollThreshold) {
-        if (!isScrollGestureRef.current) {
-            // First time detecting the scroll gesture, record the starting Y position.
-            isScrollGestureRef.current = true;
-            lastScrollYRef.current = smoothedCursorPos.current.y;
-            if (cursorRef.current) cursorRef.current.style.borderWidth = '5px'; // Visual feedback for scroll
-        } else {
-            // Gesture is active, calculate scroll amount.
-            const deltaY = smoothedCursorPos.current.y - lastScrollYRef.current;
-            window.scrollBy(0, deltaY * 1.5); // Multiplier for faster scrolling
-            lastScrollYRef.current = smoothedCursorPos.current.y;
-        }
-    } else {
-        if (isScrollGestureRef.current) {
-           // Gesture ended
-           isScrollGestureRef.current = false;
-           if (cursorRef.current) cursorRef.current.style.borderWidth = '2px';
-        }
+      isClickGestureRef.current = false; // Reset click ref when fingers are apart
     }
   };
 
@@ -224,14 +215,13 @@ export const GestureController = () => {
     }
   };
 
-
   // --- RENDER ---
   return (
     <>
       {/* The custom cursor element */}
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 w-6 h-6 rounded-full bg-primary/70 border-2 border-primary-foreground shadow-lg pointer-events-none z-[9999] transition-transform duration-100 ease-out"
+        className="fixed top-0 left-0 w-6 h-6 rounded-full bg-primary/70 border-2 border-primary-foreground shadow-lg pointer-events-none z-[9999] transition-all duration-100 ease-out"
       />
       
       {/* The video element is hidden but required for processing */}
