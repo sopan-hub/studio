@@ -155,6 +155,7 @@ export const GestureController = () => {
         
         // --- 1. Cursor Movement (Always active) ---
         if (cursorRef.current) {
+            // Invert the x-coordinate to match screen direction
             const cursorX = window.innerWidth - (indexTip.x * window.innerWidth);
             const cursorY = indexTip.y * window.innerHeight;
             cursorRef.current.style.left = `${cursorX}px`;
@@ -285,5 +286,3 @@ export const GestureController = () => {
         transform: 'scaleX(-1)' // Mirror the video feed
     }} />;
 };
-
-    
