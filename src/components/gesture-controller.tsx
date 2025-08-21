@@ -90,9 +90,10 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
   const isClickGestureRef = useRef(false);
   const lastScrollY = useRef<number | null>(null);
   
-  // Smoothing state for cursor
+  // Smoothing state for cursor and scroll
   const smoothedCursorPos = useRef({ x: 0, y: 0 });
   const [sensitivity, setSensitivity] = useState(1.5); // 0.5 to 2.5
+  const scrollVelocity = useRef(0);
 
   // --- INITIALIZATION ---
   useEffect(() => {
@@ -141,6 +142,16 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
     videoRef.current.play().catch(e => console.error("Video play failed:", e));
     detectHands();
   };
+
+  const smoothScroll = () => {
+    if (Math.abs(scrollVelocity.current) > 0.1) {
+      window.scrollBy(0, scrollVelocity.current);
+      scrollVelocity.current *= 0.95; // Apply friction
+      requestAnimationFrame(smoothScroll);
+    } else {
+      scrollVelocity.current = 0;
+    }
+  }
 
   const detectHands = () => {
     const video = videoRef.current;
@@ -196,20 +207,21 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
       cursorRef.current.style.backgroundColor = 'hsl(var(--ring))';
       const currentY = (indexFingertip.y + middleFingertip.y) / 2;
 
-      // If this is the first frame of the gesture, record the current position.
       if (lastScrollY.current === null) {
           lastScrollY.current = currentY;
       }
       
-      // Calculate the change in Y position since the last frame.
-      const deltaY = (currentY - lastScrollY.current) * window.innerHeight;
+      const deltaY = (currentY - lastScrollY.current) * 40; // Multiplier for scroll speed
       
-      // Scroll the window by the delta, adjusted for sensitivity.
-      window.scrollBy(0, deltaY * sensitivity * 1.5);
+      // Add to velocity instead of directly scrolling
+      scrollVelocity.current += deltaY;
       
-      // Update the last scroll position for the next frame.
+      if(Math.abs(scrollVelocity.current) > 1) {
+        requestAnimationFrame(smoothScroll);
+      }
+      
       lastScrollY.current = currentY;
-
+      isClickGestureRef.current = false;
     } 
     // --- 4. Click Gesture Logic ---
     else if (clickDistance < clickThreshold) {
@@ -270,3 +282,5 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
     </>
   );
 };
+
+    
