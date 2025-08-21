@@ -69,7 +69,9 @@ export const GestureController = () => {
 
         return () => {
             if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
-            videoRef.current?.srcObject && (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+            if (videoRef.current?.srcObject) {
+                (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+            }
             if (cursorRef.current && document.body.contains(cursorRef.current)) {
                 document.body.removeChild(cursorRef.current);
             }
@@ -186,7 +188,7 @@ export const GestureController = () => {
             scrollCounterRef.current = 0;
             updateCursorAppearance('clicking');
             if (clickCounterRef.current >= CLICK_THRESHOLD_FRAMES) {
-                performClick(indexTip.x, indexTip.y);
+                performClick();
                 resetGestureState(); // Reset after a successful click
             }
         } else if (isScrollGesture) {
@@ -247,14 +249,15 @@ export const GestureController = () => {
     
     // --- Action Functions ---
 
-    const performClick = (x: number, y: number) => {
+    const performClick = () => {
         if (!cursorRef.current) return;
         
-        cursorRef.current.style.display = 'none';
-        const clickX = window.innerWidth - (x * window.innerWidth);
-        const clickY = y * window.innerHeight;
+        const cursor = cursorRef.current;
+        cursor.style.display = 'none'; // Hide cursor to not interfere with elementFromPoint
+        const clickX = parseFloat(cursor.style.left);
+        const clickY = parseFloat(cursor.style.top);
         const element = document.elementFromPoint(clickX, clickY);
-        cursorRef.current.style.display = 'block';
+        cursor.style.display = 'block'; // Show it again
 
         if (element instanceof HTMLElement) {
             element.click();
@@ -282,7 +285,18 @@ export const GestureController = () => {
 
     // The video element is only for processing, not for display
     return <video ref={videoRef} autoPlay playsInline muted style={{ 
-        display: 'none',
-        transform: 'scaleX(-1)' // Mirror the video feed
+        position: 'fixed',
+        top: 10,
+        right: 10,
+        width: '120px',
+        height: '90px',
+        border: '2px solid #00FFFF',
+        borderRadius: '8px',
+        boxShadow: '0 0 10px #00FFFF',
+        zIndex: 10000,
+        transform: 'scaleX(-1)', // Mirror the video feed
+        display: 'none' // Set to 'block' for debugging
     }} />;
 };
+
+    
