@@ -67,7 +67,7 @@ const GestureInstructionPanel = ({ sensitivity, setSensitivity, onClose }: { sen
             <Slider
                 id="sensitivity-slider"
                 min={0.5}
-                max={1.5}
+                max={2.5}
                 step={0.1}
                 value={[sensitivity]}
                 onValueChange={(value) => setSensitivity(value[0])}
@@ -88,12 +88,11 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
 
   // State for gesture detection
   const isClickGestureRef = useRef(false);
-  const scrollStartYRef = useRef<number | null>(null);
-  const scrollVelocityRef = useRef(0);
+  const lastScrollY = useRef<number | null>(null);
   
   // Smoothing state for cursor
   const smoothedCursorPos = useRef({ x: 0, y: 0 });
-  const [sensitivity, setSensitivity] = useState(1); // 0.5 to 1.5
+  const [sensitivity, setSensitivity] = useState(1.5); // 0.5 to 2.5
 
   // --- INITIALIZATION ---
   useEffect(() => {
@@ -144,11 +143,6 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
   };
 
   const detectHands = () => {
-    // Perform continuous scroll if velocity is not 0
-    if (scrollVelocityRef.current !== 0) {
-        window.scrollBy(0, scrollVelocityRef.current * sensitivity);
-    }
-
     const video = videoRef.current;
     const landmarker = handLandmarkerRef.current;
 
@@ -160,8 +154,7 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
         processLandmarks(results.landmarks[0]);
       } else {
         // Reset gesture states if no hand is detected
-        scrollStartYRef.current = null;
-        scrollVelocityRef.current = 0;
+        lastScrollY.current = null;
         if (cursorRef.current) cursorRef.current.style.backgroundColor = 'hsl(var(--primary) / 0.7)';
       }
     }
@@ -177,9 +170,14 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
     const targetX = window.innerWidth * (1 - indexFingertip.x);
     const targetY = window.innerHeight * indexFingertip.y;
     
+    // Apply sensitivity and smoothing to cursor movement.
     const smoothingFactor = 0.3; // Make cursor smoother
-    smoothedCursorPos.current.x += (targetX - smoothedCursorPos.current.x) * smoothingFactor;
-    smoothedCursorPos.current.y += (targetY - smoothedCursorPos.current.y) * smoothingFactor;
+    const dx = (targetX - smoothedCursorPos.current.x) * smoothingFactor * sensitivity;
+    const dy = (targetY - smoothedCursorPos.current.y) * smoothingFactor * sensitivity;
+    
+    smoothedCursorPos.current.x += dx;
+    smoothedCursorPos.current.y += dy;
+
 
     cursorRef.current.style.transform = `translate(calc(${smoothedCursorPos.current.x}px - 50%), calc(${smoothedCursorPos.current.y}px - 50%))`;
 
@@ -192,35 +190,30 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
     const scrollGestureActive = Math.hypot(indexFingertip.x - middleFingertip.x, indexFingertip.y - middleFingertip.y) < 0.07;
     
     const clickThreshold = 0.04;
-    const scrollDeadzone = 0.05; // Vertical distance from start before scroll begins
 
     // --- 3. Scroll Gesture Logic ---
     if (scrollGestureActive) {
       cursorRef.current.style.backgroundColor = 'hsl(var(--ring))';
       const currentY = (indexFingertip.y + middleFingertip.y) / 2;
 
-      // If this is the first frame of the gesture, set the starting Y
-      if (scrollStartYRef.current === null) {
-          scrollStartYRef.current = currentY;
+      // If this is the first frame of the gesture, record the current position.
+      if (lastScrollY.current === null) {
+          lastScrollY.current = currentY;
       }
       
-      const deltaY = currentY - scrollStartYRef.current;
+      // Calculate the change in Y position since the last frame.
+      const deltaY = (currentY - lastScrollY.current) * window.innerHeight;
       
-      // Check if hand has moved out of the deadzone
-      if (Math.abs(deltaY) > scrollDeadzone) {
-          // Set velocity proportional to the distance from the start point
-          scrollVelocityRef.current = deltaY * 20; // Multiplier adjusts scroll speed
-      } else {
-          // If inside the deadzone, stop scrolling
-          scrollVelocityRef.current = 0;
-      }
+      // Scroll the window by the delta, adjusted for sensitivity.
+      window.scrollBy(0, deltaY * sensitivity * 1.5);
+      
+      // Update the last scroll position for the next frame.
+      lastScrollY.current = currentY;
 
     } 
     // --- 4. Click Gesture Logic ---
     else if (clickDistance < clickThreshold) {
-      // Stop scrolling if a click gesture is made
-      scrollStartYRef.current = null; 
-      scrollVelocityRef.current = 0;
+      lastScrollY.current = null; // Stop scrolling if a click gesture is made
       cursorRef.current.style.backgroundColor = 'hsl(var(--destructive))';
 
       if (!isClickGestureRef.current) {
@@ -238,8 +231,7 @@ export const GestureController = ({ showInstructions, setShowInstructions }: { s
     } else {
       // Reset states if no gesture is active
       isClickGestureRef.current = false;
-      scrollStartYRef.current = null;
-      scrollVelocityRef.current = 0;
+      lastScrollY.current = null;
       cursorRef.current.style.backgroundColor = 'hsl(var(--primary) / 0.7)';
     }
   };
