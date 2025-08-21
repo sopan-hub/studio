@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
-import { Search, BrainCircuit, Bot, FileText, ListChecks, UserCircle, LogOut, BookOpen, MessageSquare, Microscope, FlaskConical, Target, Github, Instagram, Mail, HelpCircle, Columns, Sigma, Code, Languages, Hand } from 'lucide-react';
+import { Search, BrainCircuit, Bot, FileText, ListChecks, UserCircle, LogOut, BookOpen, MessageSquare, Microscope, FlaskConical, Target, Github, Instagram, Mail, HelpCircle, Columns, Sigma, Code, Languages } from 'lucide-react';
 import { AiChatTool } from '@/components/ai-chat-tool';
 import { AiSummarizerTool } from '@/components/ai-summarizer-tool';
 import { AiQuizTool } from '@/components/ai-quiz-tool';
@@ -25,9 +25,6 @@ import { AiConceptExplainerTool } from '@/components/ai-concept-explainer-tool';
 import { AiMathSolverTool } from '@/components/ai-math-solver-tool';
 import { AiCodeExplainerTool } from '@/components/ai-code-explainer-tool';
 import { AiTranslatorTool } from '@/components/ai-translator-tool';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { GestureController } from '@/components/gesture-controller';
 
 
 type Tool = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator';
@@ -100,7 +97,6 @@ export default function Dashboard() {
   const [globalSearch, setGlobalSearch] = useState("");
   const { user, signOut } = useAuth();
   const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [isGestureControlEnabled, setGestureControlEnabled] = useState(false);
 
 
   const handleToolSelect = (tool: Tool) => {
@@ -189,7 +185,6 @@ export default function Dashboard() {
   return (
     <>
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setLoginDialogOpen} />
-      {isGestureControlEnabled && <GestureController />}
       <div id="app-container" className="flex flex-col min-h-screen bg-background text-foreground font-body">
           
           <header className="p-4 border-b border-primary/20 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-50">
@@ -198,11 +193,6 @@ export default function Dashboard() {
                   <h1 className="text-xl font-bold text-foreground">Study Buddy AI</h1>
               </div>
               <div className='flex items-center gap-4'>
-                 <div className="flex items-center space-x-2">
-                    <Hand className="text-primary" />
-                    <Switch id="gesture-mode" checked={isGestureControlEnabled} onCheckedChange={setGestureControlEnabled} />
-                    <Label htmlFor="gesture-mode">Gesture Control</Label>
-                </div>
                 <nav aria-label="User account">
                     {user ? (
                         <DropdownMenu>
@@ -267,5 +257,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-    
