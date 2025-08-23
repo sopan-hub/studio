@@ -25,9 +25,6 @@ import { AiConceptExplainerTool } from '@/components/ai-concept-explainer-tool';
 import { AiMathSolverTool } from '@/components/ai-math-solver-tool';
 import { AiCodeExplainerTool } from '@/components/ai-code-explainer-tool';
 import { AiTranslatorTool } from '@/components/ai-translator-tool';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { GestureController } from '@/components/gesture-controller';
 
 
 type Tool = 'chat' | 'summarizer' | 'quiz' | 'explainer' | 'flashcards' | 'math' | 'code' | 'translator';
@@ -100,8 +97,6 @@ export default function Dashboard() {
   const [globalSearch, setGlobalSearch] = useState("");
   const { user, signOut } = useAuth();
   const [isLoginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [isGestureControlOn, setGestureControlOn] = useState(false);
-  const [showGestureInstructions, setShowGestureInstructions] = useState(false);
 
 
   const handleToolSelect = (tool: Tool) => {
@@ -190,7 +185,6 @@ export default function Dashboard() {
   return (
     <>
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setLoginDialogOpen} />
-      {isGestureControlOn && <GestureController showInstructions={showGestureInstructions} setShowInstructions={setShowGestureInstructions} />}
       <div id="app-container" className="flex flex-col min-h-screen bg-background text-foreground font-body">
           
           <header className="p-4 border-b border-primary/20 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-sm z-50">
@@ -199,19 +193,6 @@ export default function Dashboard() {
                   <h1 className="text-xl font-bold text-foreground">Study Buddy AI</h1>
               </div>
               <div className='flex items-center gap-4'>
-                 <div className="flex items-center space-x-2">
-                  <Switch id="gesture-mode" checked={isGestureControlOn} onCheckedChange={setGestureControlOn} aria-label="Toggle gesture control"/>
-                  <Label htmlFor="gesture-mode" className="flex items-center gap-2 text-sm cursor-pointer">
-                    <Hand className="h-4 w-4"/>
-                    Gesture Control
-                  </Label>
-                </div>
-                 {isGestureControlOn && (
-                    <Button variant="outline" size="sm" onClick={() => setShowGestureInstructions(prev => !prev)}>
-                        <Info className="mr-2 h-4 w-4" />
-                        Instructions
-                    </Button>
-                )}
                 <nav aria-label="User account">
                     {user ? (
                         <DropdownMenu>
