@@ -12,8 +12,6 @@ const LANDMARK = {
   THUMB_TIP: 4,
   INDEX_FINGER_TIP: 8,
   MIDDLE_FINGER_TIP: 12,
-  RING_FINGER_TIP: 16,
-  PINKY_TIP: 20,
 };
 
 class GestureController {
@@ -31,7 +29,7 @@ class GestureController {
 
         // Gesture state
         this.isClicking = false;
-        this.scrollMode = false;
+        this.isScrollMode = false;
         this.scrollVelocity = 0;
         this.scrollNeutralY = 0;
         
@@ -44,6 +42,7 @@ class GestureController {
 
     async initialize() {
         if (this.isEnabled) return;
+        this.isEnabled = true;
         console.log("Initializing Gesture Controller...");
         this.createUI();
 
@@ -64,7 +63,6 @@ class GestureController {
             await this.setupWebcam();
             this.startDetectionLoop();
             this.showToast("Gesture Control Active!");
-            this.isEnabled = true;
         } catch (error) {
             console.error("Initialization failed:", error);
             this.showToast("Error: Could not start gesture control.", true);
@@ -74,15 +72,12 @@ class GestureController {
 
     async setupWebcam() {
         this.video = document.createElement('video');
-        // The video element is hidden from view; it's only used for processing.
-        this.video.style.cssText = 'position: absolute; top: -9999px; left: -9999px;';
+        this.video.style.cssText = 'position: absolute; top: -9999px; left: -9999px; transform: scaleX(-1);';
         document.body.appendChild(this.video);
 
-        // Get user's webcam stream.
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         this.video.srcObject = stream;
         
-        // Wait for the video to be ready before starting detection.
         return new Promise((resolve) => {
             this.video.onloadeddata = () => {
                 this.video.play();
@@ -92,12 +87,10 @@ class GestureController {
     }
     
     createUI() {
-        // Create the on-screen cursor element.
         this.cursor = document.createElement('div');
         this.cursor.id = 'gesture-cursor';
         document.body.appendChild(this.cursor);
 
-        // Create the instructions and settings panel.
         this.panel = document.createElement('div');
         this.panel.id = 'gesture-panel';
         this.panel.innerHTML = `
@@ -106,9 +99,9 @@ class GestureController {
             <button id="close-gesture-panel">&times;</button>
           </div>
           <div class="panel-content">
-            <p><b>Move Cursor:</b> Extend index finger.</p>
-            <p><b>Click:</b> Pinch thumb and index finger.</p>
-            <p><b>Scroll:</b> Extend index & middle finger, move up/down.</p>
+            <p><b>Move Cursor:</b> Single index finger.</p>
+            <p><b>Click:</b> Pinch thumb & index finger.</p>
+            <p><b>Scroll:</b> Index & middle finger up/down.</p>
           </div>
           <div class="panel-footer">
             <label for="sensitivity-slider">Sensitivity</label>
@@ -117,27 +110,22 @@ class GestureController {
         `;
         document.body.appendChild(this.panel);
 
-        // Add event listeners to the panel controls.
         document.getElementById('close-gesture-panel').onclick = () => this.panel.classList.add('hidden');
         document.getElementById('sensitivity-slider').oninput = (e) => this.sensitivity = parseFloat(e.target.value);
     }
     
     destroy() {
         console.log("Destroying Gesture Controller...");
+        this.isEnabled = false;
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         
-        // Stop webcam tracks and remove video element.
         if (this.video && this.video.srcObject) {
             this.video.srcObject.getTracks().forEach(track => track.stop());
         }
         if (this.video) this.video.remove();
-        
-        // Remove UI elements.
         if (this.cursor) this.cursor.remove();
         if (this.panel) this.panel.remove();
         
-        this.isEnabled = false;
-        // Make the controller instance available for garbage collection.
         window.gestureController = null; 
         this.showToast("Gesture Control Deactivated.");
     }
@@ -145,65 +133,54 @@ class GestureController {
     // --- DETECTION & PROCESSING LOOP ---
 
     startDetectionLoop() {
-        // Main loop for detecting hands and processing gestures.
-        const detect = () => {
+        const detectionLoop = () => {
             if (!this.isEnabled) return;
-            // Process the video frame if it's ready.
-            if (this.video.readyState >= 3 && this.video.currentTime !== this.lastVideoTime) {
+            
+            if (this.video && this.video.readyState >= 3 && this.video.currentTime !== this.lastVideoTime) {
                 this.lastVideoTime = this.video.currentTime;
                 const results = this.handLandmarker.detectForVideo(this.video, Date.now());
                 if (results.landmarks && results.landmarks.length > 0) {
                     this.processLandmarks(results.landmarks[0]);
                 } else {
-                    this.resetGestureState(); // Reset if no hand is detected
+                    this.resetGestureState();
                 }
             }
-            this.animationFrameId = requestAnimationFrame(detect);
-        };
-        detect();
-
-        // Separate loop for smooth scrolling animation.
-        const scrollLoop = () => {
-             if (!this.isEnabled) return;
-            if (this.scrollVelocity !== 0) {
+            
+            if(this.scrollVelocity !== 0) {
                 window.scrollBy(0, this.scrollVelocity);
             }
-            requestAnimationFrame(scrollLoop);
+
+            this.animationFrameId = requestAnimationFrame(detectionLoop);
         };
-        requestAnimationFrame(scrollLoop);
+        detectionLoop();
     }
 
     processLandmarks(landmarks) {
-        // --- 1. Cursor Movement ---
         const indexFingertip = landmarks[LANDMARK.INDEX_FINGER_TIP];
-        // Invert the X-axis so the cursor mirrors hand movement.
         const targetX = window.innerWidth * (1 - indexFingertip.x);
         const targetY = window.innerHeight * indexFingertip.y;
         
-        // Apply exponential smoothing for fluid cursor movement.
         const smoothingFactor = 0.2;
-        this.smoothedCursorPos.x += (targetX - this.smoothedCursorPos.x) * smoothingFactor * this.sensitivity;
-        this.smoothedCursorPos.y += (targetY - this.smoothedCursorPos.y) * smoothingFactor * this.sensitivity;
+        this.smoothedCursorPos.x += (targetX - this.smoothedCursorPos.x) * smoothingFactor;
+        this.smoothedCursorPos.y += (targetY - this.smoothedCursorPos.y) * smoothingFactor;
         this.cursor.style.transform = `translate(${this.smoothedCursorPos.x}px, ${this.smoothedCursorPos.y}px)`;
 
-        // --- 2. Gesture Detection ---
         const thumbTip = landmarks[LANDMARK.THUMB_TIP];
         const middleFingertip = landmarks[LANDMARK.MIDDLE_FINGER_TIP];
 
-        // Calculate distances between key landmarks.
         const clickDistance = Math.hypot(indexFingertip.x - thumbTip.x, indexFingertip.y - thumbTip.y);
         const scrollGestureActive = Math.hypot(indexFingertip.x - middleFingertip.x, indexFingertip.y - middleFingertip.y) < 0.07;
         
-        const CLICK_THRESHOLD = 0.04;
-
-        // --- 3. Handle Gestures (Scroll takes priority) ---
         if (scrollGestureActive) {
             this.handleContinuousScroll(indexFingertip);
+            if (this.isClicking) {
+                this.isClicking = false;
+                this.cursor.classList.remove('clicking');
+            }
         } else {
             this.handlePinchClick(clickDistance);
-            // Reset scroll state if gesture is no longer active
-            if(this.scrollMode) {
-                this.scrollMode = false;
+            if(this.isScrollMode) {
+                this.isScrollMode = false;
                 this.scrollVelocity = 0;
                 this.cursor.classList.remove('scrolling');
             }
@@ -214,15 +191,12 @@ class GestureController {
 
     handlePinchClick(distance) {
         const CLICK_THRESHOLD = 0.04;
-        this.scrollVelocity = 0;
-        this.cursor.classList.remove('scrolling');
         
         if (distance < CLICK_THRESHOLD) {
             if (!this.isClicking) {
                 this.isClicking = true;
                 this.cursor.classList.add('clicking');
                 
-                // Hide cursor momentarily to click the element directly underneath.
                 this.cursor.style.display = 'none';
                 const element = document.elementFromPoint(this.smoothedCursorPos.x, this.smoothedCursorPos.y);
                 this.cursor.style.display = '';
@@ -240,45 +214,38 @@ class GestureController {
     }
   
     handleContinuousScroll(indexTip) {
-        this.isClicking = false;
-        this.cursor.classList.remove('clicking');
         this.cursor.classList.add('scrolling');
         
-        if (!this.scrollMode) {
-            this.scrollMode = true;
-            this.scrollNeutralY = indexTip.y; // Set the neutral Y position on gesture start
+        if (!this.isScrollMode) {
+            this.isScrollMode = true;
+            this.scrollNeutralY = indexTip.y;
         } else {
             const deltaY = indexTip.y - this.scrollNeutralY;
             const SCROLL_DEAD_ZONE = 0.03; 
-            const MAX_VELOCITY = 15;
+            const MAX_VELOCITY = 20;
             
             if (Math.abs(deltaY) > SCROLL_DEAD_ZONE) {
                 const speed = (Math.abs(deltaY) - SCROLL_DEAD_ZONE) * 150 * this.sensitivity;
                 this.scrollVelocity = Math.sign(deltaY) * Math.min(speed, MAX_VELOCITY);
             } else {
-                this.scrollVelocity = 0; // Stop scrolling if hand is in the neutral zone.
+                this.scrollVelocity = 0;
             }
         }
     }
   
     resetGestureState() {
-        // Reset clicking state.
         if (this.isClicking) {
             this.isClicking = false;
             this.cursor.classList.remove('clicking');
         }
-        // Reset scrolling state.
-        if (this.scrollMode) {
-            this.scrollMode = false;
+        if (this.isScrollMode) {
+            this.isScrollMode = false;
             this.scrollVelocity = 0;
             this.cursor.classList.remove('scrolling');
         }
     }
 
-    // --- UTILITIES ---
-
     showToast(message, isError = false) {
-        // Remove any existing toast to prevent duplicates.
         let toast = document.querySelector('.gesture-toast');
         if (toast) toast.remove();
         
@@ -287,12 +254,10 @@ class GestureController {
         toast.textContent = message;
         document.body.appendChild(toast);
         
-        // Animate the toast in and out.
         setTimeout(() => {
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
-                // Remove the element from the DOM after the fade-out animation.
                 setTimeout(() => document.body.removeChild(toast), 500);
             }, 3000);
         }, 100);
@@ -302,23 +267,21 @@ class GestureController {
 // --- GLOBAL INSTANCE MANAGEMENT ---
 
 function handleToggle() {
-    // If no controller exists, create one and initialize it.
     if (!window.gestureController) {
         window.gestureController = new GestureController();
         window.gestureController.initialize();
     } else {
-        // If one exists, destroy it.
         window.gestureController.destroy();
-        window.gestureController = null;
     }
 }
 
-// Listen for the message from the content script to toggle the controller on/off.
 window.addEventListener("message", (event) => {
     if (event.source === window && event.data.type === "TOGGLE_GESTURE_CONTROL") {
         handleToggle();
     }
 });
 
-// Automatically start the controller the first time this script is injected.
-handleToggle();
+// Automatically start the first time.
+if (!window.gestureController) {
+    handleToggle();
+}

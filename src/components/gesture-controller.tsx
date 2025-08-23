@@ -70,7 +70,7 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
     // Setup webcam stream
     const setupWebcam = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.addEventListener('loadeddata', startDetection);
@@ -83,9 +83,10 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
     
     // Start the detection loop
     const startDetection = () => {
-      if (videoRef.current) {
-        videoRef.current.play();
-        if (animationFrameIdRef.current) cancelAnimationFrame(animationFrameIdRef.current);
+      if (videoRef.current && videoRef.current.readyState >= 3) {
+         if (animationFrameIdRef.current) {
+            cancelAnimationFrame(animationFrameIdRef.current);
+        }
         animationFrameIdRef.current = requestAnimationFrame(detectionLoop);
       }
     };
@@ -103,42 +104,39 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
       if (videoRef.current && videoRef.current.srcObject) {
         (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
       }
-      if (handLandmarkerRef.current) {
-        handLandmarkerRef.current.close();
-      }
     };
-  }, [toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // --- 2. DETECTION & ANIMATION LOOP ---
-  const detectionLoop = () => {
-    if (!videoRef.current || !handLandmarkerRef.current) return;
+  const detectionLoop = async () => {
+    if (!videoRef.current || !handLandmarkerRef.current || !videoRef.current.srcObject) {
+        animationFrameIdRef.current = requestAnimationFrame(detectionLoop);
+        return;
+    };
 
     const video = videoRef.current;
     if (video.currentTime !== lastVideoTimeRef.current) {
+      lastVideoTimeRef.current = video.currentTime;
       const results = handLandmarkerRef.current.detectForVideo(video, Date.now());
       if (results.landmarks && results.landmarks.length > 0) {
         processLandmarks(results.landmarks[0]);
       } else {
-        setIsClicking(false);
-        setScrollVelocity(0);
-        setIsScrollMode(false);
+        // No hand detected, reset gesture states
+        if (isScrollMode) setIsScrollMode(false);
+        if (scrollVelocity !== 0) setScrollVelocity(0);
+        if (isClicking) setIsClicking(false);
       }
-      lastVideoTimeRef.current = video.currentTime;
     }
+    
+    // Continuous scroll animation
+    if(scrollVelocity !== 0) {
+        window.scrollBy(0, scrollVelocity);
+    }
+
     animationFrameIdRef.current = requestAnimationFrame(detectionLoop);
   };
 
-  const scrollAnimationLoop = useRef(() => {
-    if (scrollVelocity !== 0) {
-        window.scrollBy(0, scrollVelocity);
-    }
-    requestAnimationFrame(scrollAnimationLoop.current);
-  });
-
-  useEffect(() => {
-      const id = requestAnimationFrame(scrollAnimationLoop.current);
-      return () => cancelAnimationFrame(id);
-  }, [scrollVelocity]);
 
   // --- 3. GESTURE PROCESSING ---
   const processLandmarks = (landmarks: any[]) => {
@@ -154,27 +152,28 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
     const targetX = window.innerWidth - (indexTip.x * window.innerWidth); // Invert X-axis
     const targetY = indexTip.y * window.innerHeight;
     const smoothingFactor = 0.2;
-    smoothedCursorPosRef.current.x += (targetX - smoothedCursorPosRef.current.x) * smoothingFactor * sensitivity;
-    smoothedCursorPosRef.current.y += (targetY - smoothedCursorPosRef.current.y) * smoothingFactor * sensitivity;
+    smoothedCursorPosRef.current.x += (targetX - smoothedCursorPosRef.current.x) * smoothingFactor;
+    smoothedCursorPosRef.current.y += (targetY - smoothedCursorPosRef.current.y) * smoothingFactor;
     cursorRef.current.style.transform = `translate(${smoothedCursorPosRef.current.x}px, ${smoothedCursorPosRef.current.y}px)`;
 
     // --- Gesture Detection ---
     const clickDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-    const scrollGestureActive = Math.hypot(indexTip.x - middleTip.x, indexTip.y - middleTip.y) < 0.07; // Index and middle are close
+    const scrollGestureActive = Math.hypot(indexTip.x - middleTip.x, indexTip.y - middleTip.y) < 0.07; 
 
-    // Scroll takes priority
+    // Scroll takes priority over click
     if (scrollGestureActive) {
       handleScroll(indexTip);
+      // Ensure click state is reset if scroll is active
+      if (isClicking) {
+        setIsClicking(false);
+        cursorRef.current.classList.remove('clicking');
+      }
     } else {
       handlePinchClick(clickDistance);
       // Reset scroll state when not in scroll gesture
-      if (isScrollMode) {
-          setIsScrollMode(false);
-          setScrollVelocity(0);
-          if (cursorRef.current) {
-            cursorRef.current.classList.remove('scrolling');
-          }
-      }
+      if (isScrollMode) setIsScrollMode(false);
+      if (scrollVelocity !== 0) setScrollVelocity(0);
+      cursorRef.current.classList.remove('scrolling');
     }
   };
 
@@ -183,29 +182,20 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
   // Handle pinch gesture for clicking
   const handlePinchClick = (distance: number) => {
     const CLICK_THRESHOLD = 0.04;
-    setScrollVelocity(0);
-     if (cursorRef.current) {
-       cursorRef.current.classList.remove('scrolling');
-     }
     
     if (distance < CLICK_THRESHOLD) {
       if (!isClicking) {
         setIsClicking(true);
         if (cursorRef.current) {
           cursorRef.current.classList.add('clicking');
-        }
-        
-        // Hide cursor, get element, then click
-        if (cursorRef.current) {
-            cursorRef.current.style.display = 'none';
-        }
-        const elem = document.elementFromPoint(smoothedCursorPosRef.current.x, smoothedCursorPosRef.current.y);
-         if (cursorRef.current) {
-           cursorRef.current.style.display = '';
-         }
+          // Hide cursor, get element, then click
+          cursorRef.current.style.display = 'none';
+          const elem = document.elementFromPoint(smoothedCursorPosRef.current.x, smoothedCursorPosRef.current.y);
+          cursorRef.current.style.display = '';
 
-        if (elem) {
-          (elem as HTMLElement).click();
+          if (elem) {
+            (elem as HTMLElement).click();
+          }
         }
       }
     } else {
@@ -220,9 +210,7 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
   
   // Handle two-finger gesture for continuous scrolling
   const handleScroll = (indexTip: { y: number }) => {
-    setIsClicking(false);
     if (cursorRef.current) {
-      cursorRef.current.classList.remove('clicking');
       cursorRef.current.classList.add('scrolling');
     }
 
@@ -231,8 +219,8 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
       setScrollNeutralY(indexTip.y); // Set the neutral Y position on gesture start
     } else {
       const deltaY = indexTip.y - scrollNeutralY;
-      const SCROLL_DEAD_ZONE = 0.03; // A small dead zone to prevent accidental scrolling
-      const MAX_VELOCITY = 15;
+      const SCROLL_DEAD_ZONE = 0.03; 
+      const MAX_VELOCITY = 20;
 
       if (Math.abs(deltaY) > SCROLL_DEAD_ZONE) {
         const speed = (Math.abs(deltaY) - SCROLL_DEAD_ZONE) * 150 * sensitivity;
@@ -247,7 +235,7 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
   return (
     <>
       {/* Hidden video element for webcam feed */}
-      <video ref={videoRef} className="hidden" />
+      <video ref={videoRef} className="hidden" autoPlay playsInline />
 
       {/* Custom cursor that follows the hand */}
       <div ref={cursorRef} id="gesture-cursor" />
