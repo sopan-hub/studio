@@ -153,9 +153,9 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
     // Use exponential smoothing for fluid cursor motion
     const targetX = window.innerWidth - (indexTip.x * window.innerWidth); // Invert X-axis
     const targetY = indexTip.y * window.innerHeight;
-    const smoothingFactor = 0.2 * sensitivity;
-    smoothedCursorPosRef.current.x += (targetX - smoothedCursorPosRef.current.x) * smoothingFactor;
-    smoothedCursorPosRef.current.y += (targetY - smoothedCursorPosRef.current.y) * smoothingFactor;
+    const smoothingFactor = 0.2;
+    smoothedCursorPosRef.current.x += (targetX - smoothedCursorPosRef.current.x) * smoothingFactor * sensitivity;
+    smoothedCursorPosRef.current.y += (targetY - smoothedCursorPosRef.current.y) * smoothingFactor * sensitivity;
     cursorRef.current.style.transform = `translate(${smoothedCursorPosRef.current.x}px, ${smoothedCursorPosRef.current.y}px)`;
 
     // --- Gesture Detection ---
@@ -171,7 +171,9 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
       if (isScrollMode) {
           setIsScrollMode(false);
           setScrollVelocity(0);
-          cursorRef.current.classList.remove('scrolling');
+          if (cursorRef.current) {
+            cursorRef.current.classList.remove('scrolling');
+          }
       }
     }
   };
@@ -181,18 +183,26 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
   // Handle pinch gesture for clicking
   const handlePinchClick = (distance: number) => {
     const CLICK_THRESHOLD = 0.04;
-    cursorRef.current?.classList.remove('scrolling');
     setScrollVelocity(0);
+     if (cursorRef.current) {
+       cursorRef.current.classList.remove('scrolling');
+     }
     
     if (distance < CLICK_THRESHOLD) {
       if (!isClicking) {
         setIsClicking(true);
-        cursorRef.current?.classList.add('clicking');
+        if (cursorRef.current) {
+          cursorRef.current.classList.add('clicking');
+        }
         
         // Hide cursor, get element, then click
-        cursorRef.current!.style.display = 'none';
+        if (cursorRef.current) {
+            cursorRef.current.style.display = 'none';
+        }
         const elem = document.elementFromPoint(smoothedCursorPosRef.current.x, smoothedCursorPosRef.current.y);
-        cursorRef.current!.style.display = '';
+         if (cursorRef.current) {
+           cursorRef.current.style.display = '';
+         }
 
         if (elem) {
           (elem as HTMLElement).click();
@@ -201,7 +211,9 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
     } else {
       if (isClicking) {
         setIsClicking(false);
-        cursorRef.current?.classList.remove('clicking');
+        if (cursorRef.current) {
+          cursorRef.current.classList.remove('clicking');
+        }
       }
     }
   };
@@ -209,8 +221,10 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
   // Handle two-finger gesture for continuous scrolling
   const handleScroll = (indexTip: { y: number }) => {
     setIsClicking(false);
-    cursorRef.current?.classList.remove('clicking');
-    cursorRef.current?.classList.add('scrolling');
+    if (cursorRef.current) {
+      cursorRef.current.classList.remove('clicking');
+      cursorRef.current.classList.add('scrolling');
+    }
 
     if (!isScrollMode) {
       setIsScrollMode(true);
@@ -277,8 +291,8 @@ export const GestureController = ({ showInstructions, onCloseInstructions }: Ges
 const styles = `
   #gesture-cursor {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: -12px;
+    left: -12px;
     width: 24px;
     height: 24px;
     border-radius: 50%;
@@ -289,6 +303,7 @@ const styles = `
     z-index: 9999;
     transition: transform 0.1s ease-out, background-color 0.2s ease, width 0.2s ease, height 0.2s ease;
     transform-origin: center center;
+    will-change: transform;
   }
   #gesture-cursor.clicking {
     background-color: hsla(var(--destructive), 0.7);
@@ -296,7 +311,7 @@ const styles = `
     transition-duration: 0.1s;
   }
    #gesture-cursor.scrolling {
-    background-color: hsla(48, 90%, 50%, 0.7); /* Gold color for scrolling */
+    background-color: hsla(120, 60%, 50%, 0.7);
     width: 15px;
     height: 40px;
   }
@@ -304,10 +319,11 @@ const styles = `
 
 // Inject styles into the document head
 if (typeof window !== 'undefined') {
+  const existingStyle = document.getElementById('gesture-control-styles');
+  if (!existingStyle) {
     const styleSheet = document.createElement("style");
-    styleSheet.type = "text/css";
+    styleSheet.id = 'gesture-control-styles';
     styleSheet.innerText = styles;
     document.head.appendChild(styleSheet);
+  }
 }
-
-    

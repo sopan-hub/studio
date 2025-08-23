@@ -3,8 +3,8 @@
 /* Styles for the custom cursor that follows the user's finger. */
 #gesture-cursor {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: -12px; /* Offset to center on fingertip */
+  left: -12px; /* Offset to center on fingertip */
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -27,7 +27,7 @@
 
 /* Style for when a scroll gesture is active */
 #gesture-cursor.scrolling {
-  background-color: rgba(255, 165, 0, 0.8); /* Orange */
+  background-color: rgba(22, 163, 74, 0.8); /* Green */
   width: 15px; /* Becomes thinner */
   height: 40px; /* Becomes taller to indicate scrolling */
 }
@@ -51,6 +51,13 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#gesture-panel.hidden {
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
 }
 
 #gesture-panel .panel-header {

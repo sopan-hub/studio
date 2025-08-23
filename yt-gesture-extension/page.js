@@ -31,8 +31,9 @@ class GestureController {
 
         // Gesture state
         this.isClicking = false;
-        this.scrollMode = 'none'; // Can be 'up', 'down', or 'none'
+        this.scrollMode = false;
         this.scrollVelocity = 0;
+        this.scrollNeutralY = 0;
         
         // Smoothing and sensitivity
         this.smoothedCursorPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -117,7 +118,7 @@ class GestureController {
         document.body.appendChild(this.panel);
 
         // Add event listeners to the panel controls.
-        document.getElementById('close-gesture-panel').onclick = () => this.panel.style.display = 'none';
+        document.getElementById('close-gesture-panel').onclick = () => this.panel.classList.add('hidden');
         document.getElementById('sensitivity-slider').oninput = (e) => this.sensitivity = parseFloat(e.target.value);
     }
     
@@ -163,6 +164,7 @@ class GestureController {
 
         // Separate loop for smooth scrolling animation.
         const scrollLoop = () => {
+             if (!this.isEnabled) return;
             if (this.scrollVelocity !== 0) {
                 window.scrollBy(0, this.scrollVelocity);
             }
@@ -182,7 +184,7 @@ class GestureController {
         const smoothingFactor = 0.2;
         this.smoothedCursorPos.x += (targetX - this.smoothedCursorPos.x) * smoothingFactor * this.sensitivity;
         this.smoothedCursorPos.y += (targetY - this.smoothedCursorPos.y) * smoothingFactor * this.sensitivity;
-        this.cursor.style.transform = `translate(calc(${this.smoothedCursorPos.x}px - 50%), calc(${this.smoothedCursorPos.y}px - 50%))`;
+        this.cursor.style.transform = `translate(${this.smoothedCursorPos.x}px, ${this.smoothedCursorPos.y}px)`;
 
         // --- 2. Gesture Detection ---
         const thumbTip = landmarks[LANDMARK.THUMB_TIP];
@@ -196,57 +198,66 @@ class GestureController {
 
         // --- 3. Handle Gestures (Scroll takes priority) ---
         if (scrollGestureActive) {
-            this.handleContinuousScroll(landmarks);
-        } else if (clickDistance < CLICK_THRESHOLD) {
-            this.handlePinchClick();
+            this.handleContinuousScroll(indexFingertip);
         } else {
-            this.resetGestureState();
+            this.handlePinchClick(clickDistance);
+            // Reset scroll state if gesture is no longer active
+            if(this.scrollMode) {
+                this.scrollMode = false;
+                this.scrollVelocity = 0;
+                this.cursor.classList.remove('scrolling');
+            }
         }
     }
 
     // --- GESTURE ACTIONS ---
 
-    handlePinchClick() {
-        this.scrollVelocity = 0; // Stop any scrolling
+    handlePinchClick(distance) {
+        const CLICK_THRESHOLD = 0.04;
+        this.scrollVelocity = 0;
         this.cursor.classList.remove('scrolling');
         
-        if (!this.isClicking) {
-            this.isClicking = true;
-            this.cursor.classList.add('clicking');
-            
-            // Hide cursor momentarily to click the element directly underneath.
-            this.cursor.style.display = 'none';
-            const element = document.elementFromPoint(this.smoothedCursorPos.x, this.smoothedCursorPos.y);
-            this.cursor.style.display = '';
+        if (distance < CLICK_THRESHOLD) {
+            if (!this.isClicking) {
+                this.isClicking = true;
+                this.cursor.classList.add('clicking');
+                
+                // Hide cursor momentarily to click the element directly underneath.
+                this.cursor.style.display = 'none';
+                const element = document.elementFromPoint(this.smoothedCursorPos.x, this.smoothedCursorPos.y);
+                this.cursor.style.display = '';
 
-            if (element) {
-                element.click();
+                if (element) {
+                    (element).click();
+                }
+            }
+        } else {
+             if (this.isClicking) {
+                this.isClicking = false;
+                this.cursor.classList.remove('clicking');
             }
         }
     }
   
-    handleContinuousScroll(landmarks) {
-        this.isClicking = false; // A scroll gesture cannot also be a click.
+    handleContinuousScroll(indexTip) {
+        this.isClicking = false;
         this.cursor.classList.remove('clicking');
         this.cursor.classList.add('scrolling');
         
-        // Use the midpoint between index and middle finger for stability.
-        const currentY = (landmarks[LANDMARK.INDEX_FINGER_TIP].y + landmarks[LANDMARK.MIDDLE_FINGER_TIP].y) / 2;
-        
-        // Establish a neutral vertical zone on first detection.
-        if (this.scrollNeutralY === undefined) {
-            this.scrollNeutralY = currentY;
-        }
-        
-        const deltaY = currentY - this.scrollNeutralY;
-        const SCROLL_DEAD_ZONE = 0.03; // A small dead zone to prevent accidental scrolling.
-        const MAX_VELOCITY = 15;
-        
-        if (Math.abs(deltaY) > SCROLL_DEAD_ZONE) {
-            const speed = (Math.abs(deltaY) - SCROLL_DEAD_ZONE) * 150 * this.sensitivity;
-            this.scrollVelocity = Math.sign(deltaY) * Math.min(speed, MAX_VELOCITY);
+        if (!this.scrollMode) {
+            this.scrollMode = true;
+            this.scrollNeutralY = indexTip.y; // Set the neutral Y position on gesture start
         } else {
-            this.scrollVelocity = 0; // Stop scrolling if hand is in the neutral zone.
+            const deltaY = indexTip.y - this.scrollNeutralY;
+            const SCROLL_DEAD_ZONE = 0.03; 
+            const MAX_VELOCITY = 15;
+            
+            if (Math.abs(deltaY) > SCROLL_DEAD_ZONE) {
+                const speed = (Math.abs(deltaY) - SCROLL_DEAD_ZONE) * 150 * this.sensitivity;
+                this.scrollVelocity = Math.sign(deltaY) * Math.min(speed, MAX_VELOCITY);
+            } else {
+                this.scrollVelocity = 0; // Stop scrolling if hand is in the neutral zone.
+            }
         }
     }
   
@@ -257,8 +268,8 @@ class GestureController {
             this.cursor.classList.remove('clicking');
         }
         // Reset scrolling state.
-        if (this.scrollNeutralY !== undefined) {
-            this.scrollNeutralY = undefined;
+        if (this.scrollMode) {
+            this.scrollMode = false;
             this.scrollVelocity = 0;
             this.cursor.classList.remove('scrolling');
         }
