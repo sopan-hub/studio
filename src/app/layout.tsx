@@ -9,6 +9,7 @@ const siteTitle = 'Study Buddy AI | Your Personal AI-Powered Study Partner';
 const siteDescription = 'Boost your learning with Study Buddy AI. Generate notes, create quizzes, solve math problems, get answers to your toughest questions, and more. Your all-in-one academic assistant.';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://study-buddy-ai.com'),
   title: {
     default: siteTitle,
     template: `%s | Study Buddy AI`,
